@@ -8,61 +8,94 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
-        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
+        
+        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); overflow-x: hidden; }
+
+        /* --- ANIMATED BACKGROUND --- */
+        .bg-cakes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .floating-cake { position: absolute; font-size: 2rem; opacity: 0.2; animation: float 15s linear infinite; }
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
+        }
+
         nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
         .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
-        .hero { height: 30vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; align-items: center; justify-content: center; text-align: center; }
+        
+        .hero { height: 35vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-bottom: 5px solid var(--white); }
+        
         .container { max-width: 1200px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--soft-pink); }
+        
+        .card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--soft-pink); transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); }
         .card img { width: 100%; height: 250px; object-fit: cover; }
         .card-body { padding: 25px; }
-        .price { font-size: 1.4rem; color: var(--rose-gold); font-weight: bold; margin: 10px 0; }
+        
+        /* --- CUSTOM CAKE BOX --- */
+        .custom-box { grid-column: 1 / -1; background: var(--white); padding: 40px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; margin-top: 20px; }
+        textarea { width: 100%; max-width: 600px; height: 100px; padding: 15px; border-radius: 15px; border: 1px solid var(--pink); background: var(--soft-pink); margin: 15px 0; font-family: inherit; }
+
         .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
         .btn:hover { background: var(--plum); }
+
+        /* Modal styling */
         #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 12px; background: var(--soft-pink); box-sizing: border-box; font-family: inherit; }
+        .modal-content { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; }
+        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; background: var(--soft-pink); box-sizing: border-box; }
     </style>
 </head>
 <body>
 
+<div class="bg-cakes" id="cake-bg"></div>
+
 <nav><div class="logo">MOONLIGHT 🌙</div></nav>
-<div class="hero"><h1>Handcrafted with Love</h1></div>
+
+<div class="hero">
+    <h1>Sweetness in Every Bite</h1>
+    <p>Premium Homegrown Bakery</p>
+</div>
 
 <div class="container">
     <div class="card">
         <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
         <div class="card-body">
             <h3>Classic Vanilla</h3>
-            <div class="price">₹800</div>
-            <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button>
+            <div style="color:var(--rose-gold); font-weight:bold; margin-bottom:10px;">₹800</div>
+            <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Order Now</button>
         </div>
     </div>
+
     <div class="card">
         <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
         <div class="card-body">
             <h3>Dark Chocolate Luxe</h3>
-            <div class="price">₹950</div>
-            <button class="btn" onclick="openOrder('Dark Chocolate Luxe', 950)">Buy Now</button>
+            <div style="color:var(--rose-gold); font-weight:bold; margin-bottom:10px;">₹950</div>
+            <button class="btn" onclick="openOrder('Dark Chocolate Luxe', 950)">Order Now</button>
         </div>
+    </div>
+
+    <div class="custom-box">
+        <h2>✨ Dream Cake Request</h2>
+        <p>Describe your flavor, theme, or design!</p>
+        <textarea id="custom-desc" placeholder="E.g. 2kg Strawberry cake with 'Happy Birthday' message..."></textarea><br>
+        <button class="btn" style="max-width:300px;" onclick="startCustom()">Send Custom Request</button>
     </div>
 </div>
 
 <div id="modal">
     <div class="modal-content">
         <h2 style="color:var(--rose-gold); margin-top:0;">Delivery Details 🎀</h2>
-        <div id="order-summary" style="background:var(--soft-pink); padding:10px; border-radius:10px; margin-bottom:10px; font-size:0.9rem;"></div>
+        <p id="summary" style="font-size:0.9rem; background:#fff1f5; padding:10px; border-radius:10px;"></p>
         <input type="text" id="name" placeholder="Full Name">
-        <input type="email" id="email" placeholder="Gmail Address">
         <input type="text" id="phone" placeholder="Phone Number (10 digits)">
-        <textarea id="address" placeholder="Complete Delivery Address" style="height:80px;"></textarea>
-        <button class="btn" id="confirm-btn" onclick="submitOrder()">Confirm & Message Bakers</button>
+        <input type="text" id="address" placeholder="Delivery Address">
+        <button class="btn" style="margin-top:10px;" onclick="submitOrder()">Confirm & Message Bot</button>
         <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <script>
+    // --- FIREBASE SETUP ---
     const firebaseConfig = {
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
         authDomain: "moonlight-cravings.firebaseapp.com",
@@ -71,18 +104,36 @@
         messagingSenderId: "222974574228",
         appId: "1:222974574228:web:47bed645deedf5788bbe81"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let selItem = "";
-    let selPrice = 0;
+    // --- ANIMATION LOGIC ---
+    const bg = document.getElementById('cake-bg');
+    const icons = ['🍰', '🧁', '🎂', '🍩', '🍪', '✨'];
+    for(let i=0; i<15; i++) {
+        let cake = document.createElement('div');
+        cake.className = 'floating-cake';
+        cake.innerText = icons[Math.floor(Math.random()*icons.length)];
+        cake.style.left = Math.random() * 100 + 'vw';
+        cake.style.animationDelay = Math.random() * 10 + 's';
+        cake.style.fontSize = (Math.random() * 20 + 20) + 'px';
+        bg.appendChild(cake);
+    }
+
+    // --- ORDER LOGIC ---
+    let selItem = ""; let selPrice = 0;
 
     function openOrder(item, price) {
-        selItem = item; 
-        selPrice = price;
-        // PRICE TOTAL CALCULATOR logic for display
-        document.getElementById('order-summary').innerHTML = `<strong>Item:</strong> ${item}<br><strong>Total to Pay:</strong> ₹${price}`;
+        selItem = item; selPrice = price;
+        document.getElementById('summary').innerText = `Ordering: ${item} (₹${price})`;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function startCustom() {
+        const desc = document.getElementById('custom-desc').value;
+        if(!desc) return alert("Please describe your cake first!");
+        selItem = "CUSTOM: " + desc; selPrice = "To be discussed";
+        document.getElementById('summary').innerText = `Custom Request: ${desc}`;
         document.getElementById('modal').style.display = 'flex';
     }
 
@@ -92,53 +143,24 @@
         const n = document.getElementById('name').value;
         const ph = document.getElementById('phone').value;
         const ad = document.getElementById('address').value;
-        const em = document.getElementById('email').value;
 
-        if(!n || !ph || !ad) return alert("Please fill Name, Phone, and Address!");
-
-        const btn = document.getElementById('confirm-btn');
-        btn.innerText = "Processing...";
-        btn.disabled = true;
-
-        // PREPARING DATA FOR ADMIN VAULT
-        const orderData = {
-            name: n,
-            email: em,
-            phone: ph,
-            address: ad,
-            item: selItem,
-            price: selPrice, // Price Total included
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        };
+        if(!n || !ph || !ad) return alert("Please fill all details!");
 
         try {
-            // STEP 1: DEBUG PURCHASE LOGIC (SAVE TO CLOUD)
-            console.log("Sending order to Moonlight Vault...");
-            const docRef = await db.collection("orders").add(orderData);
-            
-            // Success Debug Alert
-            alert("✅ Order Saved to Vault! Total: ₹" + selPrice);
+            // 1. Save to Admin Vault
+            await db.collection("orders").add({
+                name: n, phone: ph, address: ad, item: selItem, price: selPrice,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
 
-            // STEP 2: WHATSAPP BOT REDIRECT
-            const myBusinessNumber = "918870459614"; 
-            const message = `*MOONLIGHT CRAVINGS ORDER!* 🌙%0A%0A` +
-                            `*Item:* ${selItem}%0A` +
-                            `*Customer:* ${n}%0A` +
-                            `*Address:* ${ad}%0A` +
-                            `*Total Amount:* ₹${selPrice}%0A%0A` + // Final Bill calculator added
-                            `_Order ID: ${docRef.id}_`;
+            // 2. WHATSAPP BOT LOGIC
+            const myNum = "918870459614"; // YOUR Business Number
+            const msg = `*NEW ORDER RECEIVED!* 🌙%0A%0A*Item:* ${selItem}%0A*Total:* ₹${selPrice}%0A*Customer:* ${n}%0A*Address:* ${ad}`;
             
-            const whatsappUrl = `https://wa.me/${myBusinessNumber}?text=${message}`;
-            
-            window.open(whatsappUrl, '_blank');
+            alert("✅ Order Saved to Vault! Opening WhatsApp...");
+            window.open(`https://wa.me/${myNum}?text=${msg}`, '_blank');
             location.reload();
-
-        } catch (error) {
-            console.error("Firebase Error: ", error);
-            alert("Error: " + error.message + ". Did you click 'Publish' on your Firestore Rules?");
-            btn.innerText = "Confirm & Message Bakers";
-            btn.disabled = false;
-        }
+        } catch(e) { alert("Error! Check Firestore Rules."); }
     }
 </script>
 </body>
