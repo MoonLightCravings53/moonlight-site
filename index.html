@@ -11,49 +11,57 @@
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
         nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
         .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
-        .hero { height: 40vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .hero { height: 30vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; align-items: center; justify-content: center; text-align: center; }
         .container { max-width: 1200px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--soft-pink); }
         .card img { width: 100%; height: 250px; object-fit: cover; }
         .card-body { padding: 25px; }
         .price { font-size: 1.4rem; color: var(--rose-gold); font-weight: bold; margin: 10px 0; }
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; }
-        .custom-box { grid-column: 1 / -1; background: var(--white); padding: 40px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; }
-        textarea { width: 100%; max-width: 600px; height: 100px; padding: 15px; border-radius: 15px; border: 1px solid var(--pink); background: var(--soft-pink); margin: 15px 0; }
-        #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; }
-        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; background: var(--soft-pink); box-sizing: border-box; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn:hover { background: var(--plum); }
+        #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 12px; background: var(--soft-pink); box-sizing: border-box; font-family: inherit; }
     </style>
 </head>
 <body>
+
 <nav><div class="logo">MOONLIGHT 🌙</div></nav>
 <div class="hero"><h1>Handcrafted with Love</h1></div>
+
 <div class="container">
     <div class="card">
         <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
-        <div class="card-body"><h3>Classic Vanilla</h3><div class="price">₹800</div>
-        <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button></div>
+        <div class="card-body">
+            <h3>Classic Vanilla</h3>
+            <div class="price">₹800</div>
+            <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button>
+        </div>
     </div>
     <div class="card">
         <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
-        <div class="card-body"><h3>Dark Chocolate</h3><div class="price">₹950</div>
-        <button class="btn" onclick="openOrder('Dark Chocolate', 950)">Buy Now</button></div>
-    </div>
-    <div class="custom-box">
-        <h2>✨ Dream Cake Request</h2>
-        <textarea id="custom-text" placeholder="Describe your dream cake..."></textarea><br>
-        <button class="btn" style="max-width:250px;" onclick="startCustom()">Send Request</button>
+        <div class="card-body">
+            <h3>Dark Chocolate Luxe</h3>
+            <div class="price">₹950</div>
+            <button class="btn" onclick="openOrder('Dark Chocolate Luxe', 950)">Buy Now</button>
+        </div>
     </div>
 </div>
+
 <div id="modal">
     <div class="modal-content">
-        <h2 style="color:var(--rose-gold);">Delivery Details 🎀</h2>
-        <input type="text" id="name" placeholder="Name"><input type="email" id="email" placeholder="Gmail">
-        <input type="text" id="phone" placeholder="Phone (10 digits)"><textarea id="address" placeholder="Address" style="width:100%; margin-top:10px;"></textarea>
-        <button class="btn" style="margin-top:15px;" onclick="submitOrder()">Confirm & Message Bakers</button>
+        <h2 style="color:var(--rose-gold); margin-top:0;">Delivery Details 🎀</h2>
+        <div id="order-summary" style="background:var(--soft-pink); padding:10px; border-radius:10px; margin-bottom:10px; font-size:0.9rem;"></div>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="email" id="email" placeholder="Gmail Address">
+        <input type="text" id="phone" placeholder="Phone Number (10 digits)">
+        <textarea id="address" placeholder="Complete Delivery Address" style="height:80px;"></textarea>
+        <button class="btn" id="confirm-btn" onclick="submitOrder()">Confirm & Message Bakers</button>
         <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
@@ -63,20 +71,74 @@
         messagingSenderId: "222974574228",
         appId: "1:222974574228:web:47bed645deedf5788bbe81"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    let selItem = ""; let selPrice = 0;
-    function openOrder(i, p) { selItem = i; selPrice = p; document.getElementById('modal').style.display = 'flex'; }
-    function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; document.getElementById('modal').style.display = 'flex'; }
+
+    let selItem = "";
+    let selPrice = 0;
+
+    function openOrder(item, price) {
+        selItem = item; 
+        selPrice = price;
+        // PRICE TOTAL CALCULATOR logic for display
+        document.getElementById('order-summary').innerHTML = `<strong>Item:</strong> ${item}<br><strong>Total to Pay:</strong> ₹${price}`;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
     async function submitOrder() {
-        const n = document.getElementById('name').value, ph = document.getElementById('phone').value, ad = document.getElementById('address').value;
-        if(!n || !ph || !ad) return alert("Fill Name, Phone, and Address!");
+        const n = document.getElementById('name').value;
+        const ph = document.getElementById('phone').value;
+        const ad = document.getElementById('address').value;
+        const em = document.getElementById('email').value;
+
+        if(!n || !ph || !ad) return alert("Please fill Name, Phone, and Address!");
+
+        const btn = document.getElementById('confirm-btn');
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        // PREPARING DATA FOR ADMIN VAULT
+        const orderData = {
+            name: n,
+            email: em,
+            phone: ph,
+            address: ad,
+            item: selItem,
+            price: selPrice, // Price Total included
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
         try {
-            await db.collection("orders").add({ name: n, phone: ph, address: ad, item: selItem, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            window.open(`https://wa.me/91${ph.trim()}?text=${encodeURIComponent("New Order: " + selItem + " for " + n)}`, '_blank');
+            // STEP 1: DEBUG PURCHASE LOGIC (SAVE TO CLOUD)
+            console.log("Sending order to Moonlight Vault...");
+            const docRef = await db.collection("orders").add(orderData);
+            
+            // Success Debug Alert
+            alert("✅ Order Saved to Vault! Total: ₹" + selPrice);
+
+            // STEP 2: WHATSAPP BOT REDIRECT
+            const myBusinessNumber = "918870459614"; 
+            const message = `*MOONLIGHT CRAVINGS ORDER!* 🌙%0A%0A` +
+                            `*Item:* ${selItem}%0A` +
+                            `*Customer:* ${n}%0A` +
+                            `*Address:* ${ad}%0A` +
+                            `*Total Amount:* ₹${selPrice}%0A%0A` + // Final Bill calculator added
+                            `_Order ID: ${docRef.id}_`;
+            
+            const whatsappUrl = `https://wa.me/${myBusinessNumber}?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
             location.reload();
-        } catch (e) { alert("Error! Check Firebase Rules."); }
+
+        } catch (error) {
+            console.error("Firebase Error: ", error);
+            alert("Error: " + error.message + ". Did you click 'Publish' on your Firestore Rules?");
+            btn.innerText = "Confirm & Message Bakers";
+            btn.disabled = false;
+        }
     }
 </script>
 </body>
