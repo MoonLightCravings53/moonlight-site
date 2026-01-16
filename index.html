@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moonlight Cravings | Premium Bakery</title>
+
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f319.png">
+    <link rel="shortcut icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f319.png">
+    <meta property="og:title" content="Moonlight Cravings 🌙">
+    <meta property="og:description" content="Premium Bakery - Baking Dreams Into Reality">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1535141192574-5d4897c82536?w=200">
+    <meta property="og:type" content="website">
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
@@ -177,7 +185,6 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             });
 
-            // FEATURE UPDATE: Automated instructions message
             await db.collection("orders").doc(docRef.id).collection("chats").add({ 
                 text: `Baker: Received order for ${selItem}! 🌙 \n\nPlease read this then you can close: Your number is shown in our order list, so we will directly message you on WhatsApp within 2 to 3 hours. \n\nYou won't have payment options here; we will send you our UPI QR Code via WhatsApp to confirm your order.`, 
                 sender: "Admin", 
