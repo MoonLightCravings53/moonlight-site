@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonlightcravings | Luxury Cakes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🌙 Moonlightcravings</div>
+    <nav style="color:var(--gold)">Bespoke Baking • India</nav>
+</header>
+
+<section class="hero">
+    <h1 style="font-size: 3rem; margin-bottom: 10px;">Satisfy Your Midnight Cravings</h1>
+    <p style="font-size: 1.2rem; color: var(--gold);">Handcrafted luxury cakes delivered under the stars.</p>
+</section>
+
+<div class="cake-grid">
+    <div class="cake-card">
+        <img src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?q=80&w=500" alt="Midnight Velvet">
+        <div class="card-info">
+            <h3>The Midnight Velvet</h3>
+            <p>Deep cocoa layers with galaxy frosting.</p>
+            <div class="price">₹1,450</div>
+            <button class="btn-pay" onclick="payWithGPay(1450, 'Midnight Velvet')">Pay via GPay / UPI</button>
+            <a href="https://wa.me/919999999999?text=Ordering: Midnight Velvet" class="btn-wa">Confirm on WhatsApp</a>
+        </div>
+    </div>
+
+    <div class="cake-card">
+        <img src="https://images.unsplash.com/photo-1519340333755-56e9c1d04579?q=80&w=500" alt="Starry Vanilla">
+        <div class="card-info">
+            <h3>Starry Vanilla Bean</h3>
+            <p>Infused with Madagascan vanilla & gold leaf.</p>
+            <div class="price">₹1,100</div>
+            <button class="btn-pay" onclick="payWithGPay(1100, 'Starry Vanilla')">Pay via GPay / UPI</button>
+            <a href="https://wa.me/919999999999?text=Ordering: Starry Vanilla" class="btn-wa">Confirm on WhatsApp</a>
+        </div>
+    </div>
+</div>
+
+<footer style="text-align:center; padding: 40px; border-top: 1px solid var(--accent);">
+    <p>© 2026 MoonlightcravingsSkibidiToilet Nagercoil,India. All rights reserved.</p>
+</footer>
+
+<script>
+    function payWithGPay(amount, cake) {
+        const upiId = "example@upi"; // <--- PUT YOUR REAL GPAY ID HERE
+        const name = "Moonlightcravings";
+        const url = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&tn=Cravings_Order_${cake}&cu=INR`;
+        window.location.href = url;
+    }
+</script>
+
+</body>
+</html>
