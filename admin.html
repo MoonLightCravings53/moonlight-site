@@ -2,43 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Moonlight Vault | Live Dashboard</title>
+    <title>Moonlight Vault | Owner Management</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
-        body { background: #fce4ec; font-family: sans-serif; padding: 20px; color: #4a148c; }
-        .order-card { background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; border-left: 10px solid #b76e79; }
-        .label { font-weight: bold; color: #b76e79; font-size: 0.8rem; }
+        body { background: #fce4ec; font-family: 'Segoe UI', sans-serif; padding: 20px; color: #4a148c; }
+        .container { max-width: 900px; margin: auto; }
+        .order-card { background: white; padding: 25px; border-radius: 20px; margin-bottom: 20px; border-left: 10px solid #b76e79; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .label { color: #b76e79; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .data-box { background: #fff1f5; padding: 10px; border-radius: 10px; border: 1px solid #fce4ec; }
+        h1 { text-align: center; color: #b76e79; margin-bottom: 40px; }
     </style>
 </head>
 <body>
-    <h1>Moonlight Vault 🌙</h1>
-    <div id="orders-list">Waiting for cloud data...</div>
+
+    <div class="container">
+        <h1>Moonlight Live Orders 🌙</h1>
+        <div id="orders-list">Connecting to Cloud Vault...</div>
+    </div>
 
     <script>
-        // PASTE THE SAME FIREBASE CONFIG HERE
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_ID",
-            appId: "YOUR_APP_ID"
+          apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
+          authDomain: "moonlight-cravings.firebaseapp.com",
+          projectId: "moonlight-cravings",
+          storageBucket: "moonlight-cravings.firebasestorage.app",
+          messagingSenderId: "222974574228",
+          appId: "1:222974574228:web:47bed645deedf5788bbe81",
+          measurementId: "G-MGJQD332QD"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Listen for data in real-time
         db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
             const list = document.getElementById('orders-list');
+            if(snapshot.empty) {
+                list.innerHTML = "<p style='text-align:center; opacity:0.5;'>No orders in the vault yet.</p>";
+                return;
+            }
+            
             list.innerHTML = snapshot.docs.map(doc => {
                 const o = doc.data();
+                const time = o.timestamp ? o.timestamp.toDate().toLocaleString() : "Just now";
                 return `
                     <div class="order-card">
-                        <p><span class="label">ITEM:</span> ${o.item}</p>
-                        <p><span class="label">CUSTOMER:</span> ${o.name}</p>
-                        <p><span class="label">PHONE:</span> +91 ${o.phone}</p>
-                        <p><span class="label">GMAIL:</span> ${o.email}</p>
-                        <p><span class="label">ADDRESS:</span> ${o.address}</p>
+                        <div style="margin-bottom: 15px;">
+                            <span class="label">Item Requested</span>
+                            <strong style="font-size: 1.2rem;">${o.item}</strong>
+                        </div>
+                        <div class="info-grid">
+                            <div class="data-box"><span class="label">Customer Name</span>${o.name}</div>
+                            <div class="data-box"><span class="label">Phone Number</span>+91 ${o.phone}</div>
+                            <div class="data-box"><span class="label">Gmail</span>${o.email || 'N/A'}</div>
+                            <div class="data-box"><span class="label">Order Time</span>${time}</div>
+                        </div>
+                        <div class="data-box" style="margin-top:15px;">
+                            <span class="label">📍 Delivery Address</span>
+                            ${o.address}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -46,5 +70,6 @@
     </script>
 </body>
 </html>
+
 
 
