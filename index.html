@@ -3,58 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlight Cravings | Order</title>
+    <title>Moonlight Cravings | Pink Edition</title>
     <style>
-        :root { --gold: #d4af37; --night: #05070a; --moon: #fdf5e6; }
-        body { margin: 0; font-family: 'serif'; background: var(--night); color: var(--moon); scroll-behavior: smooth; }
-        .hero { height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519340333755-56e9c1d04579?q=80&w=1500'); background-size: cover; text-align: center; padding: 20px; }
+        :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
+        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
+        
+        .hero { 
+            height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            background: linear-gradient(rgba(252, 228, 236, 0.5), rgba(252, 228, 236, 0.5)), 
+            url('https://images.unsplash.com/photo-1519340333755-56e9c1d04579?q=80&w=1500'); 
+            background-size: cover; background-position: center; text-align: center; border-bottom: 5px solid var(--rose-gold);
+        }
+
         .container { max-width: 1100px; margin: auto; padding: 50px 20px; }
         
-        /* Artisan Description Section */
-        .brand-story { text-align: center; margin-bottom: 50px; line-height: 1.6; }
-        .brand-story h2 { color: var(--gold); }
-        .features { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; font-size: 0.9rem; font-style: italic; }
+        .brand-story { text-align: center; margin-bottom: 50px; background: var(--white); padding: 30px; border-radius: 30px; box-shadow: 0 5px 15px rgba(183,110,121,0.1); }
+        .brand-story h2 { color: var(--rose-gold); margin-top: 0; }
 
         .cake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; text-align: center; }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; transition: 0.3s; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 20px; }
         
-        /* Custom Order Section */
-        .custom-section { background: #1a1a1a; padding: 40px; border-radius: 20px; margin-top: 50px; border: 1px dashed var(--gold); }
-        input, textarea { width: 100%; padding: 15px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn:hover { background: var(--plum); }
 
-        /* Notification/Status Area */
-        #status-tab { display: none; margin-top: 20px; padding: 20px; border: 1px solid var(--gold); background: #0a0a0a; border-radius: 10px; text-align: center; }
+        .custom-section { background: var(--white); padding: 40px; border-radius: 30px; margin-top: 50px; border: 3px dashed var(--rose-gold); }
+        input, textarea { width: 100%; padding: 15px; margin: 10px 0; background: var(--soft-pink); color: var(--plum); border: 1px solid var(--pink); border-radius: 15px; box-sizing: border-box; font-family: inherit; }
+
+        /* Real-time Status Tab */
+        #status-tab { display: none; margin-top: 20px; padding: 25px; border-radius: 20px; background: var(--soft-pink); border: 2px solid var(--rose-gold); text-align: center; }
         .loading-dots:after { content: ' .'; animation: dots 1.5s steps(5, end) infinite;}
-        @keyframes dots { 0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 40% { color: white; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 60% { text-shadow: .25em 0 0 white, .5em 0 0 rgba(0,0,0,0);} 80%, 100% { text-shadow: .25em 0 0 white, .5em 0 0 white;}}
+        @keyframes dots { 0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 40% { color: var(--rose-gold); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 60% { text-shadow: .25em 0 0 var(--rose-gold), .5em 0 0 rgba(0,0,0,0);} 80%, 100% { text-shadow: .25em 0 0 var(--rose-gold), .5em 0 0 var(--rose-gold);}}
 
-        /* Payment Overlay */
-        #payment-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--night); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
-        .loader { border: 5px solid #333; border-top: 5px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        #payment-screen { display: none; position: fixed; inset: 0; background: rgba(252, 228, 236, 0.98); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
+        .loader { border: 6px solid var(--white); border-top: 6px solid var(--rose-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <h1 style="color:var(--gold); font-size: 3rem;">MOONLIGHT CRAVINGS</h1>
-        <p>Midnight Bakes & Custom Creations</p>
+        <h1 style="color:var(--rose-gold); font-size: 3.5rem; text-shadow: 2px 2px white; margin:0;">MOONLIGHT CRAVINGS</h1>
+        <p style="font-weight: bold; letter-spacing: 3px; color: var(--plum);">FRESHLY BAKED WITH LOVE</p>
     </section>
 
     <div class="container">
         <div class="brand-story">
-            <h2>Freshly baked with love</h2>
-            <p>Every cake at Moonlight Cravings is born in the dark and crafted specifically for you. <br> 
-               We use only the finest ingredients with <strong>no added preservatives</strong>.</p>
-            <div class="features">
-                <span>✦ Artisan Quality</span>
-                <span>✦ Custom Made Stuff Available</span>
-                <span>✦ Zero Stabilizers</span>
-            </div>
+            <h2>Handcrafted Artisan Bakes</h2>
+            <p>No added preservatives. Custom made stuff available. <br> Every order is baked fresh for your special moment.</p>
         </div>
 
-        <h2 style="text-align:center; color:var(--gold)">Our Signature Menu</h2>
         <div class="cake-grid">
             <div class="card">
                 <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500" alt="Vanilla">
@@ -68,34 +67,21 @@
                 <p>₹950</p>
                 <button class="btn" onclick="processPayment('Chocolate Cake', 950)">DEBUG: PAY</button>
             </div>
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" alt="Black Forest">
-                <h3>Black Forest</h3>
-                <p>₹1,100</p>
-                <button class="btn" onclick="processPayment('Black Forest', 1100)">DEBUG: PAY</button>
-            </div>
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=500" alt="Funfetti">
-                <h3>Fun Fetti</h3>
-                <p>₹900</p>
-                <button class="btn" onclick="processPayment('Fun Fetti', 900)">DEBUG: PAY</button>
-            </div>
         </div>
 
         <div class="custom-section" id="custom">
-            <h2 style="color:var(--gold)">Create a Custom Craving</h2>
-            <p>Tell us your vision. We'll review it and send you a price.</p>
+            <h2 style="color:var(--rose-gold)">Custom Craving Request</h2>
+            <p>Describe your dream cake below. A staff member will review and send your quote shortly.</p>
             <input type="text" id="cust-name" placeholder="Your Name">
-            <textarea id="cust-desc" rows="4" placeholder="Describe your dream cake (Flavors, colors, writing...)"></textarea>
-            
-            <button class="btn" id="submit-custom" onclick="sendCustomOrder()">Send Request to Staff</button>
+            <textarea id="cust-desc" rows="4" placeholder="Flavor, Theme, Date, etc..."></textarea>
+            <button class="btn" id="submit-custom" onclick="sendCustomOrder()">Send to Bakers</button>
 
             <div id="status-tab">
                 <h3 id="status-title" class="loading-dots">Waiting for Staff Review</h3>
-                <p id="status-msg">Our bakers are looking at your custom request. Please keep this page open to receive your quote.</p>
-                <div id="payment-area" style="display:none; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-                    <h2 style="color:#2ecc71">Total Price: ₹<span id="final-price">0</span></h2>
-                    <button class="btn" onclick="processPayment('CUSTOM: ' + document.getElementById('cust-desc').value, document.getElementById('final-price').innerText)">Accept Price & Pay</button>
+                <p id="status-msg">Our team is reviewing your request. Please stay on this page to receive your notification.</p>
+                <div id="payment-area" style="display:none; margin-top: 20px; border-top: 2px solid var(--pink); padding-top: 20px;">
+                    <h2 style="color:var(--rose-gold)">Final Quote: ₹<span id="final-price">0</span></h2>
+                    <button class="btn" style="background: #2ecc71;" onclick="processPayment('Custom Order: ' + document.getElementById('cust-desc').value, document.getElementById('final-price').innerText)">Accept & Pay Now</button>
                 </div>
             </div>
         </div>
@@ -103,96 +89,65 @@
 
     <div id="payment-screen">
         <div class="loader" id="loader"></div>
-        <h2 id="pay-status" style="margin-top:20px;">Processing Secure Payment...</h2>
-        <p id="pay-sub" style="color:var(--gold)">Connecting to UPI Gateway</p>
+        <h2 id="pay-status" style="color:var(--rose-gold)">Processing Secure Payment...</h2>
     </div>
 
     <script>
-        // CORE PAYMENT LOGIC
+        // LOGIC FOR ALL FEATURES
         function processPayment(item, price) {
             const screen = document.getElementById('payment-screen');
-            const status = document.getElementById('pay-status');
-            const loader = document.getElementById('loader');
-
             screen.style.display = 'flex';
-
-            const orderData = {
-                item: item,
-                price: price,
-                time: new Date().toLocaleString()
-            };
-
-            // Logs locally and attempts cloud push
+            
+            const orderData = { item: item, price: price, time: new Date().toLocaleString() };
             let orders = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
             orders.push(orderData);
             localStorage.setItem('bakeryOrders', JSON.stringify(orders));
 
             setTimeout(() => {
-                loader.style.display = 'none';
-                status.innerHTML = "Payment Proceeded! ✅";
-                document.getElementById('pay-sub').innerHTML = "Thank you! Owner will see this in the next 2 hours.<br><br><button onclick='location.reload()' style='padding:10px; cursor:pointer;'>Back to Store</button>";
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('pay-status').innerHTML = "Payment Successful! ✅<br><small>Redirecting...</small>";
+                setTimeout(() => location.reload(), 3000);
             }, 5000);
         }
 
-        // CUSTOM ORDER & NOTIFICATION LOGIC
         let currentOrderId = null;
-
         function sendCustomOrder() {
             const name = document.getElementById('cust-name').value;
             const desc = document.getElementById('cust-desc').value;
-
-            if(!name || !desc) return alert("Please fill in your name and cake details!");
+            if(!name || !desc) return alert("Fill details!");
 
             currentOrderId = Date.now();
-            
             let customs = JSON.parse(localStorage.getItem('customOrders')) || [];
-            customs.push({ 
-                id: currentOrderId, 
-                name: name, 
-                desc: desc, 
-                status: 'pending', 
-                price: 0,
-                time: new Date().toLocaleString()
-            });
+            customs.push({ id: currentOrderId, name: name, desc: desc, status: 'pending', price: 0, time: new Date().toLocaleString() });
             localStorage.setItem('customOrders', JSON.stringify(customs));
 
-            // UI Changes
             document.getElementById('submit-custom').style.display = 'none';
             document.getElementById('status-tab').style.display = 'block';
             
-            // Request Notification Permission
-            if ("Notification" in window) {
-                Notification.requestPermission();
-            }
+            if ("Notification" in window) Notification.requestPermission();
 
-            // Start polling for owner's response
-            const checkInterval = setInterval(() => {
-                let latestCustoms = JSON.parse(localStorage.getItem('customOrders')) || [];
-                let myOrder = latestCustoms.find(o => o.id === currentOrderId);
-
-                if (myOrder && myOrder.status === 'priced') {
-                    notifyCustomer(myOrder.price);
-                    clearInterval(checkInterval);
+            const poller = setInterval(() => {
+                let latest = JSON.parse(localStorage.getItem('customOrders')) || [];
+                let my = latest.find(o => o.id === currentOrderId);
+                if (my && my.status === 'priced') {
+                    handleOwnerResponse(my.price);
+                    clearInterval(poller);
                 }
             }, 3000);
         }
 
-        function notifyCustomer(price) {
-            document.getElementById('status-title').innerText = "Price Received! ✅";
+        function handleOwnerResponse(price) {
+            document.getElementById('status-title').innerText = "Price Confirmed! ✨";
             document.getElementById('status-title').classList.remove('loading-dots');
-            document.getElementById('status-msg').innerText = "A staff member has priced your custom cake.";
             document.getElementById('final-price').innerText = price;
             document.getElementById('payment-area').style.display = 'block';
-
-            // Send System Notification (PC/Mobile)
+            
             if (Notification.permission === "granted") {
-                new Notification("Moonlight Cravings", {
-                    body: "Your custom cake has been priced at ₹" + price + ". Click to pay!",
-                    icon: "https://images.unsplash.com/photo-1519340333755-56e9c1d04579?w=100"
-                });
+                new Notification("Moonlight Cravings", { body: "Your cake price is ready: ₹" + price });
             }
         }
     </script>
 </body>
 </html>
+
 
