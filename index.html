@@ -3,66 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlight Cravings | Live Edition</title>
+    <title>Moonlight Cravings | Order Now</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
+        :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); }
-        nav { background: var(--white); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(183,110,121,0.1); }
-        .nav-links button { background: none; border: none; font-weight: bold; color: var(--rose-gold); cursor: pointer; margin-left: 20px; }
         .container { max-width: 1100px; margin: auto; padding: 20px; }
         .card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn:hover { background: var(--plum); }
         #checkout-modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--pink); border-radius: 12px; background: var(--soft-pink); box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #eee; border-radius: 12px; background: #fff1f5; box-sizing: border-box; font-family: inherit; }
     </style>
 </head>
 <body>
 
 <div id="checkout-modal">
     <div class="modal-content">
-        <h2 style="color:var(--rose-gold)">Delivery Details 🚚</h2>
+        <h2 style="color:var(--rose-gold); margin-top:0;">Delivery Details 🎀</h2>
         <input type="text" id="cust-name" placeholder="Full Name">
-        <input type="email" id="cust-email" placeholder="Gmail">
-        <input type="text" id="cust-phone" placeholder="Phone Number (e.g. 9876543210)">
-        <textarea id="cust-address" placeholder="Full Delivery Address"></textarea>
-        <button class="btn" onclick="finalizeOrder()">Confirm & Message Bakers</button>
+        <input type="email" id="cust-email" placeholder="Gmail Address">
+        <input type="text" id="cust-phone" placeholder="Phone Number (10 digits)">
+        <textarea id="cust-address" rows="3" placeholder="Full Delivery Address"></textarea>
+        <button class="btn" onclick="finalizeOrder()">Confirm & Send Order</button>
         <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
-<nav>
-    <div style="font-weight: bold; color: var(--rose-gold); font-size: 1.4rem;">🌙 MOONLIGHT</div>
-    <div class="nav-links">
-        <button onclick="location.reload()">Menu</button>
-    </div>
-</nav>
-
 <div class="container">
+    <h1 style="text-align:center; color:var(--rose-gold); font-size: 2.5rem;">Moonlight Cravings</h1>
+    
     <div class="card">
+        <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=400" style="width:100%; border-radius:20px; margin-bottom:10px;">
         <h3>Classic Vanilla</h3>
         <p>₹800</p>
         <button class="btn" onclick="openCheckout('Classic Vanilla', 800)">Buy Now</button>
     </div>
 
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400" style="width:100%; border-radius:20px; margin-bottom:10px;">
+        <h3>Dark Chocolate</h3>
+        <p>₹950</p>
+        <button class="btn" onclick="openCheckout('Dark Chocolate', 950)">Buy Now</button>
+    </div>
+
     <div class="card" style="border: 2px dashed var(--rose-gold);">
         <h3>Custom Craving Request</h3>
-        <textarea id="cust-desc" placeholder="Describe your dream cake (flavor, theme, size)..."></textarea>
+        <textarea id="cust-desc" placeholder="Describe your dream cake..."></textarea>
         <button class="btn" style="margin-top:10px;" onclick="submitCustom()">Send to Bakers</button>
     </div>
 </div>
 
 <script>
-    // PASTE YOUR FIREBASE CONFIG FROM STEP 1 HERE
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "YOUR_ID",
-        appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
+      authDomain: "moonlight-cravings.firebaseapp.com",
+      projectId: "moonlight-cravings",
+      storageBucket: "moonlight-cravings.firebasestorage.app",
+      messagingSenderId: "222974574228",
+      appId: "1:222974574228:web:47bed645deedf5788bbe81",
+      measurementId: "G-MGJQD332QD"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -72,16 +74,14 @@
     let currentPrice = 0;
 
     function openCheckout(item, price) {
-        currentItem = item;
-        currentPrice = price;
+        currentItem = item; currentPrice = price;
         document.getElementById('checkout-modal').style.display = 'flex';
     }
 
     function submitCustom() {
         const desc = document.getElementById('cust-desc').value;
-        if(!desc) return alert("Describe your cake first!");
-        currentItem = "Custom: " + desc;
-        currentPrice = 0;
+        if(!desc) return alert("Please describe your cake!");
+        currentItem = "Custom: " + desc; currentPrice = 0;
         document.getElementById('checkout-modal').style.display = 'flex';
     }
 
@@ -89,9 +89,9 @@
 
     async function finalizeOrder() {
         const name = document.getElementById('cust-name').value;
-        const email = document.getElementById('cust-email').value;
         const phone = document.getElementById('cust-phone').value;
         const address = document.getElementById('cust-address').value;
+        const email = document.getElementById('cust-email').value;
 
         if(!name || !phone || !address) return alert("Please fill Name, Phone, and Address!");
 
@@ -103,19 +103,18 @@
         };
 
         try {
-            // 1. Save to Cloud Vault
             await db.collection("orders").add(orderData);
-
-            // 2. WhatsApp Bot Redirect (+91 [number] format)
-            const cleanPhone = phone.replace(/\D/g, ''); 
-            const whatsappMsg = `Hello Moonlight Cravings! My name is ${name}. I just ordered: ${currentItem}. Delivery Address: ${address}`;
-            const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(whatsappMsg)}`;
             
-            alert("Order Saved! Redirecting to WhatsApp...");
+            // WhatsApp Bot Redirect: +91 [number]
+            const cleanPhone = phone.replace(/\D/g, ''); 
+            const msg = `New Order from Moonlight Cravings!\nName: ${name}\nItem: ${currentItem}\nAddress: ${address}`;
+            const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(msg)}`;
+            
+            alert("Order Saved to Cloud Vault! ✅ Opening WhatsApp...");
             window.open(waUrl, '_blank');
             location.reload();
         } catch (e) {
-            alert("Error sending order. Please check your Firebase rules.");
+            alert("Error! Make sure your Firebase Rules are set to 'true'.");
         }
     }
 </script>
