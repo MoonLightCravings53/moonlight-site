@@ -22,42 +22,53 @@
         nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
         .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
         
-        .hero { height: 35vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-bottom: 5px solid var(--white); }
+        .hero { height: 40vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-bottom: 5px solid var(--white); }
         
-        .container { max-width: 1200px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        /* --- BRAND DESCRIPTION --- */
+        .brand-story { background: var(--white); padding: 30px; text-align: center; margin: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .brand-story p { font-style: italic; color: var(--rose-gold); line-height: 1.6; font-size: 1.1rem; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
         
         .card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--soft-pink); transition: 0.3s; }
         .card:hover { transform: translateY(-10px); }
         .card img { width: 100%; height: 250px; object-fit: cover; }
         .card-body { padding: 25px; }
         
-        /* --- CUSTOM CAKE BOX --- */
         .custom-box { grid-column: 1 / -1; background: var(--white); padding: 40px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; margin-top: 20px; }
         textarea { width: 100%; max-width: 600px; height: 100px; padding: 15px; border-radius: 15px; border: 1px solid var(--pink); background: var(--soft-pink); margin: 15px 0; font-family: inherit; }
 
         .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
         .btn:hover { background: var(--plum); }
 
-        /* Modal styling */
         #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; }
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; background: var(--soft-pink); box-sizing: border-box; }
+
+        /* Floating WhatsApp Bot Icon */
+        .wa-float { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; text-decoration: none; }
     </style>
 </head>
 <body>
 
 <div class="bg-cakes" id="cake-bg"></div>
 
-<nav><div class="logo">MOONLIGHT 🌙</div></nav>
+<nav><div class="logo">MOONLIGHT CRAVINGS 🌙</div></nav>
 
 <div class="hero">
-    <h1>Sweetness in Every Bite</h1>
-    <p>Premium Homegrown Bakery</p>
+    <h1 style="font-size: 3rem; margin-bottom: 0;">Moonlight Cravings</h1>
+    <p style="font-size: 1.2rem;">Handcrafted Luxury in Every Slice</p>
+</div>
+
+<div class="brand-story">
+    <p>✨ Freshly baked with love, <br> 
+       🌿 No added preservatives, <br>
+       🎀 Custom made stuff are available just for you!</p>
 </div>
 
 <div class="container">
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
+        <img src="https://images.unsplash.com/photo-1535141192574-5d4897c82536?w=500">
         <div class="card-body">
             <h3>Classic Vanilla</h3>
             <div style="color:var(--rose-gold); font-weight:bold; margin-bottom:10px;">₹800</div>
@@ -66,11 +77,20 @@
     </div>
 
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
+        <img src="https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=500">
         <div class="card-body">
-            <h3>Dark Chocolate Luxe</h3>
+            <h3>Confetti Sprinkle</h3>
+            <div style="color:var(--rose-gold); font-weight:bold; margin-bottom:10px;">₹900</div>
+            <button class="btn" onclick="openOrder('Confetti Sprinkle', 900)">Order Now</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1606313564059-39598042912c?w=500">
+        <div class="card-body">
+            <h3>Black Forest Luxe</h3>
             <div style="color:var(--rose-gold); font-weight:bold; margin-bottom:10px;">₹950</div>
-            <button class="btn" onclick="openOrder('Dark Chocolate Luxe', 950)">Order Now</button>
+            <button class="btn" onclick="openOrder('Black Forest Luxe', 950)">Order Now</button>
         </div>
     </div>
 
@@ -82,6 +102,8 @@
     </div>
 </div>
 
+<a href="https://wa.me/918870459614" class="wa-float" target="_blank">💬</a>
+
 <div id="modal">
     <div class="modal-content">
         <h2 style="color:var(--rose-gold); margin-top:0;">Delivery Details 🎀</h2>
@@ -89,13 +111,12 @@
         <input type="text" id="name" placeholder="Full Name">
         <input type="text" id="phone" placeholder="Phone Number (10 digits)">
         <input type="text" id="address" placeholder="Delivery Address">
-        <button class="btn" style="margin-top:10px;" onclick="submitOrder()">Confirm & Message Bot</button>
+        <button class="btn" style="margin-top:10px;" onclick="submitOrder()">Confirm & Send Order</button>
         <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <script>
-    // --- FIREBASE SETUP ---
     const firebaseConfig = {
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
         authDomain: "moonlight-cravings.firebaseapp.com",
@@ -107,20 +128,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // --- ANIMATION LOGIC ---
+    // Floating Icons
     const bg = document.getElementById('cake-bg');
-    const icons = ['🍰', '🧁', '🎂', '🍩', '🍪', '✨'];
+    const icons = ['🍰', '🧁', '🎂', '🍩', '✨'];
     for(let i=0; i<15; i++) {
         let cake = document.createElement('div');
         cake.className = 'floating-cake';
         cake.innerText = icons[Math.floor(Math.random()*icons.length)];
         cake.style.left = Math.random() * 100 + 'vw';
         cake.style.animationDelay = Math.random() * 10 + 's';
-        cake.style.fontSize = (Math.random() * 20 + 20) + 'px';
         bg.appendChild(cake);
     }
 
-    // --- ORDER LOGIC ---
     let selItem = ""; let selPrice = 0;
 
     function openOrder(item, price) {
@@ -131,8 +150,8 @@
 
     function startCustom() {
         const desc = document.getElementById('custom-desc').value;
-        if(!desc) return alert("Please describe your cake first!");
-        selItem = "CUSTOM: " + desc; selPrice = "To be discussed";
+        if(!desc) return alert("Please describe your custom craving!");
+        selItem = "CUSTOM: " + desc; selPrice = "Contact for Price";
         document.getElementById('summary').innerText = `Custom Request: ${desc}`;
         document.getElementById('modal').style.display = 'flex';
     }
@@ -147,20 +166,18 @@
         if(!n || !ph || !ad) return alert("Please fill all details!");
 
         try {
-            // 1. Save to Admin Vault
             await db.collection("orders").add({
                 name: n, phone: ph, address: ad, item: selItem, price: selPrice,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // 2. WHATSAPP BOT LOGIC
-            const myNum = "918870459614"; // YOUR Business Number
-            const msg = `*NEW ORDER RECEIVED!* 🌙%0A%0A*Item:* ${selItem}%0A*Total:* ₹${selPrice}%0A*Customer:* ${n}%0A*Address:* ${ad}`;
+            const myNum = "918870459614";
+            const msg = `*NEW ORDER: MOONLIGHT CRAVINGS* 🌙%0A%0A*Item:* ${selItem}%0A*Total:* ${selPrice}%0A*Customer:* ${n}%0A*Address:* ${ad}`;
             
-            alert("✅ Order Saved to Vault! Opening WhatsApp...");
+            alert("Order placed! Sending to WhatsApp...");
             window.open(`https://wa.me/${myNum}?text=${msg}`, '_blank');
             location.reload();
-        } catch(e) { alert("Error! Check Firestore Rules."); }
+        } catch(e) { alert("Error connecting to vault."); }
     }
 </script>
 </body>
