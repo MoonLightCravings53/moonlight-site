@@ -9,146 +9,74 @@
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
-        
-        /* Full Premium Styling */
         nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
         .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
-        
-        .hero { height: 60vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .hero h1 { font-size: 3.5rem; margin: 0; color: var(--plum); text-shadow: 2px 2px var(--white); }
-
-        .container { max-width: 1200px; margin: -50px auto 50px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        
-        .card { background: var(--white); border-radius: 30px; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--soft-pink); text-align: center; }
-        .card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(183,110,121,0.2); }
+        .hero { height: 40vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--soft-pink); }
         .card img { width: 100%; height: 250px; object-fit: cover; }
         .card-body { padding: 25px; }
         .price { font-size: 1.4rem; color: var(--rose-gold); font-weight: bold; margin: 10px 0; }
-        
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1rem; width: 100%; transition: 0.3s; }
-        .btn:hover { background: var(--plum); transform: scale(1.02); }
-
-        /* Custom Box */
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; }
         .custom-box { grid-column: 1 / -1; background: var(--white); padding: 40px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; }
-        textarea { width: 100%; max-width: 600px; height: 120px; padding: 20px; border-radius: 20px; border: 1px solid var(--pink); background: var(--soft-pink); margin: 20px 0; font-family: inherit; }
-
-        /* Full 100-line Modal Logic */
-        #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 450px; padding: 40px; border-radius: 40px; position: relative; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #eee; border-radius: 15px; background: var(--soft-pink); box-sizing: border-box; }
+        textarea { width: 100%; max-width: 600px; height: 100px; padding: 15px; border-radius: 15px; border: 1px solid var(--pink); background: var(--soft-pink); margin: 15px 0; }
+        #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; }
+        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; background: var(--soft-pink); box-sizing: border-box; }
     </style>
 </head>
 <body>
-
-<nav>
-    <div class="logo">MOONLIGHT 🌙</div>
-    <div style="font-style: italic;">"Cravings solved under the stars"</div>
-</nav>
-
-<div class="hero">
-    <h1>Our Sweet Gallery</h1>
-    <p>Handcrafted with love in India</p>
-</div>
-
+<nav><div class="logo">MOONLIGHT 🌙</div></nav>
+<div class="hero"><h1>Handcrafted with Love</h1></div>
 <div class="container">
     <div class="card">
         <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
-        <div class="card-body">
-            <h3>Classic Vanilla</h3>
-            <div class="price">₹800</div>
-            <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button>
-        </div>
+        <div class="card-body"><h3>Classic Vanilla</h3><div class="price">₹800</div>
+        <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button></div>
     </div>
-
     <div class="card">
         <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
-        <div class="card-body">
-            <h3>Dark Chocolate Luxe</h3>
-            <div class="price">₹950</div>
-            <button class="btn" onclick="openOrder('Dark Chocolate Luxe', 950)">Buy Now</button>
-        </div>
+        <div class="card-body"><h3>Dark Chocolate</h3><div class="price">₹950</div>
+        <button class="btn" onclick="openOrder('Dark Chocolate', 950)">Buy Now</button></div>
     </div>
-
     <div class="custom-box">
         <h2>✨ Dream Cake Request</h2>
-        <p>Tell us exactly what you want, and our bakers will bring it to life!</p>
-        <textarea id="custom-text" placeholder="Flavor, theme, size, or special message..."></textarea><br>
-        <button class="btn" style="max-width:300px;" onclick="startCustom()">Send Request</button>
+        <textarea id="custom-text" placeholder="Describe your dream cake..."></textarea><br>
+        <button class="btn" style="max-width:250px;" onclick="startCustom()">Send Request</button>
     </div>
 </div>
-
 <div id="modal">
     <div class="modal-content">
-        <h2 style="margin-top:0; color:var(--rose-gold);">Delivery Details 🎀</h2>
-        <input type="text" id="name" placeholder="Full Name">
-        <input type="email" id="email" placeholder="Gmail Address">
-        <input type="text" id="phone" placeholder="Phone Number (10 digits)">
-        <textarea id="address" placeholder="Complete Delivery Address" style="height:80px;"></textarea>
-        <button class="btn" onclick="submitOrder()">Confirm & Message Bakers</button>
-        <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:15px; cursor:pointer;">Cancel</button>
+        <h2 style="color:var(--rose-gold);">Delivery Details 🎀</h2>
+        <input type="text" id="name" placeholder="Name"><input type="email" id="email" placeholder="Gmail">
+        <input type="text" id="phone" placeholder="Phone (10 digits)"><textarea id="address" placeholder="Address" style="width:100%; margin-top:10px;"></textarea>
+        <button class="btn" style="margin-top:15px;" onclick="submitOrder()">Confirm & Message Bakers</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
-
 <script>
-    // YOUR CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
         authDomain: "moonlight-cravings.firebaseapp.com",
         projectId: "moonlight-cravings",
         storageBucket: "moonlight-cravings.firebasestorage.app",
         messagingSenderId: "222974574228",
-        appId: "1:222974574228:web:47bed645deedf5788bbe81",
-        measurementId: "G-MGJQD332QD"
+        appId: "1:222974574228:web:47bed645deedf5788bbe81"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    let selectedItem = "";
-    let selectedPrice = 0;
-
-    function openOrder(item, price) {
-        selectedItem = item; selectedPrice = price;
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function startCustom() {
-        const txt = document.getElementById('custom-text').value;
-        if(!txt) return alert("Please describe your cake first!");
-        selectedItem = "CUSTOM: " + txt; selectedPrice = 0;
-        document.getElementById('modal').style.display = 'flex';
-    }
-
+    let selItem = ""; let selPrice = 0;
+    function openOrder(i, p) { selItem = i; selPrice = p; document.getElementById('modal').style.display = 'flex'; }
+    function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
     async function submitOrder() {
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const address = document.getElementById('address').value;
-        const email = document.getElementById('email').value;
-
-        if(!name || !phone || !address) return alert("We need your name, phone, and address!");
-
-        const orderObj = {
-            name, email, phone, address,
-            item: selectedItem,
-            price: selectedPrice,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
+        const n = document.getElementById('name').value, ph = document.getElementById('phone').value, ad = document.getElementById('address').value;
+        if(!n || !ph || !ad) return alert("Fill Name, Phone, and Address!");
         try {
-            await db.collection("orders").add(orderObj);
-            
-            // Format for Indian WhatsApp: +91 [space] Number
-            const cleanPhone = phone.replace(/\D/g, '');
-            const waMsg = `Hello Moonlight Cravings! I am ${name}. I'd like to order: ${selectedItem}. Address: ${address}`;
-            const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
-            
-            alert("Order Saved to Vault! ✅");
-            window.open(waUrl, '_blank');
+            await db.collection("orders").add({ name: n, phone: ph, address: ad, item: selItem, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            window.open(`https://wa.me/91${ph.trim()}?text=${encodeURIComponent("New Order: " + selItem + " for " + n)}`, '_blank');
             location.reload();
-        } catch (e) { alert("Error! Set Firestore Rules to 'true' in console."); }
+        } catch (e) { alert("Error! Check Firebase Rules."); }
     }
 </script>
 </body>
