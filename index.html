@@ -3,119 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlight Cravings | Order Now</title>
+    <title>Moonlight Cravings | Premium Bakery</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; }
-        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); }
-        .container { max-width: 1100px; margin: auto; padding: 20px; }
-        .card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn:hover { background: var(--plum); }
-        #checkout-modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #eee; border-radius: 12px; background: #fff1f5; box-sizing: border-box; font-family: inherit; }
+        :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
+        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
+        
+        /* Full Premium Styling */
+        nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
+        .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
+        
+        .hero { height: 60vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1519340333755-5072134dc2f1?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .hero h1 { font-size: 3.5rem; margin: 0; color: var(--plum); text-shadow: 2px 2px var(--white); }
+
+        .container { max-width: 1200px; margin: -50px auto 50px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        
+        .card { background: var(--white); border-radius: 30px; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--soft-pink); text-align: center; }
+        .card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(183,110,121,0.2); }
+        .card img { width: 100%; height: 250px; object-fit: cover; }
+        .card-body { padding: 25px; }
+        .price { font-size: 1.4rem; color: var(--rose-gold); font-weight: bold; margin: 10px 0; }
+        
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1rem; width: 100%; transition: 0.3s; }
+        .btn:hover { background: var(--plum); transform: scale(1.02); }
+
+        /* Custom Box */
+        .custom-box { grid-column: 1 / -1; background: var(--white); padding: 40px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; }
+        textarea { width: 100%; max-width: 600px; height: 120px; padding: 20px; border-radius: 20px; border: 1px solid var(--pink); background: var(--soft-pink); margin: 20px 0; font-family: inherit; }
+
+        /* Full 100-line Modal Logic */
+        #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 450px; padding: 40px; border-radius: 40px; position: relative; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #eee; border-radius: 15px; background: var(--soft-pink); box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div id="checkout-modal">
-    <div class="modal-content">
-        <h2 style="color:var(--rose-gold); margin-top:0;">Delivery Details 🎀</h2>
-        <input type="text" id="cust-name" placeholder="Full Name">
-        <input type="email" id="cust-email" placeholder="Gmail Address">
-        <input type="text" id="cust-phone" placeholder="Phone Number (10 digits)">
-        <textarea id="cust-address" rows="3" placeholder="Full Delivery Address"></textarea>
-        <button class="btn" onclick="finalizeOrder()">Confirm & Send Order</button>
-        <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
-    </div>
+<nav>
+    <div class="logo">MOONLIGHT 🌙</div>
+    <div style="font-style: italic;">"Cravings solved under the stars"</div>
+</nav>
+
+<div class="hero">
+    <h1>Our Sweet Gallery</h1>
+    <p>Handcrafted with love in India</p>
 </div>
 
 <div class="container">
-    <h1 style="text-align:center; color:var(--rose-gold); font-size: 2.5rem;">Moonlight Cravings</h1>
-    
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=400" style="width:100%; border-radius:20px; margin-bottom:10px;">
-        <h3>Classic Vanilla</h3>
-        <p>₹800</p>
-        <button class="btn" onclick="openCheckout('Classic Vanilla', 800)">Buy Now</button>
+        <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
+        <div class="card-body">
+            <h3>Classic Vanilla</h3>
+            <div class="price">₹800</div>
+            <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button>
+        </div>
     </div>
 
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400" style="width:100%; border-radius:20px; margin-bottom:10px;">
-        <h3>Dark Chocolate</h3>
-        <p>₹950</p>
-        <button class="btn" onclick="openCheckout('Dark Chocolate', 950)">Buy Now</button>
+        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
+        <div class="card-body">
+            <h3>Dark Chocolate Luxe</h3>
+            <div class="price">₹950</div>
+            <button class="btn" onclick="openOrder('Dark Chocolate Luxe', 950)">Buy Now</button>
+        </div>
     </div>
 
-    <div class="card" style="border: 2px dashed var(--rose-gold);">
-        <h3>Custom Craving Request</h3>
-        <textarea id="cust-desc" placeholder="Describe your dream cake..."></textarea>
-        <button class="btn" style="margin-top:10px;" onclick="submitCustom()">Send to Bakers</button>
+    <div class="custom-box">
+        <h2>✨ Dream Cake Request</h2>
+        <p>Tell us exactly what you want, and our bakers will bring it to life!</p>
+        <textarea id="custom-text" placeholder="Flavor, theme, size, or special message..."></textarea><br>
+        <button class="btn" style="max-width:300px;" onclick="startCustom()">Send Request</button>
+    </div>
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h2 style="margin-top:0; color:var(--rose-gold);">Delivery Details 🎀</h2>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="email" id="email" placeholder="Gmail Address">
+        <input type="text" id="phone" placeholder="Phone Number (10 digits)">
+        <textarea id="address" placeholder="Complete Delivery Address" style="height:80px;"></textarea>
+        <button class="btn" onclick="submitOrder()">Confirm & Message Bakers</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:15px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <script>
+    // YOUR CONFIG
     const firebaseConfig = {
-      apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
-      authDomain: "moonlight-cravings.firebaseapp.com",
-      projectId: "moonlight-cravings",
-      storageBucket: "moonlight-cravings.firebasestorage.app",
-      messagingSenderId: "222974574228",
-      appId: "1:222974574228:web:47bed645deedf5788bbe81",
-      measurementId: "G-MGJQD332QD"
+        apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
+        authDomain: "moonlight-cravings.firebaseapp.com",
+        projectId: "moonlight-cravings",
+        storageBucket: "moonlight-cravings.firebasestorage.app",
+        messagingSenderId: "222974574228",
+        appId: "1:222974574228:web:47bed645deedf5788bbe81",
+        measurementId: "G-MGJQD332QD"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let currentItem = "";
-    let currentPrice = 0;
+    let selectedItem = "";
+    let selectedPrice = 0;
 
-    function openCheckout(item, price) {
-        currentItem = item; currentPrice = price;
-        document.getElementById('checkout-modal').style.display = 'flex';
+    function openOrder(item, price) {
+        selectedItem = item; selectedPrice = price;
+        document.getElementById('modal').style.display = 'flex';
     }
 
-    function submitCustom() {
-        const desc = document.getElementById('cust-desc').value;
-        if(!desc) return alert("Please describe your cake!");
-        currentItem = "Custom: " + desc; currentPrice = 0;
-        document.getElementById('checkout-modal').style.display = 'flex';
+    function startCustom() {
+        const txt = document.getElementById('custom-text').value;
+        if(!txt) return alert("Please describe your cake first!");
+        selectedItem = "CUSTOM: " + txt; selectedPrice = 0;
+        document.getElementById('modal').style.display = 'flex';
     }
 
-    function closeModal() { document.getElementById('checkout-modal').style.display = 'none'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-    async function finalizeOrder() {
-        const name = document.getElementById('cust-name').value;
-        const phone = document.getElementById('cust-phone').value;
-        const address = document.getElementById('cust-address').value;
-        const email = document.getElementById('cust-email').value;
+    async function submitOrder() {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+        const email = document.getElementById('email').value;
 
-        if(!name || !phone || !address) return alert("Please fill Name, Phone, and Address!");
+        if(!name || !phone || !address) return alert("We need your name, phone, and address!");
 
-        const orderData = {
+        const orderObj = {
             name, email, phone, address,
-            item: currentItem,
-            price: currentPrice,
+            item: selectedItem,
+            price: selectedPrice,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
 
         try {
-            await db.collection("orders").add(orderData);
+            await db.collection("orders").add(orderObj);
             
-            // WhatsApp Bot Redirect: +91 [number]
-            const cleanPhone = phone.replace(/\D/g, ''); 
-            const msg = `New Order from Moonlight Cravings!\nName: ${name}\nItem: ${currentItem}\nAddress: ${address}`;
-            const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(msg)}`;
+            // Format for Indian WhatsApp: +91 [space] Number
+            const cleanPhone = phone.replace(/\D/g, '');
+            const waMsg = `Hello Moonlight Cravings! I am ${name}. I'd like to order: ${selectedItem}. Address: ${address}`;
+            const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
             
-            alert("Order Saved to Cloud Vault! ✅ Opening WhatsApp...");
+            alert("Order Saved to Vault! ✅");
             window.open(waUrl, '_blank');
             location.reload();
-        } catch (e) {
-            alert("Error! Make sure your Firebase Rules are set to 'true'.");
-        }
+        } catch (e) { alert("Error! Set Firestore Rules to 'true' in console."); }
     }
 </script>
 </body>
