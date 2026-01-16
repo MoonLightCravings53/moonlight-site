@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard | Moonlight Cravings</title>
+    <style>
+        :root { --gold: #d4af37; --night: #05070a; --moon: #fdf5e6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--night); color: var(--moon); padding: 40px; }
+        .container { max-width: 1000px; margin: auto; }
+        
+        h1 { border-bottom: 2px solid var(--gold); padding-bottom: 10px; color: var(--gold); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #111; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #222; }
+        th { background: var(--gold); color: #000; text-transform: uppercase; font-size: 0.8rem; }
+        
+        .status-paid { color: #2ecc71; font-weight: bold; background: rgba(46, 204, 113, 0.1); padding: 5px 10px; border-radius: 5px; }
+        .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; float: right; }
+        
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--night); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { text-align: center; border: 1px solid var(--gold); padding: 40px; border-radius: 20px; }
+        input { padding: 10px; border-radius: 5px; border: 1px solid var(--gold); background: #000; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="color:var(--gold)">Admin Access</h2>
+            <input type="password" id="pass" placeholder="Enter Owner Key">
+            <button onclick="checkPass()" style="padding:10px; cursor:pointer;">Login</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <button class="btn-clear" onclick="clearOrders()">Clear All Orders</button>
+        <h1>🌙 Moonlight Cravings Orders</h1>
+        
+        <table id="orderTable">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Cake Type / Details</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Password is set to 'moonlight' for now
+        function checkPass() {
+            const p = document.getElementById('pass').value;
+            if(p === 'moonlight') {
+                document.getElementById('login-overlay').style.display = 'none';
+                loadOrders();
+            } else {
+                alert("Wrong Key!");
+            }
+        }
+
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
+            const tbody = document.querySelector('#orderTable tbody');
+            tbody.innerHTML = "";
+
+            if(orders.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No orders received yet.</td></tr>";
+                return;
+            }
+
+            orders.reverse().forEach(order => {
+                const row = `<tr>
+                    <td>${order.time}</td>
+                    <td>${order.item}</td>
+                    <td>₹${order.price}</td>
+                    <td><span class="status-paid">SUCCESSFUL</span></td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function clearOrders() {
+            if(confirm("Are you sure you want to delete the order history?")) {
+                localStorage.removeItem('bakeryOrders');
+                loadOrders();
+            }
+        }
+    </script>
+</body>
+</html>
