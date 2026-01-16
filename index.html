@@ -32,16 +32,12 @@
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 30px; }
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; }
 
-        /* --- CHAT STYLING --- */
         #chat-window { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 3000; flex-direction: column; overflow: hidden; }
-        #chat-header { background: var(--rose-gold); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        #chat-header { background: var(--rose-gold); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
         #chat-messages { height: 250px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #fff9fa; }
-        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80% ; font-size: 0.9rem; line-height: 1.4; }
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80% ; font-size: 0.9rem; }
         .msg.admin { background: var(--rose-gold); color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
         .msg.user { background: #eee; color: #333; align-self: flex-end; border-bottom-right-radius: 2px; }
-        
-        .order-item { background:white; padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; border:1px solid #f8bbd0; transition: 0.2s; }
-        .order-item:hover { background: var(--soft-pink); border-color: var(--rose-gold); }
     </style>
 </head>
 <body>
@@ -86,20 +82,20 @@
 </div>
 
 <div id="chat-window">
-    <div id="chat-header"><span id="chat-title">My Orders 🌙</span><span onclick="closeChatWindow()" style="cursor:pointer; font-size: 1.5rem;">×</span></div>
+    <div id="chat-header"><span id="chat-title">My Orders 🌙</span><span onclick="closeChatWindow()" style="cursor:pointer">×</span></div>
     
-    <div id="order-list-view" style="height: 350px; overflow-y: auto; padding: 15px; background: #fff1f5;">
-        <p style="font-size: 0.85rem; text-align: center; color: var(--rose-gold); margin-bottom: 15px;">Select an order to chat with the baker</p>
+    <div id="order-list-view" style="height: 300px; overflow-y: auto; padding: 10px; background: #fff1f5;">
+        <p style="font-size: 0.8rem; text-align: center; color: var(--rose-gold);">Select an order to chat with the baker</p>
         <div id="my-orders-container"></div>
-        <button onclick="logoutCustomer()" id="logout-btn" style="display:none; width:100%; margin-top:20px; font-size:0.75rem; color:red; background:none; border:none; cursor:pointer; text-decoration: underline;">Not you? Clear history</button>
+        <button onclick="logoutCustomer()" id="logout-btn" style="display:none; width:100%; margin-top:10px; font-size:0.7rem; color:red; background:none; border:none; cursor:pointer;">Not you? Clear history</button>
     </div>
 
     <div id="active-chat-view" style="display:none;">
         <div id="chat-messages"></div>
-        <div style="padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee; background: white;">
-            <button onclick="backToOrders()" style="background:#eee; border:none; border-radius:10px; padding: 0 12px; cursor:pointer;">←</button>
-            <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; outline: none;">
-            <button onclick="sendMsg()" style="background:var(--rose-gold); color:white; border:none; padding:5px 15px; border-radius:10px; cursor:pointer;">Send</button>
+        <div style="padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee;">
+            <button onclick="backToOrders()" style="background:#eee; border:none; border-radius:10px; padding: 0 10px;">←</button>
+            <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:8px; border:1px solid #ddd; border-radius:10px;">
+            <button onclick="sendMsg()" style="background:var(--rose-gold); color:white; border:none; padding:5px 10px; border-radius:10px;">Send</button>
         </div>
     </div>
 </div>
@@ -121,23 +117,27 @@
     let selItem = ""; let selPrice = 0; let activeOrderId = ""; 
     let userIP = ""; 
 
-    // 1. FETCH IP ON LOAD & START ANIMATION
     window.onload = async function() {
-        // IP Logic
+        // 1. Lock identity via IP
         try {
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
             userIP = data.ip;
-            console.log("Customer IP Locked:", userIP);
             loadOrderHistory(userIP);
         } catch (e) {
-            console.error("IP Fetch failed, using fallback");
-            userIP = localStorage.getItem('moonlight_fallback_id') || 'guest_' + Math.random();
-            localStorage.setItem('moonlight_fallback_id', userIP);
+            userIP = localStorage.getItem('moonlight_fallback') || 'guest_' + Math.random();
+            localStorage.setItem('moonlight_fallback', userIP);
             loadOrderHistory(userIP);
         }
 
-        // Floating Cakes
+        // 2. Recovery: Check if they were already in a chat before refresh
+        const savedChatId = localStorage.getItem('active_chat_id');
+        const savedChatName = localStorage.getItem('active_chat_name');
+        if(savedChatId && savedChatName) {
+            openChat(savedChatId, savedChatName);
+        }
+
+        // Background Animation
         const bg = document.getElementById('cake-bg');
         const icons = ['🍰', '🎂', '✨', '🧁'];
         for(let i=0; i<15; i++) {
@@ -152,7 +152,14 @@
     function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; selPrice = "Pending"; document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeChatWindow() { document.getElementById('chat-window').style.display = 'none'; }
-    function backToOrders() { document.getElementById('order-list-view').style.display = 'block'; document.getElementById('active-chat-view').style.display = 'none'; document.getElementById('chat-title').innerText = "My Orders 🌙"; }
+    
+    function backToOrders() { 
+        localStorage.removeItem('active_chat_id'); 
+        localStorage.removeItem('active_chat_name');
+        document.getElementById('order-list-view').style.display = 'block'; 
+        document.getElementById('active-chat-view').style.display = 'none'; 
+        document.getElementById('chat-title').innerText = "My Orders 🌙"; 
+    }
     
     function toggleChatWindow() { 
         const win = document.getElementById('chat-window'); 
@@ -160,7 +167,6 @@
         if(userIP) loadOrderHistory(userIP); 
     }
 
-    // 2. SUBMIT ORDER WITH IP DATA
     async function submitOrder() {
         const n = document.getElementById('name').value; 
         const ph = document.getElementById('phone').value; 
@@ -169,46 +175,42 @@
         
         try {
             const docRef = await db.collection("orders").add({ 
-                name: n, 
-                phone: ph, 
-                address: ad, 
-                item: selItem, 
-                price: selPrice, 
-                customerIP: userIP, 
+                name: n, phone: ph, address: ad, item: selItem, price: selPrice, 
+                customerIP: userIP,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             });
-
             await db.collection("orders").doc(docRef.id).collection("chats").add({ 
                 text: `Baker: Received order for ${selItem}! We'll start baking soon.`, 
                 sender: "Admin", 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             });
-
             closeModal(); 
             openChat(docRef.id, selItem);
-        } catch(e) { alert("Vault Error!"); }
+        } catch(e) { alert("Error saving order!"); }
     }
 
-    // 3. LOAD HISTORY BY IP
     function loadOrderHistory(ip) {
         db.collection("orders").where("customerIP", "==", ip).orderBy("timestamp", "desc").onSnapshot(snap => {
             const container = document.getElementById('my-orders-container');
             if (snap.empty) {
-                container.innerHTML = "<p style='text-align:center; font-size:0.8rem; color: gray;'>You haven't ordered anything yet. 🍰</p>";
+                container.innerHTML = "<p style='text-align:center; font-size:0.8rem;'>No orders yet.</p>";
                 return;
             }
             container.innerHTML = snap.docs.map(doc => `
-                <div class="order-item" onclick="openChat('${doc.id}', '${doc.data().item}')">
+                <div onclick="openChat('${doc.id}', '${doc.data().item}')" style="background:white; padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; border:1px solid #f8bbd0;">
                     <div style="font-weight:bold; color:var(--plum);">${doc.data().item}</div>
-                    <div style="font-size:0.75rem; color:var(--rose-gold); margin-top:4px;">Status: Order Received • Click to chat</div>
+                    <div style="font-size:0.7rem; color:gray;">Click to chat with baker</div>
                 </div>`).join('');
-            
             document.getElementById('logout-btn').style.display = 'block';
         });
     }
 
     function openChat(id, itemName) {
         activeOrderId = id; 
+        // Save to memory so it survives refresh
+        localStorage.setItem('active_chat_id', id);
+        localStorage.setItem('active_chat_name', itemName);
+
         document.getElementById('chat-title').innerText = itemName;
         document.getElementById('order-list-view').style.display = 'none';
         document.getElementById('active-chat-view').style.display = 'block';
@@ -226,17 +228,15 @@
         const msgText = inp.value;
         inp.value = ""; 
         await db.collection("orders").doc(activeOrderId).collection("chats").add({ 
-            text: msgText, 
-            sender: "User", 
-            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            text: msgText, sender: "User", timestamp: firebase.firestore.FieldValue.serverTimestamp() 
         });
     }
 
     function logoutCustomer() {
-        if(confirm("This will clear your view. Your orders are still safe in our system!")) {
+        if(confirm("This will clear your view. Orders are safe in our vault!")) {
+            localStorage.removeItem('active_chat_id');
+            localStorage.removeItem('active_chat_name');
             document.getElementById('chat-window').style.display = 'none';
-            // Note: Since tracking is IP-based, it will show again on next open.
-            // This button is mostly for privacy in shared environments.
         }
     }
 </script>
