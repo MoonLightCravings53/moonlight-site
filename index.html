@@ -7,32 +7,39 @@
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; --rose: #f06292; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
+        
         nav { background: var(--white); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(183,110,121,0.1); }
         .nav-links button { background: none; border: none; font-weight: bold; color: var(--rose-gold); cursor: pointer; margin-left: 20px; font-size: 1rem; }
+
         .hero { height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(252, 228, 236, 0.5), rgba(252, 228, 236, 0.5)), url('https://images.unsplash.com/photo-1519340333755-56e9c1d04579?q=80&w=1500'); background-size: cover; background-position: center; text-align: center; border-bottom: 5px solid var(--rose-gold); }
+
         .container { max-width: 1100px; margin: auto; padding: 30px 20px; }
         .cake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 20px; background: #eee; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 20px; }
+        
         .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: 0.3s; }
         .btn:hover { background: var(--plum); }
+
+        /* MODAL FOR COLLECTING INFO */
         #checkout-modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .checkout-card { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px; }
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: var(--soft-pink); border: 1px solid var(--pink); border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+        
+        /* PAYMENT SCREEN */
         #payment-screen { display: none; position: fixed; inset: 0; background: rgba(252, 228, 236, 0.98); z-index: 20000; flex-direction: column; justify-content: center; align-items: center; }
         .loader { border: 6px solid var(--white); border-top: 6px solid var(--rose-gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
         #inbox-view { display: none; }
-        .msg-card { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid var(--rose-gold); }
     </style>
 </head>
 <body>
 
     <div id="checkout-modal">
         <div class="checkout-card">
-            <h2 style="color:var(--rose-gold); margin-top:0;">Order Details 🎀</h2>
-            <p style="font-size: 0.85rem; color: #666;">Provide details for delivery and WhatsApp updates.</p>
-            <input type="text" id="cust-name" placeholder="Your Name">
+            <h2 style="color:var(--rose-gold); margin-top:0;">Delivery Info 🎀</h2>
+            <input type="text" id="cust-name" placeholder="Full Name">
             <input type="email" id="cust-email" placeholder="Gmail Address">
             <input type="text" id="cust-phone" placeholder="Phone Number (+91)">
             <textarea id="cust-address" rows="3" placeholder="Full Delivery Address"></textarea>
@@ -57,19 +64,19 @@
     <div id="menu-view">
         <section class="hero">
             <h1 style="color:var(--rose-gold); font-size: 3rem; margin:0;">MOONLIGHT CRAVINGS</h1>
-            <p style="font-weight: bold; letter-spacing: 2px; color: var(--plum);">ARTISAN BAKERY</p>
+            <p style="font-weight: bold; letter-spacing: 2px; color: var(--plum);">FRESHLY BAKED</p>
         </section>
 
         <div class="container">
             <div class="cake-grid">
                 <div class="card">
-                    <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500" alt="Vanilla">
+                    <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
                     <h3>Classic Vanilla</h3>
                     <p>₹800</p>
                     <button class="btn" onclick="openCheckout('Vanilla Cake', 800)">Buy Now</button>
                 </div>
                 <div class="card">
-                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500" alt="Chocolate">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
                     <h3>Dark Chocolate</h3>
                     <p>₹950</p>
                     <button class="btn" onclick="openCheckout('Chocolate Cake', 950)">Buy Now</button>
@@ -78,18 +85,16 @@
 
             <div class="custom-section" style="background:white; padding:30px; border-radius:30px; margin-top:50px; border:3px dashed var(--rose-gold);">
                 <h2 style="color:var(--rose-gold)">Custom Craving Request</h2>
-                <textarea id="cust-desc" rows="4" placeholder="Describe your dream cake (Flavor, Theme, Date)..."></textarea>
+                <textarea id="cust-desc" rows="4" placeholder="Describe your dream cake..."></textarea>
                 <button class="btn" onclick="submitCustom()">Send to Bakers</button>
-                <p id="status-msg" style="display:none; color:var(--rose-gold); font-weight:bold; margin-top:10px; text-align:center;">✨ Request sent! Check your Inbox for the quote.</p>
+                <p id="status-msg" style="display:none; color:var(--rose-gold); font-weight:bold; margin-top:10px; text-align:center;">✨ Request sent! Check Inbox for quote.</p>
             </div>
         </div>
     </div>
 
     <div id="inbox-view" class="container">
-        <h2 style="color:var(--rose-gold)">Your Sweet Inbox</h2>
-        <div id="inbox-container">
-            <p style="text-align:center; opacity:0.6;">No messages yet.</p>
-        </div>
+        <h2 style="color:var(--rose-gold)">Inbox</h2>
+        <div id="inbox-container"><p style="text-align:center; opacity:0.6;">No messages yet.</p></div>
     </div>
 
     <script>
@@ -100,12 +105,9 @@
         function switchTab(tab) {
             document.getElementById('menu-view').style.display = tab === 'menu' ? 'block' : 'none';
             document.getElementById('inbox-view').style.display = tab === 'inbox' ? 'block' : 'none';
-            if(tab === 'inbox') {
-                document.getElementById('notif-dot').style.display = 'none';
-                updateInbox();
-            }
         }
 
+        // Fix for "Buy Now"
         function openCheckout(item, price) {
             currentItem = item;
             currentPrice = price;
@@ -113,16 +115,19 @@
             document.getElementById('checkout-modal').style.display = 'flex';
         }
 
+        // Fix for "Send to Bakers"
         function submitCustom() {
             const desc = document.getElementById('cust-desc').value;
-            if(!desc) return alert("Please describe your cake first!");
+            if(!desc) return alert("Please describe your cake!");
             currentItem = "Custom: " + desc;
             currentPrice = 0;
             isCustom = true;
             document.getElementById('checkout-modal').style.display = 'flex';
         }
 
-        function closeModal() { document.getElementById('checkout-modal').style.display = 'none'; }
+        function closeModal() {
+            document.getElementById('checkout-modal').style.display = 'none';
+        }
 
         function finalizeOrder() {
             const name = document.getElementById('cust-name').value;
@@ -130,48 +135,29 @@
             const phone = document.getElementById('cust-phone').value;
             const address = document.getElementById('cust-address').value;
 
-            if(!name || !email || !phone || !address) return alert("Please fill all details for delivery!");
+            if(!name || !email || !phone || !address) return alert("All fields are required!");
 
             if(isCustom) {
+                // Save custom request
                 let customs = JSON.parse(localStorage.getItem('customOrders')) || [];
                 customs.push({ id: Date.now(), name, email, phone, address, desc: currentItem, status: 'pending', price: 0 });
                 localStorage.setItem('customOrders', JSON.stringify(customs));
                 closeModal();
-                document.getElementById('cust-desc').value = "";
                 document.getElementById('status-msg').style.display = "block";
             } else {
-                processPayment(name, phone);
+                // Process standard payment
+                document.getElementById('payment-screen').style.display = 'flex';
+                setTimeout(() => {
+                    document.querySelector('.loader').style.display = 'none';
+                    document.getElementById('pay-status').innerHTML = "Confirmed! ✅<br><small>WhatsApp update sent to " + phone + "</small>";
+                    
+                    let paid = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
+                    paid.push({ time: new Date().toLocaleString(), name, item: currentItem, price: currentPrice });
+                    localStorage.setItem('bakeryOrders', JSON.stringify(paid));
+                    
+                    setTimeout(() => location.reload(), 3000);
+                }, 3000);
             }
-        }
-
-        function processPayment(name, phone) {
-            document.getElementById('payment-screen').style.display = 'flex';
-            setTimeout(() => {
-                document.querySelector('.loader').style.display = 'none';
-                document.getElementById('pay-status').innerHTML = "Order Placed! ✅<br><small>We'll WhatsApp you at "+phone+"</small>";
-                
-                let paid = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
-                paid.push({ time: new Date().toLocaleString(), name, phone, item: currentItem, price: currentPrice });
-                localStorage.setItem('bakeryOrders', JSON.stringify(paid));
-
-                setTimeout(() => location.reload(), 3000);
-            }, 3000);
-        }
-
-        function updateInbox() {
-            const customs = JSON.parse(localStorage.getItem('customOrders')) || [];
-            const container = document.getElementById('inbox-container');
-            if(customs.length === 0) return;
-            container.innerHTML = customs.reverse().map(o => `
-                <div class="msg-card">
-                    <h4>Custom Order Status</h4>
-                    <p>${o.desc.replace('Custom: ', '')}</p>
-                    ${o.status === 'priced' ? 
-                        `<h3 style="color:var(--rose-gold)">Price: ₹${o.price}</h3>
-                         <button class="btn" onclick="openCheckout('${o.desc}', ${o.price})">Pay Now</button>` : 
-                        `<p style="color:orange;">⏳ Reviewing your design...</p>`}
-                </div>
-            `).join('');
         }
     </script>
 </body>
