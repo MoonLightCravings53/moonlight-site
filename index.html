@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlight Cravings | Pink Edition</title>
+    <title>Moonlight Cravings | Signature Bakes</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; --rose: #f06292; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
         
-        /* Navigation & Tabs */
         nav { background: var(--white); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(183,110,121,0.1); }
-        .nav-links button { background: none; border: none; font-weight: bold; color: var(--rose-gold); cursor: pointer; margin-left: 20px; font-size: 1rem; transition: 0.3s; }
-        .nav-links button:hover { color: var(--plum); }
+        .nav-links button { background: none; border: none; font-weight: bold; color: var(--rose-gold); cursor: pointer; margin-left: 20px; font-size: 1rem; }
 
         .hero { 
             height: 45vh; display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -24,54 +24,55 @@
 
         .container { max-width: 1100px; margin: auto; padding: 30px 20px; }
         
-        /* Login Overlay */
-        #login-modal { display: flex; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        /* SECURE LOGIN OVERLAY */
+        #login-modal { display: flex; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.9); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
         .login-card { background: white; padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         
-        /* Sections */
-        .brand-story { text-align: center; margin-bottom: 50px; background: var(--white); padding: 30px; border-radius: 30px; box-shadow: 0 5px 15px rgba(183,110,121,0.1); }
-        .cake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; transition: 0.3s; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 20px; }
-        
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 14px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-google { background: white; border: 1px solid #ddd; padding: 12px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 20px; font-weight: bold; }
 
-        /* Inbox Styling */
+        .phone-row { display: flex; gap: 10px; margin: 15px 0; }
+        .country-code { background: var(--soft-pink); padding: 12px; border-radius: 15px; font-weight: bold; border: 1px solid var(--pink); color: var(--plum); }
+
+        .cake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 20px; }
+        
         #inbox-view { display: none; }
-        .msg-card { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid var(--rose-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .msg-card { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid var(--rose-gold); }
 
-        .custom-section { background: var(--white); padding: 40px; border-radius: 30px; margin-top: 50px; border: 3px dashed var(--rose-gold); }
-        input, textarea { width: 100%; padding: 15px; margin: 10px 0; background: var(--soft-pink); color: var(--plum); border: 1px solid var(--pink); border-radius: 15px; box-sizing: border-box; font-family: inherit; }
-
-        #status-tab { display: none; margin-top: 20px; padding: 25px; border-radius: 20px; background: var(--soft-pink); border: 2px solid var(--rose-gold); text-align: center; }
-        .loading-dots:after { content: ' .'; animation: dots 1.5s steps(5, end) infinite;}
-        @keyframes dots { 0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 40% { color: var(--rose-gold); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 60% { text-shadow: .25em 0 0 var(--rose-gold), .5em 0 0 rgba(0,0,0,0);} 80%, 100% { text-shadow: .25em 0 0 var(--rose-gold), .5em 0 0 var(--rose-gold);}}
-
-        #payment-screen { display: none; position: fixed; inset: 0; background: rgba(252, 228, 236, 0.98); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
-        .loader { border: 6px solid var(--white); border-top: 6px solid var(--rose-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        input, textarea { width: 100%; padding: 15px; margin: 10px 0; background: var(--soft-pink); color: var(--plum); border: 1px solid var(--pink); border-radius: 15px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <div id="login-modal">
         <div class="login-card">
-            <h2 style="color:var(--rose-gold)">Hey Gorgeous! ✨</h2>
-            <p>Sign in to start your custom craving.</p>
-            <button class="btn-google" onclick="mockGoogleLogin()">
+            <h2 id="login-title" style="color:var(--rose-gold)">Hey Gorgeous! ✨</h2>
+            <p id="login-desc">Sign in with Google to start your order.</p>
+            
+            <button id="google-btn" class="btn-google" onclick="continueWithGoogle()">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="18"> Sign in with Google
             </button>
-            <div id="setup-fields" style="display:none; margin-top: 20px;">
-                <input type="text" id="user-name" placeholder="Full Name">
-                <input type="text" id="user-phone" placeholder="Phone Number">
-                <button class="btn" onclick="saveProfile()">Start Sweeting</button>
+
+            <div id="phone-setup" style="display:none;">
+                <div class="phone-row">
+                    <div class="country-code">+91</div>
+                    <input type="number" id="user-phone" placeholder="Enter WhatsApp Number" style="margin:0;">
+                </div>
+                <button class="btn" onclick="verifyAndRegister()">Verify via WhatsApp</button>
+            </div>
+
+            <div id="verify-wait" style="display:none;">
+                <h3 style="color:var(--rose-gold)">Verifying Number...</h3>
+                <p>We've sent a registration confirmation to your WhatsApp. Please wait.</p>
+                <div class="loading-dots"></div>
             </div>
         </div>
     </div>
 
     <nav>
-        <div style="font-weight: bold; color: var(--rose-gold); font-size: 1.4rem; letter-spacing: 1px;">🌙 MOONLIGHT</div>
+        <div style="font-weight: bold; color: var(--rose-gold); font-size: 1.4rem;">🌙 MOONLIGHT</div>
         <div class="nav-links">
             <button onclick="switchTab('menu')">Menu</button>
             <button onclick="switchTab('inbox')">Inbox <span id="notif-dot" style="color:var(--rose); display:none;">●</span></button>
@@ -81,139 +82,163 @@
     <div id="menu-view">
         <section class="hero">
             <h1 style="color:var(--rose-gold); font-size: 3.5rem; text-shadow: 2px 2px white; margin:0;">MOONLIGHT CRAVINGS</h1>
-            <p style="font-weight: bold; letter-spacing: 3px; color: var(--plum);">FRESHLY BAKED WITH LOVE</p>
+            <p style="font-weight: bold; letter-spacing: 3px; color: var(--plum);">FRESHLY BAKED IN NAGERCOIL</p>
         </section>
 
         <div class="container">
-            <div class="brand-story">
-                <h2>Handcrafted Artisan Bakes</h2>
-                <p>Freshly baked with love • No added preservatives • Custom made stuff are available.</p>
-            </div>
-
             <div class="cake-grid">
                 <div class="card">
-                    <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500" alt="Vanilla">
+                    <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500">
                     <h3>Classic Vanilla</h3>
                     <p>₹800</p>
-                    <button class="btn" onclick="processPayment('Vanilla Cake', 800)">Buy Now</button>
+                    <button class="btn" onclick="orderItem('Vanilla')">Buy Now</button>
                 </div>
                 <div class="card">
-                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500" alt="Chocolate">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500">
                     <h3>Dark Chocolate</h3>
                     <p>₹950</p>
-                    <button class="btn" onclick="processPayment('Chocolate Cake', 950)">Buy Now</button>
+                    <button class="btn" onclick="orderItem('Chocolate')">Buy Now</button>
                 </div>
             </div>
 
-            <div class="custom-section" id="custom">
+            <div class="custom-section" style="background:white; padding:40px; border-radius:30px; margin-top:40px; border:3px dashed var(--rose-gold);">
                 <h2 style="color:var(--rose-gold)">Custom Craving Request</h2>
-                <textarea id="cust-desc" rows="4" placeholder="Describe your dream cake..."></textarea>
-                <button class="btn" id="submit-custom" onclick="sendCustomOrder()">Send to Bakers</button>
-
-                <div id="status-tab">
-                    <h3 id="status-title" class="loading-dots">Waiting for Staff Review</h3>
-                    <p id="status-msg">Our bakers are reviewing your design. Stay here for your quote!</p>
-                </div>
+                <textarea id="cust-desc" rows="4" placeholder="Flavor, Theme, Date..."></textarea>
+                <button class="btn" onclick="sendCustomOrder()">Send to Bakers</button>
             </div>
         </div>
     </div>
 
     <div id="inbox-view" class="container">
         <h2 style="color:var(--rose-gold)">Your Sweet Inbox</h2>
-        <div id="inbox-container">
-            <p style="text-align:center; opacity:0.6;">No messages yet.</p>
-        </div>
-    </div>
-
-    <div id="payment-screen">
-        <div class="loader" id="loader"></div>
-        <h2 id="pay-status" style="color:var(--rose-gold)">Processing Secure Payment...</h2>
+        <div id="inbox-container"></div>
     </div>
 
     <script>
-        // LOGIN & PROFILE LOGIC
-        function mockGoogleLogin() {
-            document.getElementById('setup-fields').style.display = 'block';
-        }
-
-        function saveProfile() {
-            const name = document.getElementById('user-name').value;
-            const phone = document.getElementById('user-phone').value;
-            if(!name || !phone) return alert("Please fill details!");
-            localStorage.setItem('moonlightUser', JSON.stringify({ name, phone }));
-            document.getElementById('login-modal').style.display = 'none';
-        }
-
-        // Check for existing login
-        window.onload = () => {
-            if(localStorage.getItem('moonlightUser')) {
-                document.getElementById('login-modal').style.display = 'none';
-            }
-            updateInbox();
+        // --- FIREBASE CONFIG (Replace with your keys) ---
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "12345",
+            appId: "1:123:web:abc"
         };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        // TAB SWITCHING
-        function switchTab(tab) {
-            document.getElementById('menu-view').style.display = tab === 'menu' ? 'block' : 'none';
-            document.getElementById('inbox-view').style.display = tab === 'inbox' ? 'block' : 'none';
-            if(tab === 'inbox') {
-                document.getElementById('notif-dot').style.display = 'none';
-                updateInbox();
-            }
-        }
-
-        // ORDER LOGIC
-        function processPayment(item, price) {
-            const screen = document.getElementById('payment-screen');
-            screen.style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('pay-status').innerHTML = "Order Confirmed! ✅<br><small>We will contact you shortly.</small>";
-                setTimeout(() => location.reload(), 3000);
-            }, 5000);
-        }
-
-        function sendCustomOrder() {
-            const desc = document.getElementById('cust-desc').value;
-            const user = JSON.parse(localStorage.getItem('moonlightUser'));
-            if(!desc) return alert("Describe your cake!");
-
-            const orderId = Date.now();
-            let customs = JSON.parse(localStorage.getItem('customOrders')) || [];
-            customs.push({ id: orderId, name: user.name, phone: user.phone, desc: desc, status: 'pending', price: 0 });
-            localStorage.setItem('customOrders', JSON.stringify(customs));
-
-            document.getElementById('submit-custom').style.display = 'none';
-            document.getElementById('status-tab').style.display = 'block';
-
-            // Polling for price update
-            const poll = setInterval(() => {
-                let latest = JSON.parse(localStorage.getItem('customOrders')) || [];
-                let order = latest.find(o => o.id === orderId);
-                if(order && order.status === 'priced') {
-                    document.getElementById('notif-dot').style.display = 'inline';
-                    updateInbox();
-                    clearInterval(poll);
+        // --- AUTH LOGIC ---
+        async function continueWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // Check if already registered in datastore
+                const userDoc = await db.collection("customers").doc(user.uid).get();
+                if (userDoc.exists) {
+                    finishLogin(userDoc.data());
+                } else {
+                    document.getElementById('google-btn').style.display = 'none';
+                    document.getElementById('login-title').innerText = "One Last Step! 📞";
+                    document.getElementById('login-desc').innerText = "Enter your WhatsApp number for order updates.";
+                    document.getElementById('phone-setup').style.display = 'block';
                 }
+            } catch (error) { alert(error.message); }
+        }
+
+        async function verifyAndRegister() {
+            const phone = document.getElementById('user-phone').value;
+            if (phone.length !== 10) return alert("Enter a valid 10-digit Indian number.");
+
+            const user = auth.currentUser;
+            const fullPhone = "+91" + phone;
+
+            // Save to Persistent Datastore
+            await db.collection("customers").doc(user.uid).set({
+                name: user.displayName,
+                email: user.email,
+                phone: fullPhone,
+                joined: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById('phone-setup').style.display = 'none';
+            document.getElementById('verify-wait').style.display = 'block';
+
+            // Simulate WhatsApp Notification Handshake
+            setTimeout(() => {
+                finishLogin({ name: user.displayName, phone: fullPhone });
             }, 3000);
         }
 
-        function updateInbox() {
-            const customs = JSON.parse(localStorage.getItem('customOrders')) || [];
-            const container = document.getElementById('inbox-container');
-            if(customs.length === 0) return;
-
-            container.innerHTML = customs.reverse().map(o => `
-                <div class="msg-card">
-                    <h4>Custom Order Update</h4>
-                    <p>${o.desc}</p>
-                    ${o.status === 'priced' ? 
-                        `<h3 style="color:var(--rose-gold)">Price: ₹${o.price}</h3>
-                         <button class="btn" onclick="processPayment('Custom Order', ${o.price})">Pay & Confirm Order</button>` : 
-                        `<p style="font-style:italic">Status: Staff is reviewing...</p>`}
-                </div>
-            `).join('');
+        function finishLogin(userData) {
+            localStorage.setItem('moonlightUser', JSON.stringify(userData));
+            document.getElementById('login-modal').style.display = 'none';
+            updateInbox();
         }
+
+        // --- CORE FEATURES ---
+        function switchTab(tab) {
+            document.getElementById('menu-view').style.display = tab === 'menu' ? 'block' : 'none';
+            document.getElementById('inbox-view').style.display = tab === 'inbox' ? 'block' : 'none';
+        }
+
+        async function sendCustomOrder() {
+            const desc = document.getElementById('cust-desc').value;
+            const user = JSON.parse(localStorage.getItem('moonlightUser'));
+            if(!desc) return alert("Describe your cake first!");
+
+            const order = {
+                id: Date.now(),
+                customerName: user.name,
+                customerPhone: user.phone,
+                desc: desc,
+                status: 'pending',
+                price: 0
+            };
+
+            // Save to Firestore so Admin can see it instantly
+            await db.collection("orders").add(order);
+            alert("Sent! Check your Inbox shortly for the price quote.");
+            document.getElementById('cust-desc').value = "";
+        }
+
+        // Auto-refresh Inbox from Datastore
+        function updateInbox() {
+            const user = JSON.parse(localStorage.getItem('moonlightUser'));
+            if(!user) return;
+
+            db.collection("orders").where("customerPhone", "==", user.phone)
+              .onSnapshot((snapshot) => {
+                const container = document.getElementById('inbox-container');
+                if(snapshot.empty) {
+                    container.innerHTML = "<p style='text-align:center'>No messages yet.</p>";
+                    return;
+                }
+
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const o = doc.data();
+                    return `
+                        <div class="msg-card">
+                            <h4>Order Status: ${o.status.toUpperCase()}</h4>
+                            <p>${o.desc}</p>
+                            ${o.status === 'priced' ? 
+                                `<h3 style="color:var(--rose-gold)">Quote: ₹${o.price}</h3>
+                                 <button class="btn" onclick="confirmFinal()">Pay & Confirm</button>` : 
+                                `<p><i>Bakers are reviewing your request...</i></p>`}
+                        </div>
+                    `;
+                }).join('');
+            });
+        }
+
+        window.onload = () => {
+            if(localStorage.getItem('moonlightUser')) {
+                document.getElementById('login-modal').style.display = 'none';
+                updateInbox();
+            }
+        };
     </script>
 </body>
 </html>
