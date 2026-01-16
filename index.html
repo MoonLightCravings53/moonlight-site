@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlight Cravings | Pink Edition</title>
+    <title>Moonlight Cravings | Live Edition</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; --rose: #f06292; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); scroll-behavior: smooth; }
@@ -98,6 +100,19 @@
     </div>
 
     <script>
+        // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG FROM FIREBASE CONSOLE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         let currentItem = "";
         let currentPrice = 0;
         let isCustom = false;
@@ -107,7 +122,6 @@
             document.getElementById('inbox-view').style.display = tab === 'inbox' ? 'block' : 'none';
         }
 
-        // Fix for "Buy Now"
         function openCheckout(item, price) {
             currentItem = item;
             currentPrice = price;
@@ -115,7 +129,6 @@
             document.getElementById('checkout-modal').style.display = 'flex';
         }
 
-        // Fix for "Send to Bakers"
         function submitCustom() {
             const desc = document.getElementById('cust-desc').value;
             if(!desc) return alert("Please describe your cake!");
@@ -129,7 +142,7 @@
             document.getElementById('checkout-modal').style.display = 'none';
         }
 
-        function finalizeOrder() {
+        async function finalizeOrder() {
             const name = document.getElementById('cust-name').value;
             const email = document.getElementById('cust-email').value;
             const phone = document.getElementById('cust-phone').value;
@@ -137,26 +150,40 @@
 
             if(!name || !email || !phone || !address) return alert("All fields are required!");
 
-            if(isCustom) {
-                // Save custom request
-                let customs = JSON.parse(localStorage.getItem('customOrders')) || [];
-                customs.push({ id: Date.now(), name, email, phone, address, desc: currentItem, status: 'pending', price: 0 });
-                localStorage.setItem('customOrders', JSON.stringify(customs));
-                closeModal();
-                document.getElementById('status-msg').style.display = "block";
-            } else {
-                // Process standard payment
+            // Prepare Cloud Data
+            const orderData = {
+                name,
+                email,
+                phone,
+                address,
+                item: currentItem,
+                price: currentPrice,
+                isCustom: isCustom,
+                status: isCustom ? 'pending' : 'paid',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // Show Loading/Processing Screen
                 document.getElementById('payment-screen').style.display = 'flex';
-                setTimeout(() => {
-                    document.querySelector('.loader').style.display = 'none';
-                    document.getElementById('pay-status').innerHTML = "Confirmed! ✅<br><small>WhatsApp update sent to " + phone + "</small>";
-                    
-                    let paid = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
-                    paid.push({ time: new Date().toLocaleString(), name, item: currentItem, price: currentPrice });
-                    localStorage.setItem('bakeryOrders', JSON.stringify(paid));
-                    
-                    setTimeout(() => location.reload(), 3000);
-                }, 3000);
+                
+                // Save to Firebase Cloud
+                await db.collection("orders").add(orderData);
+
+                // Update UI based on type
+                if(isCustom) {
+                    document.getElementById('pay-status').innerHTML = "Request Sent! ✨<br><small>We will contact you shortly.</small>";
+                } else {
+                    document.getElementById('pay-status').innerHTML = "Confirmed! ✅<br><small>Order received at Cloud Vault.</small>";
+                }
+                
+                document.querySelector('.loader').style.display = 'none';
+                
+                setTimeout(() => location.reload(), 3000);
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Something went wrong. Please try again.");
+                document.getElementById('payment-screen').style.display = 'none';
             }
         }
     </script>
