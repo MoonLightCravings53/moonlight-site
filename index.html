@@ -32,15 +32,13 @@
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 30px; }
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; }
 
-        /* --- NEW: IN-APP CHAT STYLING --- */
+        /* --- UPDATED CHAT STYLING --- */
         #chat-window { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 3000; flex-direction: column; overflow: hidden; }
         #chat-header { background: var(--rose-gold); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
         #chat-messages { height: 250px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #fff9fa; }
         .msg { padding: 8px 12px; border-radius: 15px; max-width: 80% ; font-size: 0.9rem; }
         .msg.admin { background: var(--rose-gold); color: white; align-self: flex-start; }
         .msg.user { background: #eee; color: #333; align-self: flex-end; }
-        #chat-footer { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee; }
-        #chat-footer input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -50,10 +48,7 @@
 
 <div class="hero"><h1>Baking Dreams Into Reality</h1></div>
 
-<div class="brand-desc">
-    Freshly baked with love, no added preservatives. <br>
-    Custom made creations available for your special moments!
-</div>
+<div class="brand-desc">Freshly baked with love, no added preservatives. <br> Custom made creations available!</div>
 
 <div class="container">
     <div class="card">
@@ -68,7 +63,6 @@
         <img src="https://images.unsplash.com/photo-1606313564059-39598042912c?w=500">
         <div class="card-body"><h3>Black Forest Cake</h3><p>₹950</p><button class="btn" onclick="openOrder('Black Forest Cake', 950)">Buy Now</button></div>
     </div>
-
     <div class="custom-box">
         <h3>✨ Custom Cake Request</h3>
         <textarea id="custom-text" style="width:100%; height:80px; margin:10px 0; border-radius:10px; padding:10px;" placeholder="Describe your dream cake..."></textarea>
@@ -89,13 +83,24 @@
 </div>
 
 <div id="chat-window">
-    <div id="chat-header"><span>Chat with Baker 🌙</span><span onclick="this.parentElement.parentElement.style.display='none'" style="cursor:pointer">×</span></div>
-    <div id="chat-messages"></div>
-    <div id="chat-footer">
-        <input type="text" id="chat-input" placeholder="Ask about your order...">
-        <button onclick="sendMsg()" style="background:var(--rose-gold); color:white; border:none; padding:5px 10px; border-radius:10px;">Send</button>
+    <div id="chat-header"><span id="chat-title">My Orders 🌙</span><span onclick="closeChatWindow()" style="cursor:pointer">×</span></div>
+    
+    <div id="order-list-view" style="height: 300px; overflow-y: auto; padding: 10px; background: #fff1f5;">
+        <p style="font-size: 0.8rem; text-align: center; color: var(--rose-gold);">Select an order to chat with the baker</p>
+        <div id="my-orders-container"></div>
+    </div>
+
+    <div id="active-chat-view" style="display:none;">
+        <div id="chat-messages"></div>
+        <div style="padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee;">
+            <button onclick="backToOrders()" style="background:#eee; border:none; border-radius:10px; padding: 0 10px;">←</button>
+            <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:8px; border:1px solid #ddd; border-radius:10px;">
+            <button onclick="sendMsg()" style="background:var(--rose-gold); color:white; border:none; padding:5px 10px; border-radius:10px;">Send</button>
+        </div>
     </div>
 </div>
+
+<button id="reopen-chat-btn" onclick="toggleChatWindow()" style="position:fixed; bottom:20px; right:20px; background:var(--plum); color:white; border:none; width:60px; height:60px; border-radius:50%; font-size:25px; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:2999;">💬</button>
 
 <script>
     const firebaseConfig = {
@@ -109,77 +114,62 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Background Animation
+    let selItem = ""; let selPrice = 0; let activeOrderId = ""; let customerPhone = "";
+
+    // BG Animation
     const bg = document.getElementById('cake-bg');
     const icons = ['🍰', '🎂', '✨', '🧁'];
     for(let i=0; i<15; i++) {
         let div = document.createElement('div');
-        div.className = 'floating-cake';
-        div.innerText = icons[Math.floor(Math.random()*icons.length)];
-        div.style.left = Math.random() * 100 + 'vw';
-        div.style.animationDelay = Math.random() * 10 + 's';
+        div.className = 'floating-cake'; div.innerText = icons[Math.floor(Math.random()*icons.length)];
+        div.style.left = Math.random() * 100 + 'vw'; div.style.animationDelay = Math.random() * 10 + 's';
         bg.appendChild(div);
     }
 
-    let selItem = ""; let selPrice = 0; let activeOrderId = "";
-
-    function openOrder(item, price) {
-        selItem = item; selPrice = price;
-        document.getElementById('summary').innerText = `${item} - ₹${price}`;
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function startCustom() {
-        const t = document.getElementById('custom-text').value;
-        if(!t) return alert("Please add a description!");
-        selItem = "CUSTOM: " + t; selPrice = "Pending";
-        document.getElementById('summary').innerText = "Custom Request";
-        document.getElementById('modal').style.display = 'flex';
-    }
-
+    function openOrder(item, price) { selItem = item; selPrice = price; document.getElementById('summary').innerText = `${item} - ₹${price}`; document.getElementById('modal').style.display = 'flex'; }
+    function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; selPrice = "Pending"; document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function closeChatWindow() { document.getElementById('chat-window').style.display = 'none'; }
+    function backToOrders() { document.getElementById('order-list-view').style.display = 'block'; document.getElementById('active-chat-view').style.display = 'none'; document.getElementById('chat-title').innerText = "My Orders 🌙"; }
+    function toggleChatWindow() { const win = document.getElementById('chat-window'); win.style.display = win.style.display === 'none' ? 'flex' : 'none'; if(customerPhone) loadOrderHistory(customerPhone); }
 
     async function submitOrder() {
-        const n = document.getElementById('name').value;
-        const ph = document.getElementById('phone').value;
-        const ad = document.getElementById('address').value;
-        if(!n || !ph || !ad) return alert("All fields are required!");
-
+        const n = document.getElementById('name').value; const ph = document.getElementById('phone').value; const ad = document.getElementById('address').value;
+        if(!n || !ph || !ad) return alert("All fields required!");
+        customerPhone = ph;
         try {
-            const docRef = await db.collection("orders").add({
-                name: n, phone: ph, address: ad, item: selItem, price: selPrice,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            activeOrderId = docRef.id;
-            closeModal();
-            openChat(activeOrderId);
-            // Send initial automated message
-            await db.collection("orders").doc(activeOrderId).collection("chats").add({
-                text: `Hi ${n}! We've received your order for ${selItem}. How can we help?`,
-                sender: "Admin",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            const docRef = await db.collection("orders").add({ name: n, phone: ph, address: ad, item: selItem, price: selPrice, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            await db.collection("orders").doc(docRef.id).collection("chats").add({ text: `Baker: Received order for ${selItem}!`, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            closeModal(); loadOrderHistory(ph); openChat(docRef.id, selItem);
         } catch(e) { alert("Vault Error!"); }
     }
 
-    function openChat(id) {
+    function loadOrderHistory(phone) {
+        db.collection("orders").where("phone", "==", phone).orderBy("timestamp", "desc").onSnapshot(snap => {
+            const container = document.getElementById('my-orders-container');
+            container.innerHTML = snap.docs.map(doc => `
+                <div onclick="openChat('${doc.id}', '${doc.data().item}')" style="background:white; padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; border:1px solid #f8bbd0;">
+                    <div style="font-weight:bold; color:var(--plum);">${doc.data().item}</div>
+                    <div style="font-size:0.7rem; color:gray;">Click to chat with assistant</div>
+                </div>`).join('');
+        });
+    }
+
+    function openChat(id, itemName) {
+        activeOrderId = id; document.getElementById('chat-title').innerText = itemName;
+        document.getElementById('order-list-view').style.display = 'none';
+        document.getElementById('active-chat-view').style.display = 'block';
         document.getElementById('chat-window').style.display = 'flex';
-        db.collection("orders").doc(id).collection("chats").orderBy("timestamp")
-          .onSnapshot(snap => {
+        db.collection("orders").doc(id).collection("chats").orderBy("timestamp").onSnapshot(snap => {
             const box = document.getElementById('chat-messages');
             box.innerHTML = snap.docs.map(d => `<div class="msg ${d.data().sender === 'Admin' ? 'admin' : 'user'}">${d.data().text}</div>`).join('');
             box.scrollTop = box.scrollHeight;
-          });
+        });
     }
 
     async function sendMsg() {
-        const inp = document.getElementById('chat-input');
-        if(!inp.value || !activeOrderId) return;
-        await db.collection("orders").doc(activeOrderId).collection("chats").add({
-            text: inp.value,
-            sender: "User",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        const inp = document.getElementById('chat-input'); if(!inp.value || !activeOrderId) return;
+        await db.collection("orders").doc(activeOrderId).collection("chats").add({ text: inp.value, sender: "User", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
         inp.value = "";
     }
 </script>
