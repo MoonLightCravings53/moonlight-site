@@ -167,28 +167,29 @@
         if(userIP) loadOrderHistory(userIP); 
     }
 
-    async function submitOrder() {
-        const n = document.getElementById('name').value; 
-        const ph = document.getElementById('phone').value; 
-        const ad = document.getElementById('address').value;
-        if(!n || !ph || !ad) return alert("All fields required!");
-        
-        try {
-            const docRef = await db.collection("orders").add({ 
-                name: n, phone: ph, address: ad, item: selItem, price: selPrice, 
-                customerIP: userIP,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-            });
-            await db.collection("orders").doc(docRef.id).collection("chats").add({ 
-                text: `Baker: Received order for ${selItem}! We'll start baking soon.`, 
-                sender: "Admin", 
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-            });
-            closeModal(); 
-            openChat(docRef.id, selItem);
-        } catch(e) { alert("Error saving order!"); }
-    }
+   async function submitOrder() {
+    const n = document.getElementById('name').value; 
+    const ph = document.getElementById('phone').value; 
+    const ad = document.getElementById('address').value;
+    if(!n || !ph || !ad) return alert("All fields required!");
+    
+    try {
+        const docRef = await db.collection("orders").add({ 
+            name: n, phone: ph, address: ad, item: selItem, price: selPrice, 
+            customerIP: userIP,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        });
+]
+        await db.collection("orders").doc(docRef.id).collection("chats").add({ 
+            text: `Baker: Received order for ${selItem}! 🌙 \n\nPlease read this: Your number is shown in our order list, so we will directly message you on WhatsApp within 2 to 3 hours. \n\nYou won't have payment options here; we will send you our UPI QR Code via WhatsApp to confirm the booking. You can close this window now!`, 
+            sender: "Admin", 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        });
 
+        closeModal(); 
+        openChat(docRef.id, selItem);
+    } catch(e) { alert("Error saving order!"); }
+}
     function loadOrderHistory(ip) {
         db.collection("orders").where("customerIP", "==", ip).orderBy("timestamp", "desc").onSnapshot(snap => {
             const container = document.getElementById('my-orders-container');
@@ -242,3 +243,4 @@
 </script>
 </body>
 </html>
+
