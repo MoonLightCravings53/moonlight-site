@@ -10,16 +10,13 @@
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); overflow-x: hidden; }
 
-        /* Floating Background */
         .bg-cakes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .floating-cake { position: absolute; font-size: 2rem; opacity: 0.15; animation: float 15s linear infinite; }
         @keyframes float { 0% { transform: translateY(110vh); } 100% { transform: translateY(-10vh); } }
 
         nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
         .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
-        
         .hero { height: 35vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        
         .brand-desc { background: white; padding: 20px; text-align: center; margin: 20px auto; max-width: 800px; border-radius: 20px; font-style: italic; color: var(--rose-gold); }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
@@ -34,6 +31,16 @@
         #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 30px; }
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; }
+
+        /* --- NEW: IN-APP CHAT STYLING --- */
+        #chat-window { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 3000; flex-direction: column; overflow: hidden; }
+        #chat-header { background: var(--rose-gold); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
+        #chat-messages { height: 250px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #fff9fa; }
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80% ; font-size: 0.9rem; }
+        .msg.admin { background: var(--rose-gold); color: white; align-self: flex-start; }
+        .msg.user { background: #eee; color: #333; align-self: flex-end; }
+        #chat-footer { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee; }
+        #chat-footer input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -41,9 +48,7 @@
 <div class="bg-cakes" id="cake-bg"></div>
 <nav><div class="logo">MOONLIGHT CRAVINGS 🌙</div></nav>
 
-<div class="hero">
-    <h1>Baking Dreams Into Reality</h1>
-</div>
+<div class="hero"><h1>Baking Dreams Into Reality</h1></div>
 
 <div class="brand-desc">
     Freshly baked with love, no added preservatives. <br>
@@ -53,27 +58,15 @@
 <div class="container">
     <div class="card">
         <img src="https://images.unsplash.com/photo-1535141192574-5d4897c82536?w=500">
-        <div class="card-body">
-            <h3>Classic Vanilla</h3>
-            <p>₹800</p>
-            <button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button>
-        </div>
+        <div class="card-body"><h3>Classic Vanilla</h3><p>₹800</p><button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button></div>
     </div>
     <div class="card">
         <img src="https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=500">
-        <div class="card-body">
-            <h3>fun fetti</h3>
-            <p>₹900</p>
-            <button class="btn" onclick="openOrder('fun fetti', 900)">Buy Now</button>
-        </div>
+        <div class="card-body"><h3>fun fetti</h3><p>₹900</p><button class="btn" onclick="openOrder('fun fetti', 900)">Buy Now</button></div>
     </div>
     <div class="card">
         <img src="https://images.unsplash.com/photo-1606313564059-39598042912c?w=500">
-        <div class="card-body">
-            <h3>Black Forest Cake</h3>
-            <p>₹950</p>
-            <button class="btn" onclick="openOrder('Black Forest Cake', 950)">Buy Now</button>
-        </div>
+        <div class="card-body"><h3>Black Forest Cake</h3><p>₹950</p><button class="btn" onclick="openOrder('Black Forest Cake', 950)">Buy Now</button></div>
     </div>
 
     <div class="custom-box">
@@ -90,8 +83,17 @@
         <input type="text" id="name" placeholder="Your Name">
         <input type="text" id="phone" placeholder="WhatsApp Number">
         <input type="text" id="address" placeholder="Delivery Address">
-        <button class="btn" onclick="submitOrder()">Confirm & Message Bot</button>
+        <button class="btn" onclick="submitOrder()">Confirm & Open Chat</button>
         <button onclick="closeModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+    </div>
+</div>
+
+<div id="chat-window">
+    <div id="chat-header"><span>Chat with Baker 🌙</span><span onclick="this.parentElement.parentElement.style.display='none'" style="cursor:pointer">×</span></div>
+    <div id="chat-messages"></div>
+    <div id="chat-footer">
+        <input type="text" id="chat-input" placeholder="Ask about your order...">
+        <button onclick="sendMsg()" style="background:var(--rose-gold); color:white; border:none; padding:5px 10px; border-radius:10px;">Send</button>
     </div>
 </div>
 
@@ -107,7 +109,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Generate Floating Background
+    // Background Animation
     const bg = document.getElementById('cake-bg');
     const icons = ['🍰', '🎂', '✨', '🧁'];
     for(let i=0; i<15; i++) {
@@ -119,7 +121,7 @@
         bg.appendChild(div);
     }
 
-    let selItem = ""; let selPrice = 0;
+    let selItem = ""; let selPrice = 0; let activeOrderId = "";
 
     function openOrder(item, price) {
         selItem = item; selPrice = price;
@@ -130,8 +132,8 @@
     function startCustom() {
         const t = document.getElementById('custom-text').value;
         if(!t) return alert("Please add a description!");
-        selItem = "CUSTOM: " + t; selPrice = "Discussed via Chat";
-        document.getElementById('summary').innerText = "Custom Request Submission";
+        selItem = "CUSTOM: " + t; selPrice = "Pending";
+        document.getElementById('summary').innerText = "Custom Request";
         document.getElementById('modal').style.display = 'flex';
     }
 
@@ -141,23 +143,46 @@
         const n = document.getElementById('name').value;
         const ph = document.getElementById('phone').value;
         const ad = document.getElementById('address').value;
-
         if(!n || !ph || !ad) return alert("All fields are required!");
 
         try {
-            await db.collection("orders").add({
+            const docRef = await db.collection("orders").add({
                 name: n, phone: ph, address: ad, item: selItem, price: selPrice,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-            const myNum = "918870459614";
-            const botMsg = `*MOONLIGHT CRAVINGS BOT* 🌙%0A--------------------------%0A*ORDER RECEIVED!*%0A--------------------------%0A*Item:* ${selItem}%0A*Total:* ₹${selPrice}%0A*Customer:* ${n}%0A*Address:* ${ad}%0A--------------------------%0A_The baker will contact you to confirm delivery timing._`;
+            activeOrderId = docRef.id;
+            closeModal();
+            openChat(activeOrderId);
+            // Send initial automated message
+            await db.collection("orders").doc(activeOrderId).collection("chats").add({
+                text: `Hi ${n}! We've received your order for ${selItem}. How can we help?`,
+                sender: "Admin",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch(e) { alert("Vault Error!"); }
+    }
 
-            alert("Order Logged! Redirecting to Business Chat...");
-            window.open(`https://wa.me/${myNum}?text=${botMsg}`, '_blank');
-            location.reload();
+    function openChat(id) {
+        document.getElementById('chat-window').style.display = 'flex';
+        db.collection("orders").doc(id).collection("chats").orderBy("timestamp")
+          .onSnapshot(snap => {
+            const box = document.getElementById('chat-messages');
+            box.innerHTML = snap.docs.map(d => `<div class="msg ${d.data().sender === 'Admin' ? 'admin' : 'user'}">${d.data().text}</div>`).join('');
+            box.scrollTop = box.scrollHeight;
+          });
+    }
 
-        } catch(e) { alert("Vault Error: Check Internet Connection"); }
+    async function sendMsg() {
+        const inp = document.getElementById('chat-input');
+        if(!inp.value || !activeOrderId) return;
+        await db.collection("orders").doc(activeOrderId).collection("chats").add({
+            text: inp.value,
+            sender: "User",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        inp.value = "";
     }
 </script>
 </body>
 </html>
+
