@@ -1,103 +1,50 @@
-/* Moonlightcravings Theme */
-:root {
-    --night: #0a0e1a;    /* Deep Midnight Blue */
-    --moon: #fdf5e6;     /* Soft Moonlight Cream */
-    --gold: #d4af37;     /* Elegant Gold */
-    --star: #ffffff;     /* White */
-    --accent: #2c3e50;   /* Slate Blue */
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner Dashboard | Moonlight Cravings</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 40px; }
+        table { width: 100%; background: white; border-collapse: collapse; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #05070a; color: #d4af37; }
+        .badge { background: #e8f5e9; color: #2e7d32; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>🎂 Store Orders</h1>
+    <p>Logged in as: Owner</p>
+    
+    <table id="orderTable">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Item/Custom Details</th>
+                <th>Amount Paid</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
 
-body {
-    font-family: 'Georgia', serif; /* More elegant, classic font */
-    margin: 0;
-    background-color: var(--night);
-    color: var(--moon);
-    line-height: 1.6;
-}
+    <script>
+        const orders = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
+        const tbody = document.querySelector('#orderTable tbody');
 
-header {
-    background: rgba(10, 14, 26, 0.95);
-    padding: 20px 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--gold);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+        if(orders.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4'>No orders yet today.</td></tr>";
+        }
 
-.logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--gold);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-.hero {
-    text-align: center;
-    padding: 100px 20px;
-    background: radial-gradient(circle at center, #1a2a6c, #b21f1f, #fdbb2d); /* Starry sky vibe */
-    background: linear-gradient(rgba(10,14,26,0.8), rgba(10,14,26,0.8)), 
-                url('https://images.unsplash.com/photo-1535254973040-607b474cb8c2?q=80&w=1000');
-    background-size: cover;
-    background-position: center;
-}
-
-.cake-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    padding: 50px 5%;
-}
-
-.cake-card {
-    background: #16213e;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    transition: 0.4s;
-    text-align: center;
-}
-
-.cake-card:hover {
-    border-color: var(--gold);
-    transform: translateY(-10px);
-}
-
-.cake-card img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-}
-
-.card-info { padding: 20px; }
-
-.price { color: var(--gold); font-size: 1.5rem; font-weight: bold; margin: 10px 0; }
-
-/* Buttons */
-.btn-pay {
-    background: var(--gold);
-    color: var(--night);
-    border: none;
-    padding: 15px;
-    border-radius: 50px;
-    width: 100%;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.btn-wa {
-    background: transparent;
-    color: var(--moon);
-    border: 1px solid var(--moon);
-    text-decoration: none;
-    display: block;
-    padding: 13px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-}
-
-.btn-wa:hover { background: rgba(255,255,255,0.1); }
+        orders.reverse().forEach(order => {
+            const row = `<tr>
+                <td>${order.time}</td>
+                <td>${order.item}</td>
+                <td>₹${order.price}</td>
+                <td><span class="badge">Paid</span></td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    </script>
+</body>
+</html>
