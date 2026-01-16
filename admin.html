@@ -41,10 +41,8 @@
     </div>
 
     <script>
-        // 1. Password Protection (The key is 'moonlight53')
         function unlockVault() {
             const key = document.getElementById('vault-key').value;
-            // We use a simple hash check so the password isn't visible in plain text
             if (btoa(key) === "bW9vbmxpZ2h0NTM=") { 
                 document.getElementById('auth-gate').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
@@ -54,7 +52,6 @@
             }
         }
 
-        // 2. Render Orders from Cloud/Local
         function renderOrders() {
             const orders = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
             const tbody = document.querySelector('#orderTable tbody');
@@ -68,15 +65,12 @@
             `).join('');
         }
 
-        // 3. ANTI-INSPECT TRICKS
-        // Disable F12, Ctrl+Shift+I, Ctrl+U
         document.onkeydown = function(e) {
             if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
                 return false;
             }
         };
 
-        // If they manage to open console, this creates an infinite loop to slow them down
         setInterval(function() {
             const startTime = performance.now();
             debugger; 
@@ -88,3 +82,4 @@
     </script>
 </body>
 </html>
+
