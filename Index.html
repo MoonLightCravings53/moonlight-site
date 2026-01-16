@@ -3,57 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlightcravings | Luxury Cakes</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Moonlight Cravings | Order</title>
+    <style>
+        :root { --gold: #d4af37; --night: #05070a; --moon: #fdf5e6; }
+        body { margin: 0; font-family: 'serif'; background: var(--night); color: var(--moon); scroll-behavior: smooth; }
+        .hero { height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519340333755-56e9c1d04579?q=80&w=1500'); background-size: cover; text-align: center; }
+        .container { max-width: 1100px; margin: auto; padding: 50px 20px; }
+        .cake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; text-align: center; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        /* Custom Order Section */
+        .custom-section { background: #1a1a1a; padding: 40px; border-radius: 20px; margin-top: 50px; border: 1px dashed var(--gold); }
+        input, textarea, select { width: 100%; padding: 15px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; }
+
+        /* Payment Overlay */
+        #payment-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--night); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
+        .loader { border: 5px solid #333; border-top: 5px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">🌙 Moonlightcravings</div>
-    <nav style="color:var(--gold)">Bespoke Baking • India</nav>
-</header>
+    <section class="hero">
+        <h1 style="color:var(--gold); font-size: 3rem;">MOONLIGHT CRAVINGS</h1>
+        <p>Midnight Bakes & Custom Creations</p>
+    </section>
 
-<section class="hero">
-    <h1 style="font-size: 3rem; margin-bottom: 10px;">Satisfy Your Midnight Cravings</h1>
-    <p style="font-size: 1.2rem; color: var(--gold);">Handcrafted luxury cakes delivered under the stars.</p>
-</section>
+    <div class="container">
+        <h2 style="text-align:center; color:var(--gold)">Our Signature Menu</h2>
+        <div class="cake-grid">
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed2bb4?w=500" alt="Vanilla">
+                <h3>Classic Vanilla</h3>
+                <p>₹800</p>
+                <button class="btn" onclick="processPayment('Vanilla Cake', 800)">DEBUG: PAY</button>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500" alt="Chocolate">
+                <h3>Dark Chocolate</h3>
+                <p>₹950</p>
+                <button class="btn" onclick="processPayment('Chocolate Cake', 950)">DEBUG: PAY</button>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" alt="Black Forest">
+                <h3>Black Forest</h3>
+                <p>₹1,100</p>
+                <button class="btn" onclick="processPayment('Black Forest', 1100)">DEBUG: PAY</button>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=500" alt="Funfetti">
+                <h3>Fun Fetti</h3>
+                <p>₹900</p>
+                <button class="btn" onclick="processPayment('Fun Fetti', 900)">DEBUG: PAY</button>
+            </div>
+        </div>
 
-<div class="cake-grid">
-    <div class="cake-card">
-        <img src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?q=80&w=500" alt="Midnight Velvet">
-        <div class="card-info">
-            <h3>The Midnight Velvet</h3>
-            <p>Deep cocoa layers with galaxy frosting.</p>
-            <div class="price">₹1,450</div>
-            <button class="btn-pay" onclick="payWithGPay(1450, 'Midnight Velvet')">Pay via GPay / UPI</button>
-            <a href="https://wa.me/919999999999?text=Ordering: Midnight Velvet" class="btn-wa">Confirm on WhatsApp</a>
+        <div class="custom-section" id="custom">
+            <h2 style="color:var(--gold)">Create a Custom Craving</h2>
+            <input type="text" id="cust-name" placeholder="Your Name">
+            <textarea id="cust-desc" placeholder="Describe your dream cake (Flavors, colors, writing...)"></textarea>
+            <input type="number" id="cust-price" placeholder="Budget you're willing to pay (₹)">
+            <button class="btn" onclick="processPayment('CUSTOM: ' + document.getElementById('cust-desc').value, document.getElementById('cust-price').value)">Process Custom Order</button>
         </div>
     </div>
 
-    <div class="cake-card">
-        <img src="https://images.unsplash.com/photo-1519340333755-56e9c1d04579?q=80&w=500" alt="Starry Vanilla">
-        <div class="card-info">
-            <h3>Starry Vanilla Bean</h3>
-            <p>Infused with Madagascan vanilla & gold leaf.</p>
-            <div class="price">₹1,100</div>
-            <button class="btn-pay" onclick="payWithGPay(1100, 'Starry Vanilla')">Pay via GPay / UPI</button>
-            <a href="https://wa.me/919999999999?text=Ordering: Starry Vanilla" class="btn-wa">Confirm on WhatsApp</a>
-        </div>
+    <div id="payment-screen">
+        <div class="loader" id="loader"></div>
+        <h2 id="pay-status" style="margin-top:20px;">Processing Secure Payment...</h2>
+        <p id="pay-sub" style="color:var(--gold)">Connecting to UPI Gateway</p>
     </div>
-</div>
 
-<footer style="text-align:center; padding: 40px; border-top: 1px solid var(--accent);">
-    <p>© 2026 MoonlightcravingsSkibidiToilet Nagercoil,India. All rights reserved.</p>
-</footer>
+    <script>
+        function processPayment(item, price) {
+            const screen = document.getElementById('payment-screen');
+            const status = document.getElementById('pay-status');
+            const sub = document.getElementById('pay-sub');
+            const loader = document.getElementById('loader');
 
-<script>
-    function payWithGPay(amount, cake) {
-        const upiId = "example@upi"; // <--- PUT YOUR REAL GPAY ID HERE
-        const name = "Moonlightcravings";
-        const url = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&tn=Cravings_Order_${cake}&cu=INR`;
-        window.location.href = url;
-    }
-</script>
+            screen.style.display = 'flex';
 
+            // Save order to Local Storage (so Admin can see it)
+            let orders = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
+            orders.push({ item: item, price: price, time: new Date().toLocaleString() });
+            localStorage.setItem('bakeryOrders', JSON.stringify(orders));
+
+            // Animation sequence
+            setTimeout(() => {
+                loader.style.display = 'none';
+                status.innerHTML = "Payment Proceeded! ✅";
+                status.style.color = "var(--gold)";
+                sub.innerHTML = "Thank you! The owner will see and confirm your order in the next 2 hours.<br><br><button onclick='location.reload()' style='background:white; border:none; padding:10px; cursor:pointer;'>Back to Home</button>";
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
