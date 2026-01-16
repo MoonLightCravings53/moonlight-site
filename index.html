@@ -37,8 +37,8 @@
         #chat-header { background: var(--rose-gold); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
         #chat-messages { height: 250px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #fff9fa; }
         .msg { padding: 8px 12px; border-radius: 15px; max-width: 80% ; font-size: 0.9rem; }
-        .msg.admin { background: var(--rose-gold); color: white; align-self: flex-start; }
-        .msg.user { background: #eee; color: #333; align-self: flex-end; }
+        .msg.admin { background: var(--rose-gold); color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: #eee; color: #333; align-self: flex-end; border-bottom-right-radius: 2px; }
     </style>
 </head>
 <body>
@@ -88,6 +88,7 @@
     <div id="order-list-view" style="height: 300px; overflow-y: auto; padding: 10px; background: #fff1f5;">
         <p style="font-size: 0.8rem; text-align: center; color: var(--rose-gold);">Select an order to chat with the baker</p>
         <div id="my-orders-container"></div>
+        <button onclick="logoutCustomer()" id="logout-btn" style="display:none; width:100%; margin-top:10px; font-size:0.7rem; color:red; background:none; border:none; cursor:pointer;">Not you? Clear history</button>
     </div>
 
     <div id="active-chat-view" style="display:none;">
@@ -116,41 +117,75 @@
 
     let selItem = ""; let selPrice = 0; let activeOrderId = ""; let customerPhone = "";
 
-    // BG Animation
-    const bg = document.getElementById('cake-bg');
-    const icons = ['🍰', '🎂', '✨', '🧁'];
-    for(let i=0; i<15; i++) {
-        let div = document.createElement('div');
-        div.className = 'floating-cake'; div.innerText = icons[Math.floor(Math.random()*icons.length)];
-        div.style.left = Math.random() * 100 + 'vw'; div.style.animationDelay = Math.random() * 10 + 's';
-        bg.appendChild(div);
-    }
+    // Load saved phone on startup
+    window.onload = function() {
+        const savedPhone = localStorage.getItem('moonlight_phone');
+        if(savedPhone) {
+            customerPhone = savedPhone;
+            loadOrderHistory(savedPhone);
+            document.getElementById('logout-btn').style.display = 'block';
+        }
+        
+        // Background Animation
+        const bg = document.getElementById('cake-bg');
+        const icons = ['🍰', '🎂', '✨', '🧁'];
+        for(let i=0; i<15; i++) {
+            let div = document.createElement('div');
+            div.className = 'floating-cake'; div.innerText = icons[Math.floor(Math.random()*icons.length)];
+            div.style.left = Math.random() * 100 + 'vw'; div.style.animationDelay = Math.random() * 10 + 's';
+            bg.appendChild(div);
+        }
+    };
 
     function openOrder(item, price) { selItem = item; selPrice = price; document.getElementById('summary').innerText = `${item} - ₹${price}`; document.getElementById('modal').style.display = 'flex'; }
     function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; selPrice = "Pending"; document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeChatWindow() { document.getElementById('chat-window').style.display = 'none'; }
     function backToOrders() { document.getElementById('order-list-view').style.display = 'block'; document.getElementById('active-chat-view').style.display = 'none'; document.getElementById('chat-title').innerText = "My Orders 🌙"; }
-    function toggleChatWindow() { const win = document.getElementById('chat-window'); win.style.display = win.style.display === 'none' ? 'flex' : 'none'; if(customerPhone) loadOrderHistory(customerPhone); }
+    
+    function toggleChatWindow() { 
+        const win = document.getElementById('chat-window'); 
+        win.style.display = win.style.display === 'none' ? 'flex' : 'none'; 
+        if(customerPhone) loadOrderHistory(customerPhone); 
+    }
 
     async function submitOrder() {
-        const n = document.getElementById('name').value; const ph = document.getElementById('phone').value; const ad = document.getElementById('address').value;
+        const n = document.getElementById('name').value; 
+        const ph = document.getElementById('phone').value; 
+        const ad = document.getElementById('address').value;
         if(!n || !ph || !ad) return alert("All fields required!");
+        
         customerPhone = ph;
+        localStorage.setItem('moonlight_phone', ph); // Save identity locally
+        document.getElementById('logout-btn').style.display = 'block';
+
         try {
-            const docRef = await db.collection("orders").add({ name: n, phone: ph, address: ad, item: selItem, price: selPrice, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            await db.collection("orders").doc(docRef.id).collection("chats").add({ text: `Baker: Received order for ${selItem}!`, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            closeModal(); loadOrderHistory(ph); openChat(docRef.id, selItem);
+            const docRef = await db.collection("orders").add({ 
+                name: n, phone: ph, address: ad, item: selItem, price: selPrice, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            await db.collection("orders").doc(docRef.id).collection("chats").add({ 
+                text: `Baker: Received order for ${selItem}! We'll start baking soon.`, 
+                sender: "Admin", 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            closeModal(); 
+            loadOrderHistory(ph); 
+            openChat(docRef.id, selItem);
         } catch(e) { alert("Vault Error!"); }
     }
 
     function loadOrderHistory(phone) {
         db.collection("orders").where("phone", "==", phone).orderBy("timestamp", "desc").onSnapshot(snap => {
             const container = document.getElementById('my-orders-container');
+            if (snap.empty) {
+                container.innerHTML = "<p style='text-align:center; font-size:0.8rem;'>No orders yet.</p>";
+                return;
+            }
             container.innerHTML = snap.docs.map(doc => `
                 <div onclick="openChat('${doc.id}', '${doc.data().item}')" style="background:white; padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; border:1px solid #f8bbd0;">
                     <div style="font-weight:bold; color:var(--plum);">${doc.data().item}</div>
-                    <div style="font-size:0.7rem; color:gray;">Click to chat with assistant</div>
+                    <div style="font-size:0.7rem; color:gray;">Click to chat with baker</div>
                 </div>`).join('');
         });
     }
@@ -160,6 +195,8 @@
         document.getElementById('order-list-view').style.display = 'none';
         document.getElementById('active-chat-view').style.display = 'block';
         document.getElementById('chat-window').style.display = 'flex';
+        
+        // Live listener for messages
         db.collection("orders").doc(id).collection("chats").orderBy("timestamp").onSnapshot(snap => {
             const box = document.getElementById('chat-messages');
             box.innerHTML = snap.docs.map(d => `<div class="msg ${d.data().sender === 'Admin' ? 'admin' : 'user'}">${d.data().text}</div>`).join('');
@@ -169,10 +206,21 @@
 
     async function sendMsg() {
         const inp = document.getElementById('chat-input'); if(!inp.value || !activeOrderId) return;
-        await db.collection("orders").doc(activeOrderId).collection("chats").add({ text: inp.value, sender: "User", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-        inp.value = "";
+        const msgText = inp.value;
+        inp.value = ""; // Clear for better UX
+        await db.collection("orders").doc(activeOrderId).collection("chats").add({ 
+            text: msgText, 
+            sender: "User", 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        });
+    }
+
+    function logoutCustomer() {
+        if(confirm("This will clear your order history from this browser. Continue?")) {
+            localStorage.removeItem('moonlight_phone');
+            location.reload();
+        }
     }
 </script>
 </body>
 </html>
-
