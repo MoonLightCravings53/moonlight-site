@@ -76,27 +76,31 @@
     </div>
 
     <script>
-        function processPayment(item, price) {
-            const screen = document.getElementById('payment-screen');
-            const status = document.getElementById('pay-status');
-            const sub = document.getElementById('pay-sub');
-            const loader = document.getElementById('loader');
+       function processPayment(item, price) {
+    const screen = document.getElementById('payment-screen');
+    const status = document.getElementById('pay-status');
 
-            screen.style.display = 'flex';
+    screen.style.display = 'flex';
 
-            // Save order to Local Storage (so Admin can see it)
-            let orders = JSON.parse(localStorage.getItem('bakeryOrders')) || [];
-            orders.push({ item: item, price: price, time: new Date().toLocaleString() });
-            localStorage.setItem('bakeryOrders', JSON.stringify(orders));
+    const orderData = {
+        item: item,
+        price: price,
+        customerIP: "Remote User",
+        time: new Date().toLocaleString()
+    };
 
-            // Animation sequence
-            setTimeout(() => {
-                loader.style.display = 'none';
-                status.innerHTML = "Payment Proceeded! ✅";
-                status.style.color = "var(--gold)";
-                sub.innerHTML = "Thank you! The owner will see and confirm your order in the next 2 hours.<br><br><button onclick='location.reload()' style='background:white; border:none; padding:10px; cursor:pointer;'>Back to Home</button>";
-            }, 5000);
-        }
+    fetch('YOUR_GOOGLE_SCRIPT_URL_HERE', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(orderData)
+    });
+
+    setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+        status.innerHTML = "Payment Proceeded! ✅";
+    }, 5000);
+}
     </script>
 </body>
 </html>
+
