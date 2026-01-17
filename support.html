@@ -6,55 +6,60 @@
     <title>Support | Moonlight Cravings</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    
     <style>
         :root { --plum: #4a148c; --rose: #b76e79; --light: #fff1f5; --white: #ffffff; --green: #2ecc71; }
         body { background: var(--light); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
 
-        /* Header with Wallet Info */
         header { background: var(--white); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .back-btn { text-decoration: none; color: var(--rose); font-weight: bold; }
         .user-info { background: var(--plum); color: gold; padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: bold; }
 
-        /* Inbox Styling */
         #support-container { flex: 1; display: flex; flex-direction: column; max-width: 700px; margin: 20px auto; width: 95%; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
         #chat-display { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
         
-        /* Message Bubbles */
         .msg { padding: 12px 16px; border-radius: 18px; max-width: 80%; line-height: 1.4; position: relative; font-size: 0.95rem; }
         .msg.User { background: #e1f5fe; align-self: flex-start; border-bottom-left-radius: 2px; color: #01579b; }
         .msg.Admin { background: var(--rose); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .msg img { max-width: 100%; border-radius: 10px; margin-top: 8px; display: block; border: 2px solid rgba(0,0,0,0.1); }
+        .msg img { max-width: 100%; border-radius: 10px; margin-top: 8px; display: block; cursor: pointer; }
         .msg-time { font-size: 0.65rem; opacity: 0.6; display: block; margin-top: 5px; }
 
-        /* Input Area */
         .input-area { padding: 15px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
         #msg-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+        
+        /* Attachment Button */
+        .btn-attach { background: #f0f0f0; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-attach:hover { background: #e0e0e0; }
+        
         .btn-send { background: var(--plum); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
         
-        .upload-tip { background: #fff9c4; padding: 10px; font-size: 0.75rem; text-align: center; color: #827717; }
+        #file-input { display: none; }
+        .loading-dots { font-size: 0.8rem; color: var(--rose); font-style: italic; display: none; padding: 5px 20px; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="back-btn">← Back to Shop</a>
+        <a href="index.html" class="back-btn">← Back</a>
         <div class="logo" style="color: var(--plum); font-weight: bold;">SOS SUPPORT 🆘</div>
         <div class="user-info">✨ <span id="user-points">0</span> MP</div>
     </header>
 
-    <div class="upload-tip">
-        <b>To send Payment Screenshot:</b> Upload to <a href="https://postimages.org" target="_blank">PostImages</a> and paste the <b>Direct Link</b> here.
-    </div>
-
     <div id="support-container">
         <div id="chat-display">
-            <div class="msg User">
-                Hello! Please send your Order Name and any GPay screenshots if you're having payment issues. Staff will reply here shortly.
+            <div class="msg Admin">
+                Hello! Please send your Order Name and any payment screenshots. You can use the 📎 icon to upload from your Gallery or Files.
             </div>
         </div>
         
+        <div id="upload-status" class="loading-dots">Uploading your image... Please wait...</div>
+
         <div class="input-area">
-            <input type="text" id="msg-input" placeholder="Type message or paste image link...">
+            <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(this)">
+            <button class="btn-attach" onclick="document.getElementById('file-input').click()">📎</button>
+            
+            <input type="text" id="msg-input" placeholder="Type a message...">
             <button class="btn-send" onclick="sendSupportMsg()">➤</button>
         </div>
     </div>
@@ -64,27 +69,25 @@
             apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", 
             authDomain: "moonlight-cravings.firebaseapp.com", 
             projectId: "moonlight-cravings", 
-            storageBucket: "moonlight-cravings.firebasestorage.app", 
+            storageBucket: "moonlight-cravings.appspot.com", 
             messagingSenderId: "222974574228", 
             appId: "1:222974574228:web:47bed645deedf5788bbe81" 
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         let userIP = "";
 
         async function initSupport() {
-            // Get IP to track the specific conversation
             const res = await fetch('https://api.ipify.org?format=json');
             const data = await res.json();
             userIP = data.ip;
 
-            // Load User Points for the header
             db.collection("users").doc(userIP).onSnapshot(doc => {
                 if(doc.exists) document.getElementById('user-points').innerText = doc.data().points || 0;
             });
 
-            // Stream messages
             db.collection("support_tickets").doc(userIP).collection("messages")
                 .orderBy("timestamp", "asc")
                 .onSnapshot(snap => {
@@ -93,21 +96,52 @@
                     
                     snap.forEach(doc => {
                         const m = doc.data();
-                        const isImage = m.text.includes('http') && (m.text.match(/\.(jpeg|jpg|gif|png)$/) != null);
+                        const isImage = m.text.startsWith('https://firebasestorage') || m.text.includes('postimg');
                         
                         const msgDiv = document.createElement('div');
                         msgDiv.className = `msg ${m.sender}`;
-                        msgDiv.innerHTML = isImage ? `<img src="${m.text}">` : m.text;
+                        msgDiv.innerHTML = isImage ? `<img src="${m.text}" onclick="window.open('${m.text}')">` : m.text;
                         
                         if(m.timestamp) {
                             const time = m.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                             msgDiv.innerHTML += `<span class="msg-time">${time}</span>`;
                         }
-                        
                         display.appendChild(msgDiv);
                     });
                     display.scrollTop = display.scrollHeight;
                 });
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if(!file) return;
+
+            const status = document.getElementById('upload-status');
+            status.style.display = 'block';
+
+            // Create a unique filename
+            const fileName = `support/${userIP}_${Date.now()}_${file.name}`;
+            const storageRef = storage.ref().child(fileName);
+
+            try {
+                // Upload to Firebase Storage
+                const snapshot = await storageRef.put(file);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Send the URL as a message
+                await db.collection("support_tickets").doc(userIP).collection("messages").add({
+                    text: downloadURL,
+                    sender: "User",
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                status.style.display = 'none';
+                input.value = ""; // Clear input
+            } catch (error) {
+                console.error(error);
+                alert("Upload failed. Try again.");
+                status.style.display = 'none';
+            }
         }
 
         async function sendSupportMsg() {
@@ -115,14 +149,12 @@
             const text = input.value.trim();
             if(!text) return;
 
-            // Add to the ticket
             await db.collection("support_tickets").doc(userIP).collection("messages").add({
                 text: text,
                 sender: "User",
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // Update a "last_active" timestamp on the main ticket for the Admin to see
             await db.collection("support_tickets").doc(userIP).set({
                 last_message: text,
                 customerIP: userIP,
@@ -132,7 +164,6 @@
             input.value = "";
         }
 
-        // Allow "Enter" key to send
         document.getElementById('msg-input').addEventListener("keypress", (e) => {
             if (e.key === "Enter") sendSupportMsg();
         });
