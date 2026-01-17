@@ -10,67 +10,23 @@
     
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --gold: #ffd700; }
-        
-        /* Security Layer: Prevent text selection and highlights */
-        body { 
-            margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); 
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
-        }
-
-        /* Nav & Wallet */
+        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); -webkit-user-select: none; user-select: none; }
         nav { background: var(--white); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo { font-size: 1.4rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 1px; }
-        .wallet-pill { 
-            background: linear-gradient(135deg, var(--plum), #6a1b9a); 
-            color: gold; padding: 8px 18px; border-radius: 30px; 
-            font-weight: bold; display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        /* PREMIUM GIFT POPUP (Not AI Looking) */
-        #claim-popup { 
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            background: #fff; width: 320px; border-radius: 0 0 20px 20px; z-index: 5000; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 1px solid #eee;
-        }
-        .popup-header { background: var(--rose-gold); padding: 20px; color: white; clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); }
-        .popup-body { padding: 30px 20px; }
-        .pts-badge { font-size: 2.5rem; display: block; margin: 10px 0; font-weight: bold; color: var(--plum); text-shadow: 1px 1px gold; }
-
-        /* Product Cards */
+        .wallet-pill { background: linear-gradient(135deg, var(--plum), #6a1b9a); color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
         .card { background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #fce4ec; }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .price-tag { font-weight: bold; color: var(--rose-gold); font-size: 1.1rem; }
-        
-        select, input[type="text"] { 
-            width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia';
-        }
-
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .card img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+        select, textarea, input[type="text"] { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia'; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn:hover { background: var(--plum); transform: scale(1.05); }
         .emergency-btn { display: block; background: #e74c3c; color: white; text-align: center; padding: 12px; text-decoration: none; font-weight: bold; border-radius: 0 0 15px 15px; }
-
-        /* Custom Order Area */
-        .custom-box { grid-column: 1/-1; background: white; padding: 30px; border-radius: 25px; border: 2px dashed var(--rose-gold); text-align: center; }
-
-        /* Cart & History Tabs */
         #chat-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; height: 500px; background: white; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 3000; flex-direction: column; overflow: hidden; }
         .tab-btn { flex: 1; padding: 15px; border: none; background: #fdf2f5; cursor: pointer; font-weight: bold; color: var(--rose-gold); }
         .tab-btn.active { background: white; color: var(--plum); border-bottom: 3px solid var(--plum); }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="claim-popup">
-    <div class="popup-header">
-        <div style="font-size: 2rem;">🎁</div>
-        <h3 style="margin:0">Member Reward</h3>
-    </div>
-    <div class="popup-body">
-        <p style="margin:0; font-size: 0.9rem;">Congratulations! You've unlocked</p>
-        <span class="pts-badge" id="pending-pts">0</span>
-        <p style="margin:0 0 20px 0; color: #888;">MoonLight Points</p>
-        <button class="btn" onclick="claimPoints()" style="width:100%; background:var(--plum); box-shadow: 0 4px 15px rgba(74,20,140,0.3);">ADD TO WALLET</button>
-    </div>
-</div>
+<body oncontextmenu="return false;">
 
 <nav>
     <div class="logo">MOONLIGHT 🌙</div>
@@ -82,94 +38,103 @@
 
 <a href="support.html" class="emergency-btn">🆘 EMERGENCY HOTLINE & PAYMENT HELP</a>
 
-<div class="container" id="product-grid">
+<div class="container">
     <div class="card">
         <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
         <div class="card-body">
-            <h3>Classic Celebration Cakes</h3>
-            <select id="size-classic" onchange="updatePrice('classic')">
-                <option value="500" data-label="0.5kg (Vanilla/Choco/Forest)">0.5kg - ₹500</option>
-                <option value="1000" data-label="1kg (Vanilla/Choco/Forest)">1kg - ₹1000</option>
+            <h3>Premium Cakes</h3>
+            <select id="cake-select">
+                <optgroup label="Standard (Vanilla/Choco/Forest/Funfetti/Lemon)">
+                    <option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Standard Cake">1kg - ₹999</option>
+                </optgroup>
+                <optgroup label="Special (Dark Choco / Orange)">
+                    <option value="600" data-label="0.5kg Special Cake">0.5kg - ₹600</option>
+                    <option value="1199" data-label="1kg Special Cake">1kg - ₹1199</option>
+                </optgroup>
+                <optgroup label="Banana Cake">
+                    <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
+                </optgroup>
             </select>
-            <button class="btn" onclick="addToCartBySelect('size-classic', 'Classic Cake')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1541344493871-33758b21ca01?w=400">
-        <div class="card-body">
-            <h3>Premium Fruit & Plum Cakes</h3>
-            <select id="size-fruit">
-                <option value="600" data-label="0.5kg Plum Cake">0.5kg Plum Cake - ₹600</option>
-                <option value="1100" data-label="1kg Plum Cake">1kg Plum Cake - ₹1100</option>
-                <option value="450" data-label="0.5kg Banana Cake">0.5kg Banana Cake - ₹450</option>
-                <option value="850" data-label="1kg Banana Cake">1kg Banana Cake - ₹850</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('size-fruit', 'Premium Cake')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1567171466295-4afa5814522d?w=400">
-        <div class="card-body">
-            <h3>Specialty: Orange & Dark Choco</h3>
-            <select id="size-special">
-                <option value="1200" data-label="1kg Orange/Dark Choco">1kg - ₹1200</option>
-                <option value="650" data-label="0.5kg Orange/Dark Choco">0.5kg - ₹650</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('size-special', 'Specialty Cake')">Add to Cart</button>
+            <button class="btn" onclick="addToCartBySelect('cake-select', 'Cake')">Add to Cart</button>
         </div>
     </div>
 
     <div class="card">
         <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
         <div class="card-body">
-            <h3>Gourmet Cupcakes (Box of 5)</h3>
-            <select id="flavor-cup">
-                <option value="200" data-label="Classic Cupcake Box">Vanilla/Choco/Lemon - ₹200</option>
-                <option value="275" data-label="Blueberry Cupcake Box">Blueberry Special - ₹275</option>
+            <h3>Cupcakes (Box of 5)</h3>
+            <select id="cupcake-select">
+                <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
+                <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
+                <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
+                <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
             </select>
-            <button class="btn" onclick="addToCartBySelect('flavor-cup', 'Cupcake Box')">Add to Cart</button>
+            <button class="btn" onclick="addToCartBySelect('cupcake-select', 'Cupcakes')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
+        <div class="card-body">
+            <h3>Dacquoise & Macarons</h3>
+            <select id="treat-select">
+                <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
+                <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
+                <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('treat-select', 'Treats')">Add to Cart</button>
         </div>
     </div>
 
     <div class="card">
         <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
         <div class="card-body">
-            <h3>Bakery Cookies (Box of 8)</h3>
-            <select id="flavor-cookie">
-                <option value="200" data-label="Butter/Sugar Cookie Box">Butter/Sugar - ₹200</option>
-                <option value="240" data-label="Choco Chip Cookie Box">Choco Chip Special - ₹240</option>
+            <h3>Cookie Boxes (8 pcs)</h3>
+            <select id="cookie-select">
+                <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
+                <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
+                <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
             </select>
-            <button class="btn" onclick="addToCartBySelect('flavor-cookie', 'Cookie Box')">Add to Cart</button>
+            <button class="btn" onclick="addToCartBySelect('cookie-select', 'Cookies')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
+        <div class="card-body">
+            <h3>Bakery Snacks</h3>
+            <select id="snack-select">
+                <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
+                <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
+                <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('snack-select', 'Snacks')">Add to Cart</button>
         </div>
     </div>
 
     <div class="custom-box">
-        <h3>✨ Can't find what you're looking for?</h3>
-        <p>Brownies, Macarons, Churros? We make everything!</p>
-        <textarea id="custom-req" placeholder="Describe your dream dessert here..." style="width:80%; height:60px; border-radius:15px; padding:10px; border:1px solid #ddd;"></textarea><br>
-        <button class="btn" style="margin-top:10px;" onclick="addCustomToCart()">Add Custom Request</button>
+        <h3>✨ Custom Requests</h3>
+        <textarea id="custom-req" placeholder="Specific flavors or large orders..."></textarea><br>
+        <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
     </div>
 </div>
 
 <div id="chat-window">
     <div style="display:flex; background:#fdf2f5;">
-        <button class="tab-btn active" id="btn-cart" onclick="showTab('cart')">Shopping Cart</button>
+        <button class="tab-btn active" id="btn-cart" onclick="showTab('cart')">Cart</button>
         <button class="tab-btn" id="btn-history" onclick="showTab('history')">My Orders</button>
         <button onclick="toggleChatWindow()" style="border:none; background:none; padding:10px; cursor:pointer;">✕</button>
     </div>
-    
     <div id="tab-cart-content" style="padding:20px; flex:1; overflow-y:auto;">
         <div id="cart-items"></div>
         <hr>
         <div style="font-weight:bold; margin:10px 0;">Total: ₹<span id="cart-total-val">0</span></div>
-        <input type="text" id="c-name" placeholder="Name">
+        <input type="text" id="c-name" placeholder="Full Name">
         <input type="text" id="c-phone" placeholder="WhatsApp Number">
-        <input type="text" id="c-addr" placeholder="Address">
+        <input type="text" id="c-addr" placeholder="Delivery Address">
         <button class="btn" style="width:100%; margin-top:10px;" onclick="submitOrder()">Place Order</button>
     </div>
-
     <div id="tab-history-content" style="padding:20px; flex:1; overflow-y:auto; display:none;">
         <div id="history-list"></div>
     </div>
@@ -184,40 +149,22 @@
 
     let userIP = "";
     let myCart = [];
-    let _SECURE_POINTS = 0; // Private variable
-
-    // SECURITY: Disable Inspect Shortcuts
-    document.onkeydown = function(e) {
-        if(e.keyCode == 123) return false;
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-    }
+    let _SECURE_POINTS = 0;
 
     window.onload = async function() {
         const r = await fetch('https://api.ipify.org?format=json');
         const d = await r.json();
         userIP = d.ip;
-
         db.collection("users").doc(userIP).onSnapshot(doc => {
             if(doc.exists) {
                 _SECURE_POINTS = doc.data().points || 0;
                 document.getElementById('user-points').innerText = _SECURE_POINTS;
             }
         });
-
-        db.collection("points_pending").doc(userIP).onSnapshot(doc => {
-            if(doc.exists && doc.data().amount > 0) {
-                document.getElementById('pending-pts').innerText = doc.data().amount;
-                document.getElementById('claim-popup').style.display = 'block';
-            }
-        });
-
         loadOrderHistory();
     };
 
-    function addToCartBySelect(id, baseName) {
+    function addToCartBySelect(id) {
         const el = document.getElementById(id);
         const price = parseInt(el.value);
         const label = el.options[el.selectedIndex].getAttribute('data-label');
@@ -227,8 +174,8 @@
 
     function addCustomToCart() {
         const req = document.getElementById('custom-req').value;
-        if(!req) return alert("Please describe your request!");
-        myCart.push({ name: "CUSTOM: " + req, price: 0 }); // Price added later by admin
+        if(!req) return alert("Please enter details");
+        myCart.push({ name: "CUSTOM: " + req, price: 0 });
         renderCart();
         document.getElementById('custom-req').value = "";
     }
@@ -238,7 +185,7 @@
         let total = 0;
         document.getElementById('cart-items').innerHTML = myCart.map((item, i) => {
             total += item.price;
-            return `<div style="display:flex; justify-content:space-between; font-size:0.8rem; margin:5px 0;">
+            return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;">
                 <span>${item.name}</span>
                 <span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span>
             </div>`;
@@ -250,19 +197,15 @@
         const n = document.getElementById('c-name').value;
         const p = document.getElementById('c-phone').value;
         const a = document.getElementById('c-addr').value;
-        if(!n || !p || !a || myCart.length === 0) return alert("Fill all fields!");
-
+        if(!n || !p || !a || myCart.length === 0) return alert("Fill all details!");
         await db.collection("orders").add({
             name: n, phone: p, address: a,
             item: myCart.map(i => i.name).join(", "),
             price: document.getElementById('cart-total-val').innerText,
-            customerIP: userIP,
-            status: 'placed',
+            customerIP: userIP, status: 'placed',
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
         myCart = []; renderCart();
-        alert("Order Placed! Switching to My Orders tab...");
         showTab('history');
     }
 
@@ -271,17 +214,9 @@
             document.getElementById('history-list').innerHTML = snap.docs.map(doc => `
                 <div style="background:#fdf2f5; padding:10px; border-radius:10px; margin-bottom:10px; font-size:0.8rem;">
                     <b>${doc.data().item}</b><br>
-                    <span style="color:var(--rose-gold)">Status: ${doc.data().status.toUpperCase()}</span>
-                </div>
-            `).join('');
+                    <span>Status: ${doc.data().status.toUpperCase()}</span>
+                </div>`).join('');
         });
-    }
-
-    async function claimPoints() {
-        const amt = parseInt(document.getElementById('pending-pts').innerText);
-        await db.collection("users").doc(userIP).set({ points: _SECURE_POINTS + amt }, { merge: true });
-        await db.collection("points_pending").doc(userIP).delete();
-        document.getElementById('claim-popup').style.display = 'none';
     }
 
     function showTab(t) {
