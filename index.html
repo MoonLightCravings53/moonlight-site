@@ -249,11 +249,22 @@
         db.collection("orders").where("customerIP", "==", userIP).orderBy("timestamp", "desc").onSnapshot(snap => {
             document.getElementById('history-list').innerHTML = snap.docs.map(doc => {
                 const data = doc.data();
+                
+                let statusText = "Not Confirmed Yet";
+                let statusColor = "#e67e22";
+
+                if (data.status === 'confirmed') {
+                    statusText = "Confirmed ✓";
+                    statusColor = "#27ae60";
+                }
+
                 return `
-                <div style="background:#fdf2f5; padding:10px; border-radius:10px; margin-bottom:10px;">
-                    <div style="font-size:0.8rem; font-weight:bold;">${data.item}</div>
-                    <div style="font-size:0.7rem; color:var(--rose-gold)">Status: ${data.status.toUpperCase()}</div>
-                    <div id="chat-box-${doc.id}" style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;"></div>
+                <div style="background:#fdf2f5; padding:15px; border-radius:15px; margin-bottom:15px; border-left: 5px solid ${statusColor};">
+                    <div style="font-size:0.85rem; font-weight:bold;">${data.item}</div>
+                    <div style="font-size:0.75rem; color:${statusColor}; font-weight:bold; margin-top:5px;">
+                        Status: ${statusText}
+                    </div>
+                    <div id="chat-box-${doc.id}" style="margin-top:10px; border-top:1px solid rgba(0,0,0,0.05); padding-top:10px;"></div>
                 </div>`;
             }).join('');
             
@@ -289,3 +300,4 @@
 </script>
 </body>
 </html>
+
