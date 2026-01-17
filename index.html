@@ -30,8 +30,8 @@
         #chat-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; height: 500px; background: white; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 3000; flex-direction: column; overflow: hidden; }
         .tab-btn { flex: 1; padding: 15px; border: none; background: #fdf2f5; cursor: pointer; font-weight: bold; color: var(--rose-gold); }
         .tab-btn.active { background: white; color: var(--plum); border-bottom: 3px solid var(--plum); }
-        .msg { padding: 8px 12px; margin: 5px; border-radius: 10px; max-width: 80%; font-size: 0.85rem; }
-        .msg.Admin { background: var(--pink); align-self: flex-start; }
+        .msg { padding: 8px 12px; margin: 5px; border-radius: 10px; max-width: 80%; font-size: 0.85rem; word-wrap: break-word; }
+        .msg.Admin { background: var(--pink); align-self: flex-start; border-bottom-left-radius: 2px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -53,88 +53,12 @@
 <a href="support.html" class="emergency-btn">🆘 EMERGENCY HOTLINE & PAYMENT HELP</a>
 
 <div class="container">
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
-        <div class="card-body">
-            <h3>Premium Cakes</h3>
-            <select id="cake-select">
-                <optgroup label="Standard (Vanilla/Choco/Forest/Funfetti/Lemon)">
-                    <option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option>
-                    <option value="999" data-label="1kg Standard Cake">1kg - ₹999</option>
-                </optgroup>
-                <optgroup label="Plum Cake">
-                    <option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option>
-                </optgroup>
-                <optgroup label="Special (Dark Choco / Orange)">
-                    <option value="600" data-label="0.5kg Special Cake">0.5kg - ₹600</option>
-                    <option value="1199" data-label="1kg Special Cake">1kg - ₹1199</option>
-                </optgroup>
-                <optgroup label="Banana Cake">
-                    <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
-                </optgroup>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
-        <div class="card-body">
-            <h3>Cupcakes (Box of 5)</h3>
-            <select id="cupcake-select">
-                <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
-                <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
-                <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
-                <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
-        <div class="card-body">
-            <h3>Dacquoise & Macarons</h3>
-            <select id="treat-select">
-                <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
-                <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
-                <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
-        <div class="card-body">
-            <h3>Cookie Boxes (8 pcs)</h3>
-            <select id="cookie-select">
-                <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
-                <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
-                <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
-        <div class="card-body">
-            <h3>Bakery Snacks</h3>
-            <select id="snack-select">
-                <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
-                <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
-                <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card" style="display:flex; flex-direction:column; justify-content:center; padding: 20px;">
-        <h3>✨ Custom Requests</h3>
-        <textarea id="custom-req" placeholder="Specific flavors or large orders..."></textarea>
-        <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
-    </div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400"><div class="card-body"><h3>Premium Cakes</h3><select id="cake-select"><optgroup label="Standard"><option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option><option value="999" data-label="1kg Standard Cake">1kg - ₹999</option></optgroup><optgroup label="Plum Cake"><option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option></optgroup></select><button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button></div></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400"><div class="card-body"><h3>Cupcakes (Box of 5)</h3><select id="cupcake-select"><option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option><option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option></select><button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button></div></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400"><div class="card-body"><h3>Dacquoise & Macarons</h3><select id="treat-select"><option value="200" data-label="6pc Almond Dacquoise">Almond (6pcs) - ₹200</option><option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option></select><button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button></div></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400"><div class="card-body"><h3>Cookie Boxes</h3><select id="cookie-select"><option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option></select><button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button></div></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400"><div class="card-body"><h3>Bakery Snacks</h3><select id="snack-select"><option value="180" data-label="10pc Donut Holes">Donut Holes - ₹180</option></select><button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button></div></div>
+    <div class="card" style="display:flex; flex-direction:column; justify-content:center; padding: 20px;"><h3>✨ Custom Requests</h3><textarea id="custom-req" placeholder="Specific flavors..."></textarea><button class="btn" onclick="addCustomToCart()">Add Custom Order</button></div>
 </div>
 
 <div id="chat-window">
@@ -145,16 +69,13 @@
     </div>
     
     <div id="tab-cart-content" style="padding:20px; flex:1; overflow-y:auto;">
-        <div id="cart-items"></div>
-        <hr>
+        <div id="cart-items"></div><hr>
         <div style="font-weight:bold; margin:10px 0;">Total: ₹<span id="cart-total-val">0</span></div>
-        <input type="text" id="c-name" placeholder="Full Name">
-        <input type="text" id="c-phone" placeholder="WhatsApp Number">
-        <input type="text" id="c-addr" placeholder="Delivery Address">
+        <input type="text" id="c-name" placeholder="Full Name"><input type="text" id="c-phone" placeholder="WhatsApp Number"><input type="text" id="c-addr" placeholder="Delivery Address">
         <button class="btn" style="width:100%; margin-top:10px;" onclick="submitOrder()">Place Order</button>
     </div>
 
-    <div id="tab-history-content" style="padding:20px; flex:1; overflow-y:auto; display:none; display:flex; flex-direction:column;">
+    <div id="tab-history-content" style="padding:15px; flex:1; overflow-y:auto; display:none; flex-direction:column; background: #fffafb;">
         <div id="history-list"></div>
     </div>
 </div>
@@ -213,10 +134,7 @@
         let total = 0;
         document.getElementById('cart-items').innerHTML = myCart.map((item, i) => {
             total += item.price;
-            return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;">
-                <span>${item.name}</span>
-                <span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span>
-            </div>`;
+            return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;"><span>${item.name}</span><span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span></div>`;
         }).join('');
         document.getElementById('cart-total-val').innerText = total;
     }
@@ -236,7 +154,7 @@
         });
 
         await orderRef.collection("chats").add({
-            text: "🌙 Order received in the bakery! We've started prepping your treats. Check your WhatsApp for a confirmation message shortly!",
+            text: "🌙 Order received! We've started prepping your treats. Check here for live status updates!",
             sender: "Admin",
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -246,34 +164,38 @@
     }
 
     function loadOrderHistory() {
+        // Query orders linked to this IP
         db.collection("orders").where("customerIP", "==", userIP).orderBy("timestamp", "desc").onSnapshot(snap => {
-            document.getElementById('history-list').innerHTML = snap.docs.map(doc => {
-                const data = doc.data();
-                
-                let statusText = "Not Confirmed Yet";
-                let statusColor = "#e67e22";
+            const list = document.getElementById('history-list');
+            list.innerHTML = "";
 
-                if (data.status === 'confirmed') {
-                    statusText = "Confirmed ✓";
-                    statusColor = "#27ae60";
-                }
-
-                return `
-                <div style="background:#fdf2f5; padding:15px; border-radius:15px; margin-bottom:15px; border-left: 5px solid ${statusColor};">
-                    <div style="font-size:0.85rem; font-weight:bold;">${data.item}</div>
-                    <div style="font-size:0.75rem; color:${statusColor}; font-weight:bold; margin-top:5px;">
-                        Status: ${statusText}
-                    </div>
-                    <div id="chat-box-${doc.id}" style="margin-top:10px; border-top:1px solid rgba(0,0,0,0.05); padding-top:10px;"></div>
-                </div>`;
-            }).join('');
-            
             snap.docs.forEach(doc => {
-                db.collection("orders").doc(doc.id).collection("chats").orderBy("timestamp").onSnapshot(s => {
-                    const box = document.getElementById(`chat-box-${doc.id}`);
-                    if(box) box.innerHTML = s.docs.map(d => `<div class="msg ${d.data().sender}">${d.data().text}</div>`).join('');
+                const data = doc.data();
+                const isConfirmed = data.status === 'confirmed';
+                const statusLabel = isConfirmed ? "Confirmed ✓" : "Waiting for Bakery...";
+                const statusColor = isConfirmed ? "#27ae60" : "#e67e22";
+
+                const orderCard = document.createElement('div');
+                orderCard.style = `background:white; padding:15px; border-radius:15px; margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.03); border-left: 5px solid ${statusColor};`;
+                orderCard.innerHTML = `
+                    <div style="font-size:0.85rem; font-weight:bold; color:var(--plum)">${data.item}</div>
+                    <div style="font-size:0.7rem; color:${statusColor}; font-weight:bold; margin-top:4px;">Status: ${statusLabel}</div>
+                    <div id="chat-box-${doc.id}" style="margin-top:10px; padding-top:10px; border-top:1px solid #fdf2f5; display:flex; flex-direction:column;">
+                        <span style="font-size:0.6rem; color:#aaa; text-align:center;">Loading updates...</span>
+                    </div>
+                `;
+                list.appendChild(orderCard);
+
+                // Sub-listener for messages for THIS specific order
+                db.collection("orders").doc(doc.id).collection("chats").orderBy("timestamp", "asc").onSnapshot(chatSnap => {
+                    const chatBox = document.getElementById(`chat-box-${doc.id}`);
+                    if(chatBox) {
+                        chatBox.innerHTML = chatSnap.docs.map(d => `<div class="msg ${d.data().sender}">${d.data().text}</div>`).join('');
+                    }
                 });
             });
+
+            if(snap.empty) list.innerHTML = "<p style='text-align:center; font-size:0.8rem; color:#999;'>No orders found yet.</p>";
         });
     }
 
@@ -300,4 +222,3 @@
 </script>
 </body>
 </html>
-
