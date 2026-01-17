@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moonlight Vault | Owner Command Center</title>
+    <title>Vault | Moonlight Cravings</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --plum: #4a148c; --rose: #b76e79; --light: #fff1f5; --green: #25D366; --gold: #ffd700; }
-        body { background: var(--light); font-family: 'Segoe UI', sans-serif; padding: 20px; color: var(--plum); margin: 0; }
+        :root { --plum: #4a148c; --rose: #b76e79; --light: #fff1f5; --green: #25D366; --gold: #ffd700; --red: #e74c3c; }
+        body { background: var(--light); font-family: 'Segoe UI', sans-serif; padding: 20px; color: var(--plum); margin: 0; -webkit-user-select: none; user-select: none; }
         
         .header-area { text-align: center; margin-bottom: 20px; }
-        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 10px 25px; border-radius: 20px; border: 2px solid var(--rose); background: white; cursor: pointer; font-weight: bold; color: var(--rose); }
-        .tab-btn.active { background: var(--rose); color: white; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 20px; border-radius: 20px; border: 2px solid var(--rose); background: white; cursor: pointer; font-weight: bold; color: var(--rose); transition: 0.3s; }
+        .tab-btn.active { background: var(--rose); color: white; box-shadow: 0 4px 10px rgba(183,110,121,0.3); }
+        .tab-btn.sos-tab { border-color: var(--red); color: var(--red); }
+        .tab-btn.sos-tab.active { background: var(--red); color: white; }
 
-        #orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 25px; max-width: 1400px; margin: auto; }
+        #main-display { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 25px; max-width: 1400px; margin: auto; }
         
-        .order-card { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--rose); box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
+        .card { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--rose); box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
+        .sos-card { border-top-color: var(--red); }
+        
         .status-badge { align-self: flex-start; padding: 4px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; }
         .status-new { background: #ffebee; color: #c62828; }
         .status-confirmed { background: #e8f5e9; color: #2e7d32; }
@@ -25,28 +29,29 @@
         .points-box { background: var(--light); border: 2px dashed gold; padding: 10px; border-radius: 15px; margin-top: 15px; text-align: center; }
         .points-box input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #ddd; text-align: center; }
 
-        .btn-confirm { background: var(--plum); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-action { background: var(--plum); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-gift { background: gold; color: var(--plum); border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-left: 5px; }
         
-        /* Chat styles from your original admin */
-        .chat-container { margin-top: 15px; background: #fff9fa; border-radius: 12px; border: 1px solid #f3d0d7; padding: 10px; }
-        .chat-display { height: 100px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #f3d0d7; }
-        .msg.Admin { background: var(--rose); color: white; align-self: flex-end; padding: 5px; border-radius: 5px; }
-        .msg.User { background: #eee; align-self: flex-start; padding: 5px; border-radius: 5px; }
-        .btn-wa { background: var(--green); color: white; text-decoration: none; padding: 10px; border-radius: 10px; text-align: center; display: block; margin-top: 10px; font-weight: bold; }
+        .chat-display { height: 120px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #fdfdfd; border: 1px solid #eee; border-radius: 10px; }
+        .msg.Admin { background: var(--rose); color: white; align-self: flex-end; padding: 6px 10px; border-radius: 10px 10px 0 10px; }
+        .msg.User { background: #eee; align-self: flex-start; padding: 6px 10px; border-radius: 10px 10px 10px 0; }
+        .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
+        
+        .wa-link { background: var(--green); color: white; text-decoration: none; padding: 10px; border-radius: 10px; text-align: center; display: block; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div class="header-area">
         <h1>MOONLIGHT VAULT 🌙</h1>
         <div class="tabs">
-            <button class="tab-btn active" id="tab-new" onclick="switchTab('new')">NEW PLACED ORDERS</button>
-            <button class="tab-btn" id="tab-done" onclick="switchTab('confirmed')">CONFIRMED ORDERS</button>
+            <button class="tab-btn active" id="btn-new" onclick="switchTab('new')">NEW ORDERS</button>
+            <button class="tab-btn" id="btn-confirmed" onclick="switchTab('confirmed')">CONFIRMED</button>
+            <button class="tab-btn sos-tab" id="btn-sos" onclick="switchTab('sos')">🆘 SOS TICKETS</button>
         </div>
     </div>
 
-    <div id="orders-grid">Loading...</div>
+    <div id="main-display">Loading Vault Data...</div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
@@ -55,83 +60,123 @@
 
         let currentTab = 'new';
 
+        // Security: Block F12 and Inspect
+        document.onkeydown = (e) => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) return false; };
+
         function switchTab(t) {
             currentTab = t;
-            document.getElementById('tab-new').classList.toggle('active', t === 'new');
-            document.getElementById('tab-done').classList.toggle('active', t === 'confirmed');
-            loadOrders();
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${t}`).classList.add('active');
+            renderView();
         }
 
-        function loadOrders() {
-            db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
-                const grid = document.getElementById('orders-grid');
-                grid.innerHTML = '';
-                snap.forEach(doc => {
-                    const o = doc.data();
-                    const isConfirmed = o.status === 'confirmed';
-                    
-                    if ((currentTab === 'new' && !isConfirmed) || (currentTab === 'confirmed' && isConfirmed)) {
+        function renderView() {
+            const display = document.getElementById('main-display');
+            display.innerHTML = '';
+
+            if (currentTab === 'sos') {
+                // SOS TICKETS VIEW
+                db.collection("support_tickets").orderBy("last_update", "desc").onSnapshot(snap => {
+                    display.innerHTML = '';
+                    snap.forEach(doc => {
+                        const s = doc.data();
                         const card = document.createElement('div');
-                        card.className = 'order-card';
+                        card.className = 'card sos-card';
                         card.innerHTML = `
-                            <div class="status-badge ${isConfirmed ? 'status-confirmed' : 'status-new'}">${isConfirmed ? 'CONFIRMED' : 'PENDING'}</div>
-                            <div style="font-weight:bold;">${o.item} - ₹${o.price}</div>
-                            <div style="font-size:0.8rem;">Customer: ${o.name} (${o.phone})</div>
-                            
-                            <div class="chat-container">
-                                <div class="chat-display" id="chat-${doc.id}"></div>
-                                <div style="display:flex; gap:5px; margin-top:5px;">
-                                    <input type="text" id="in-${doc.id}" style="flex:1;" placeholder="Reply...">
-                                    <button onclick="sendReply('${doc.id}')">➤</button>
-                                </div>
+                            <div class="status-badge status-new">EMERGENCY: ${doc.id}</div>
+                            <div class="chat-display" id="sos-chat-${doc.id}"></div>
+                            <div style="display:flex; gap:5px; margin-top:10px;">
+                                <input type="text" id="sos-in-${doc.id}" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;" placeholder="Reply to SOS...">
+                                <button onclick="sendSOSReply('${doc.id}')" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">➤</button>
                             </div>
-
-                            ${!isConfirmed ? 
-                                `<button class="btn-confirm" onclick="confirmOrder('${doc.id}')">✅ CONFIRM ORDER</button>` : 
-                                `<div class="points-box">
-                                    <span>Gift MoonLight Points:</span><br>
-                                    <input type="number" id="pts-${doc.id}" value="100">
-                                    <button class="btn-gift" onclick="giftPoints('${doc.id}', '${o.customerIP}')">GIFT POINTS</button>
-                                </div>`
-                            }
-                            <a href="https://wa.me/${o.phone.replace(/\D/g,'')}" target="_blank" class="btn-wa">WhatsApp Customer</a>
                         `;
-                        grid.appendChild(card);
-                        loadChat(doc.id);
-                    }
+                        display.appendChild(card);
+                        loadSOSMessages(doc.id);
+                    });
                 });
-            });
+            } else {
+                // ORDERS VIEW
+                db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
+                    display.innerHTML = '';
+                    snap.forEach(doc => {
+                        const o = doc.data();
+                        const isConfirmed = o.status === 'confirmed';
+                        if ((currentTab === 'new' && !isConfirmed) || (currentTab === 'confirmed' && isConfirmed)) {
+                            const card = document.createElement('div');
+                            card.className = 'card';
+                            card.innerHTML = `
+                                <div class="status-badge ${isConfirmed ? 'status-confirmed' : 'status-new'}">${isConfirmed ? 'CONFIRMED' : 'PENDING'}</div>
+                                <div style="font-weight:bold;">${o.item} - ₹${o.price}</div>
+                                <div style="font-size:0.8rem; margin-bottom:10px;">User: ${o.name} (${o.phone})</div>
+                                <div class="chat-display" id="chat-${doc.id}"></div>
+                                <div style="display:flex; gap:5px; margin-top:10px;">
+                                    <input type="text" id="in-${doc.id}" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;" placeholder="Message user...">
+                                    <button onclick="sendOrderReply('${doc.id}')" style="background:var(--plum); color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">➤</button>
+                                </div>
+                                ${!isConfirmed ? 
+                                    `<button class="btn-action" onclick="confirmOrder('${doc.id}')">✅ CONFIRM ORDER</button>` : 
+                                    `<div class="points-box">
+                                        <span>Gift Points:</span><br>
+                                        <input type="number" id="pts-${doc.id}" value="100">
+                                        <button class="btn-gift" onclick="giftPoints('${doc.id}', '${o.customerIP}')">GIFT</button>
+                                    </div>`
+                                }
+                                <a href="https://wa.me/${o.phone.replace(/\D/g,'')}" target="_blank" class="wa-link">Open WhatsApp</a>
+                            `;
+                            display.appendChild(card);
+                            loadOrderChat(doc.id);
+                        }
+                    });
+                });
+            }
         }
 
+        // Logic functions
         async function confirmOrder(id) {
-            if(confirm("Are you sure this order is confirmed?")) {
-                await db.collection("orders").doc(id).update({ status: 'confirmed' });
-                alert("Order Confirmed! Moved to Confirmed tab.");
-            }
+            if(confirm("Mark as confirmed?")) await db.collection("orders").doc(id).update({ status: 'confirmed' });
         }
 
         async function giftPoints(orderId, ip) {
-            const amount = document.getElementById(`pts-${orderId}`).value;
-            if(confirm(`Gift ${amount} MoonLight Points to this customer?`)) {
-                await db.collection("points_pending").doc(ip).set({ amount: parseInt(amount) });
-                alert("Points sent! Customer will see a claim popup next time they visit.");
-            }
+            const amt = document.getElementById(`pts-${orderId}`).value;
+            await db.collection("points_pending").doc(ip).set({ amount: parseInt(amt) });
+            alert("Points gifted!");
         }
 
-        function loadChat(id) {
+        function loadOrderChat(id) {
             db.collection("orders").doc(id).collection("chats").orderBy("timestamp").onSnapshot(s => {
                 const box = document.getElementById(`chat-${id}`);
                 if(box) box.innerHTML = s.docs.map(d => `<div class="msg ${d.data().sender}">${d.data().text}</div>`).join('');
+                if(box) box.scrollTop = box.scrollHeight;
             });
         }
 
-        async function sendReply(id) {
-            const val = document.getElementById(`in-${id}`).value;
-            await db.collection("orders").doc(id).collection("chats").add({ text: val, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            document.getElementById(`in-${id}`).value = "";
+        function loadSOSMessages(id) {
+            db.collection("support_tickets").doc(id).collection("messages").orderBy("timestamp").onSnapshot(s => {
+                const box = document.getElementById(`sos-chat-${id}`);
+                if(box) box.innerHTML = s.docs.map(d => {
+                    const m = d.data();
+                    const isImg = m.text.includes('http');
+                    return `<div class="msg ${m.sender}">${isImg ? `<img src="${m.text}">` : m.text}</div>`;
+                }).join('');
+                if(box) box.scrollTop = box.scrollHeight;
+            });
         }
 
-        window.onload = loadOrders;
+        async function sendOrderReply(id) {
+            const el = document.getElementById(`in-${id}`);
+            if(!el.value) return;
+            await db.collection("orders").doc(id).collection("chats").add({ text: el.value, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            el.value = "";
+        }
+
+        async function sendSOSReply(id) {
+            const el = document.getElementById(`sos-in-${id}`);
+            if(!el.value) return;
+            await db.collection("support_tickets").doc(id).collection("messages").add({ text: el.value, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            el.value = "";
+        }
+
+        window.onload = renderView;
     </script>
 </body>
 </html>
