@@ -7,26 +7,38 @@
     <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --gold: #ffd700; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); -webkit-user-select: none; user-select: none; }
         nav { background: var(--white); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo { font-size: 1.4rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 1px; }
-        .wallet-pill { background: linear-gradient(135deg, var(--plum), #6a1b9a); color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .wallet-pill { background: linear-gradient(135deg, var(--plum), #6a1b9a); color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        
+        /* Point Gift Popup */
+        #claim-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 300px; border-radius: 20px; z-index: 5000; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); padding: 20px; border: 2px solid var(--gold); }
+        
         .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #fce4ec; }
-        .card img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
-        select, textarea, input[type="text"] { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia'; }
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn:hover { background: var(--plum); transform: scale(1.05); }
+        .card { background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        select, textarea, input[type="text"] { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; }
         .emergency-btn { display: block; background: #e74c3c; color: white; text-align: center; padding: 12px; text-decoration: none; font-weight: bold; border-radius: 0 0 15px 15px; }
+
+        /* Chat/Cart Window */
         #chat-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; height: 500px; background: white; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 3000; flex-direction: column; overflow: hidden; }
         .tab-btn { flex: 1; padding: 15px; border: none; background: #fdf2f5; cursor: pointer; font-weight: bold; color: var(--rose-gold); }
         .tab-btn.active { background: white; color: var(--plum); border-bottom: 3px solid var(--plum); }
+        .msg { padding: 8px 12px; margin: 5px; border-radius: 10px; max-width: 80%; font-size: 0.85rem; }
+        .msg.Admin { background: var(--pink); align-self: flex-start; }
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+<div id="claim-popup">
+    <h3 style="margin:0">✨ Reward Unlocked!</h3>
+    <p>You received <span id="pending-pts" style="font-weight:bold; color:var(--plum);">0</span> MoonLight Points!</p>
+    <button class="btn" onclick="claimPoints()">ADD TO WALLET</button>
+</div>
 
 <nav>
     <div class="logo">MOONLIGHT 🌙</div>
@@ -48,6 +60,9 @@
                     <option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option>
                     <option value="999" data-label="1kg Standard Cake">1kg - ₹999</option>
                 </optgroup>
+                <optgroup label="Plum Cake">
+                    <option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option>
+                </optgroup>
                 <optgroup label="Special (Dark Choco / Orange)">
                     <option value="600" data-label="0.5kg Special Cake">0.5kg - ₹600</option>
                     <option value="1199" data-label="1kg Special Cake">1kg - ₹1199</option>
@@ -56,69 +71,10 @@
                     <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
                 </optgroup>
             </select>
-            <button class="btn" onclick="addToCartBySelect('cake-select', 'Cake')">Add to Cart</button>
+            <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
         </div>
     </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
-        <div class="card-body">
-            <h3>Cupcakes (Box of 5)</h3>
-            <select id="cupcake-select">
-                <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
-                <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
-                <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
-                <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('cupcake-select', 'Cupcakes')">Add to Cart</button>
-        </div>
     </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
-        <div class="card-body">
-            <h3>Dacquoise & Macarons</h3>
-            <select id="treat-select">
-                <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
-                <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
-                <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('treat-select', 'Treats')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
-        <div class="card-body">
-            <h3>Cookie Boxes (8 pcs)</h3>
-            <select id="cookie-select">
-                <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
-                <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
-                <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('cookie-select', 'Cookies')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
-        <div class="card-body">
-            <h3>Bakery Snacks</h3>
-            <select id="snack-select">
-                <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
-                <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
-                <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('snack-select', 'Snacks')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="custom-box">
-        <h3>✨ Custom Requests</h3>
-        <textarea id="custom-req" placeholder="Specific flavors or large orders..."></textarea><br>
-        <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
-    </div>
-</div>
 
 <div id="chat-window">
     <div style="display:flex; background:#fdf2f5;">
@@ -126,6 +82,7 @@
         <button class="tab-btn" id="btn-history" onclick="showTab('history')">My Orders</button>
         <button onclick="toggleChatWindow()" style="border:none; background:none; padding:10px; cursor:pointer;">✕</button>
     </div>
+    
     <div id="tab-cart-content" style="padding:20px; flex:1; overflow-y:auto;">
         <div id="cart-items"></div>
         <hr>
@@ -135,7 +92,8 @@
         <input type="text" id="c-addr" placeholder="Delivery Address">
         <button class="btn" style="width:100%; margin-top:10px;" onclick="submitOrder()">Place Order</button>
     </div>
-    <div id="tab-history-content" style="padding:20px; flex:1; overflow-y:auto; display:none;">
+
+    <div id="tab-history-content" style="padding:20px; flex:1; overflow-y:auto; display:none; display:flex; flex-direction:column;">
         <div id="history-list"></div>
     </div>
 </div>
@@ -155,12 +113,22 @@
         const r = await fetch('https://api.ipify.org?format=json');
         const d = await r.json();
         userIP = d.ip;
+
+        // Points & Gift Listener
         db.collection("users").doc(userIP).onSnapshot(doc => {
             if(doc.exists) {
                 _SECURE_POINTS = doc.data().points || 0;
                 document.getElementById('user-points').innerText = _SECURE_POINTS;
             }
         });
+
+        db.collection("points_pending").doc(userIP).onSnapshot(doc => {
+            if(doc.exists && doc.data().amount > 0) {
+                document.getElementById('pending-pts').innerText = doc.data().amount;
+                document.getElementById('claim-popup').style.display = 'block';
+            }
+        });
+
         loadOrderHistory();
     };
 
@@ -170,14 +138,6 @@
         const label = el.options[el.selectedIndex].getAttribute('data-label');
         myCart.push({ name: label, price: price });
         renderCart();
-    }
-
-    function addCustomToCart() {
-        const req = document.getElementById('custom-req').value;
-        if(!req) return alert("Please enter details");
-        myCart.push({ name: "CUSTOM: " + req, price: 0 });
-        renderCart();
-        document.getElementById('custom-req').value = "";
     }
 
     function renderCart() {
@@ -198,30 +158,57 @@
         const p = document.getElementById('c-phone').value;
         const a = document.getElementById('c-addr').value;
         if(!n || !p || !a || myCart.length === 0) return alert("Fill all details!");
-        await db.collection("orders").add({
+
+        const orderRef = await db.collection("orders").add({
             name: n, phone: p, address: a,
             item: myCart.map(i => i.name).join(", "),
             price: document.getElementById('cart-total-val').innerText,
             customerIP: userIP, status: 'placed',
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        // AUTOMATED CHAT BOT MESSAGE
+        await orderRef.collection("chats").add({
+            text: "🌙 Order received in the bakery! We've started prepping your treats. Check your WhatsApp for a confirmation message shortly!",
+            sender: "Admin",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
         myCart = []; renderCart();
         showTab('history');
     }
 
     function loadOrderHistory() {
         db.collection("orders").where("customerIP", "==", userIP).orderBy("timestamp", "desc").onSnapshot(snap => {
-            document.getElementById('history-list').innerHTML = snap.docs.map(doc => `
-                <div style="background:#fdf2f5; padding:10px; border-radius:10px; margin-bottom:10px; font-size:0.8rem;">
-                    <b>${doc.data().item}</b><br>
-                    <span>Status: ${doc.data().status.toUpperCase()}</span>
-                </div>`).join('');
+            document.getElementById('history-list').innerHTML = snap.docs.map(doc => {
+                const data = doc.data();
+                return `
+                <div style="background:#fdf2f5; padding:10px; border-radius:10px; margin-bottom:10px;">
+                    <div style="font-size:0.8rem; font-weight:bold;">${data.item}</div>
+                    <div style="font-size:0.7rem; color:var(--rose-gold)">Status: ${data.status.toUpperCase()}</div>
+                    <div id="chat-box-${doc.id}" style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;"></div>
+                </div>`;
+            }).join('');
+            
+            snap.docs.forEach(doc => {
+                db.collection("orders").doc(doc.id).collection("chats").orderBy("timestamp").onSnapshot(s => {
+                    const box = document.getElementById(`chat-box-${doc.id}`);
+                    if(box) box.innerHTML = s.docs.map(d => `<div class="msg ${d.data().sender}">${d.data().text}</div>`).join('');
+                });
+            });
         });
+    }
+
+    async function claimPoints() {
+        const amt = parseInt(document.getElementById('pending-pts').innerText);
+        await db.collection("users").doc(userIP).set({ points: _SECURE_POINTS + amt }, { merge: true });
+        await db.collection("points_pending").doc(userIP).delete();
+        document.getElementById('claim-popup').style.display = 'none';
     }
 
     function showTab(t) {
         document.getElementById('tab-cart-content').style.display = t === 'cart' ? 'block' : 'none';
-        document.getElementById('tab-history-content').style.display = t === 'history' ? 'block' : 'none';
+        document.getElementById('tab-history-content').style.display = t === 'history' ? 'flex' : 'none';
         document.getElementById('btn-cart').classList.toggle('active', t === 'cart');
         document.getElementById('btn-history').classList.toggle('active', t === 'history');
     }
