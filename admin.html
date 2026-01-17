@@ -7,176 +7,131 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --plum: #4a148c; --rose: #b76e79; --light: #fff1f5; --green: #25D366; }
+        :root { --plum: #4a148c; --rose: #b76e79; --light: #fff1f5; --green: #25D366; --gold: #ffd700; }
         body { background: var(--light); font-family: 'Segoe UI', sans-serif; padding: 20px; color: var(--plum); margin: 0; }
         
-        h1 { color: var(--rose); text-align: center; letter-spacing: 2px; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: var(--plum); opacity: 0.7; margin-bottom: 30px; }
-        
-        .admin-controls { text-align: center; margin-bottom: 30px; }
-        .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-clear:hover { background: #c0392b; }
+        .header-area { text-align: center; margin-bottom: 20px; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 25px; border-radius: 20px; border: 2px solid var(--rose); background: white; cursor: pointer; font-weight: bold; color: var(--rose); }
+        .tab-btn.active { background: var(--rose); color: white; }
 
-        #orders-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); 
-            gap: 25px; 
-            max-width: 1400px; 
-            margin: auto; 
-        }
+        #orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 25px; max-width: 1400px; margin: auto; }
         
-        .order-card { 
-            background: white; 
-            border-radius: 20px; 
-            padding: 20px; 
-            border-top: 6px solid var(--rose); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            transition: transform 0.2s;
-        }
-        .order-card:hover { transform: translateY(-5px); }
-        
-        .delete-x { position: absolute; top: 10px; right: 15px; color: #ccc; cursor: pointer; font-size: 1.5rem; font-weight: bold; }
-        .delete-x:hover { color: #e74c3c; }
+        .order-card { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--rose); box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
+        .status-badge { align-self: flex-start; padding: 4px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; }
+        .status-new { background: #ffebee; color: #c62828; }
+        .status-confirmed { background: #e8f5e9; color: #2e7d32; }
 
-        .label { display: block; font-size: 0.7rem; color: var(--rose); font-weight: bold; text-transform: uppercase; margin-top: 10px; }
-        .value { font-size: 1rem; color: var(--plum); font-weight: 500; }
+        .points-box { background: var(--light); border: 2px dashed gold; padding: 10px; border-radius: 15px; margin-top: 15px; text-align: center; }
+        .points-box input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #ddd; text-align: center; }
+
+        .btn-confirm { background: var(--plum); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-gift { background: gold; color: var(--plum); border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-left: 5px; }
         
-        /* LIVE CHAT SECTION */
+        /* Chat styles from your original admin */
         .chat-container { margin-top: 15px; background: #fff9fa; border-radius: 12px; border: 1px solid #f3d0d7; padding: 10px; }
-        .chat-display { height: 120px; overflow-y: auto; font-size: 0.85rem; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #f3d0d7; padding-bottom: 5px; }
-        .msg { padding: 5px 10px; border-radius: 10px; max-width: 85%; line-height: 1.4; }
-        .msg.Admin { background: var(--rose); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .msg.User { background: #eee; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
-        
-        .chat-input-row { display: flex; gap: 5px; margin-top: 8px; }
-        .chat-input-row input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; outline: none; font-size: 0.85rem; }
-        .btn-send { background: var(--plum); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; }
-
-        /* CONTACT ACTIONS */
-        .contact-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
-        .btn-wa { 
-            background: var(--green); color: white; text-decoration: none; 
-            padding: 12px; border-radius: 12px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
-        }
-        .btn-call { 
-            background: #3498db; color: white; text-decoration: none; 
-            padding: 12px; border-radius: 12px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
-        }
+        .chat-display { height: 100px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #f3d0d7; }
+        .msg.Admin { background: var(--rose); color: white; align-self: flex-end; padding: 5px; border-radius: 5px; }
+        .msg.User { background: #eee; align-self: flex-start; padding: 5px; border-radius: 5px; }
+        .btn-wa { background: var(--green); color: white; text-decoration: none; padding: 10px; border-radius: 10px; text-align: center; display: block; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>MOONLIGHT VAULT 🌙</h1>
-    <p class="subtitle">Owner Command Center</p>
-    
-    <div class="admin-controls">
-        <button class="btn-clear" onclick="clearAllOrders()">🗑️ CLEAR ALL DEBUG ORDERS</button>
+    <div class="header-area">
+        <h1>MOONLIGHT VAULT 🌙</h1>
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-new" onclick="switchTab('new')">NEW PLACED ORDERS</button>
+            <button class="tab-btn" id="tab-done" onclick="switchTab('confirmed')">CONFIRMED ORDERS</button>
+        </div>
     </div>
 
-    <div id="orders-grid">Connecting to Moonlight Cloud...</div>
+    <div id="orders-grid">Loading...</div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
-            authDomain: "moonlight-cravings.firebaseapp.com",
-            projectId: "moonlight-cravings",
-            storageBucket: "moonlight-cravings.firebasestorage.app",
-            messagingSenderId: "222974574228",
-            appId: "1:222974574228:web:47bed645deedf5788bbe81"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // LISTEN TO ORDERS LIVE
-        db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
-            const grid = document.getElementById('orders-grid');
-            grid.innerHTML = ''; 
+        let currentTab = 'new';
 
-            snap.forEach(doc => {
-                const o = doc.data();
-                const orderId = doc.id;
-                const cleanPhone = (o.phone || "").replace(/\D/g, '');
-                
-                const card = document.createElement('div');
-                card.className = 'order-card';
-                card.innerHTML = `
-                    <span class="delete-x" onclick="deleteOrder('${orderId}')">×</span>
-                    
-                    <div style="font-weight:bold; font-size:1.2rem; color:var(--rose); padding-right:20px;">${o.item}</div>
-                    
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; margin-top:5px;">
-                        <div><span class="label">Price</span><div class="value">₹${o.price}</div></div>
-                        <div><span class="label">Customer</span><div class="value">${o.name}</div></div>
-                    </div>
+        function switchTab(t) {
+            currentTab = t;
+            document.getElementById('tab-new').classList.toggle('active', t === 'new');
+            document.getElementById('tab-done').classList.toggle('active', t === 'confirmed');
+            loadOrders();
+        }
 
-                    <span class="label">📍 Delivery Address</span>
-                    <div class="value" style="font-size:0.9rem;">${o.address}</div>
+        function loadOrders() {
+            db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const grid = document.getElementById('orders-grid');
+                grid.innerHTML = '';
+                snap.forEach(doc => {
+                    const o = doc.data();
+                    const isConfirmed = o.status === 'confirmed';
                     
-                    <div class="chat-container">
-                        <div class="chat-display" id="chat-box-${orderId}"></div>
-                        <div class="chat-input-row">
-                            <input type="text" id="input-${orderId}" placeholder="Type web reply...">
-                            <button class="btn-send" onclick="sendReply('${orderId}')">➤</button>
-                        </div>
-                    </div>
+                    if ((currentTab === 'new' && !isConfirmed) || (currentTab === 'confirmed' && isConfirmed)) {
+                        const card = document.createElement('div');
+                        card.className = 'order-card';
+                        card.innerHTML = `
+                            <div class="status-badge ${isConfirmed ? 'status-confirmed' : 'status-new'}">${isConfirmed ? 'CONFIRMED' : 'PENDING'}</div>
+                            <div style="font-weight:bold;">${o.item} - ₹${o.price}</div>
+                            <div style="font-size:0.8rem;">Customer: ${o.name} (${o.phone})</div>
+                            
+                            <div class="chat-container">
+                                <div class="chat-display" id="chat-${doc.id}"></div>
+                                <div style="display:flex; gap:5px; margin-top:5px;">
+                                    <input type="text" id="in-${doc.id}" style="flex:1;" placeholder="Reply...">
+                                    <button onclick="sendReply('${doc.id}')">➤</button>
+                                </div>
+                            </div>
 
-                    <div class="contact-actions">
-                        <a href="https://wa.me/${cleanPhone}?text=Hi ${o.name}, this is Moonlight Cravings! Regarding your order for ${o.item}..." 
-                           target="_blank" class="btn-wa">
-                           💬 Communicate in WhatsApp
-                        </a>
-                        <a href="tel:${o.phone}" class="btn-call">📞 Voice Call</a>
-                    </div>
-                `;
-                grid.appendChild(card);
-                loadMessages(orderId);
+                            ${!isConfirmed ? 
+                                `<button class="btn-confirm" onclick="confirmOrder('${doc.id}')">✅ CONFIRM ORDER</button>` : 
+                                `<div class="points-box">
+                                    <span>Gift MoonLight Points:</span><br>
+                                    <input type="number" id="pts-${doc.id}" value="100">
+                                    <button class="btn-gift" onclick="giftPoints('${doc.id}', '${o.customerIP}')">GIFT POINTS</button>
+                                </div>`
+                            }
+                            <a href="https://wa.me/${o.phone.replace(/\D/g,'')}" target="_blank" class="btn-wa">WhatsApp Customer</a>
+                        `;
+                        grid.appendChild(card);
+                        loadChat(doc.id);
+                    }
+                });
             });
-        });
+        }
 
-        function loadMessages(id) {
-            db.collection("orders").doc(id).collection("chats").orderBy("timestamp")
-              .onSnapshot(snap => {
-                  const box = document.getElementById(`chat-box-${id}`);
-                  if(box) {
-                      box.innerHTML = snap.docs.map(d => `
-                        <div class="msg ${d.data().sender}">${d.data().text}</div>
-                      `).join('');
-                      box.scrollTop = box.scrollHeight;
-                  }
-              });
+        async function confirmOrder(id) {
+            if(confirm("Are you sure this order is confirmed?")) {
+                await db.collection("orders").doc(id).update({ status: 'confirmed' });
+                alert("Order Confirmed! Moved to Confirmed tab.");
+            }
+        }
+
+        async function giftPoints(orderId, ip) {
+            const amount = document.getElementById(`pts-${orderId}`).value;
+            if(confirm(`Gift ${amount} MoonLight Points to this customer?`)) {
+                await db.collection("points_pending").doc(ip).set({ amount: parseInt(amount) });
+                alert("Points sent! Customer will see a claim popup next time they visit.");
+            }
+        }
+
+        function loadChat(id) {
+            db.collection("orders").doc(id).collection("chats").orderBy("timestamp").onSnapshot(s => {
+                const box = document.getElementById(`chat-${id}`);
+                if(box) box.innerHTML = s.docs.map(d => `<div class="msg ${d.data().sender}">${d.data().text}</div>`).join('');
+            });
         }
 
         async function sendReply(id) {
-            const input = document.getElementById(`input-${id}`);
-            if(!input.value) return;
-            await db.collection("orders").doc(id).collection("chats").add({
-                text: input.value,
-                sender: "Admin",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            input.value = "";
+            const val = document.getElementById(`in-${id}`).value;
+            await db.collection("orders").doc(id).collection("chats").add({ text: val, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById(`in-${id}`).value = "";
         }
 
-        async function deleteOrder(id) {
-            if(confirm("Delete this order forever?")) {
-                await db.collection("orders").doc(id).delete();
-            }
-        }
-
-        async function clearAllOrders() {
-            if(confirm("⚠️ WIPE EVERYTHING? This cannot be undone.")) {
-                const snap = await db.collection("orders").get();
-                const batch = db.batch();
-                snap.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                alert("Vault Wiped.");
-            }
-        }
+        window.onload = loadOrders;
     </script>
 </body>
 </html>
