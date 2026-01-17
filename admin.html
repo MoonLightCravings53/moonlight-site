@@ -16,6 +16,7 @@
             --gold: #ffd700; 
             --green: #27ae60;
             --red: #e74c3c;
+            --blue: #3498db;
         }
 
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); padding: 20px; }
@@ -34,7 +35,7 @@
         .stat-card b { font-size: 1.5rem; color: var(--plum); }
 
         .table-wrap { background: var(--white); border-radius: 20px; overflow-x: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         th { background: #fdf2f5; color: var(--plum); padding: 15px; text-align: left; font-size: 0.9rem; border-bottom: 2px solid var(--pink); }
         td { padding: 15px; border-bottom: 1px solid var(--pink); font-size: 0.85rem; vertical-align: top; }
 
@@ -49,6 +50,11 @@
         .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; font-weight: bold; display: inline-block; margin-top: 5px; }
         .status-placed { background: #fff3e0; color: #e67e22; border: 1px solid #e67e22; }
         .status-confirmed { background: #e8f5e9; color: var(--green); border: 1px solid var(--green); }
+        
+        /* New Style for Fulfillment */
+        .method-tag { font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
+        .method-delivery { color: var(--blue); }
+        .method-pickup { color: #e67e22; }
 
         #chat-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -87,6 +93,7 @@
             <thead>
                 <tr>
                     <th>Customer</th>
+                    <th>Fulfillment</th>
                     <th>Order Items</th>
                     <th>Price</th>
                     <th>Management</th>
@@ -145,6 +152,11 @@
             const isConfirmed = data.status === 'confirmed';
             const statusClass = isConfirmed ? 'status-confirmed' : 'status-placed';
             const statusLabel = isConfirmed ? 'CONFIRMED' : 'WAITING';
+            
+            // Logic for showing Delivery/Pickup
+            const method = data.method || "Delivery"; 
+            const methodClass = method === "Delivery" ? "method-delivery" : "method-pickup";
+            const methodIcon = method === "Delivery" ? "🚀" : "🏪";
 
             const row = `
                 <tr>
@@ -152,6 +164,14 @@
                         <div style="font-weight:bold; color:var(--plum)">${data.name}</div>
                         <div style="font-size:0.75rem; color:var(--rose-gold)">${data.phone}</div>
                         <span class="status-badge ${statusClass}">${statusLabel}</span>
+                    </td>
+                    <td>
+                        <div class="method-tag ${methodClass}">
+                            ${methodIcon} ${method.toUpperCase()}
+                        </div>
+                        <div style="font-size:0.7rem; color:#888; margin-top:4px; max-width:150px;">
+                            ${data.address}
+                        </div>
                     </td>
                     <td><div style="color: #555; font-style: italic; line-height: 1.4;">${data.item}</div></td>
                     <td><b style="color:var(--plum)">₹${data.price}</b></td>
@@ -173,7 +193,6 @@
         document.getElementById('stat-cust').innerText = uniqueIPs.size;
     });
 
-    // --- DELETE LOGIC ---
     async function deleteOrder(orderId) {
         if(confirm("Permanently delete this order from the vault?")) {
             try {
