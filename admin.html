@@ -8,210 +8,226 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --admin-dark: #0a0b10;
-            --gold: #d4af37;
-            --glass: rgba(255, 255, 255, 0.05);
-            --text: #e0e0e0;
-            --accent: #b76e79; /* Rose Gold from user site */
+        :root { 
+            --dark-bg: #05070a; 
+            --gold: #d4af37; 
+            --rose: #b76e79; 
+            --glass: rgba(255, 255, 255, 0.05); 
+            --border: rgba(212, 175, 55, 0.2);
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--admin-dark); 
-            color: var(--text); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--dark-bg); 
+            color: #e0e0e0; 
             margin: 0; 
-            padding: 20px;
+            padding: 25px;
+            line-height: 1.5;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--glass);
+        /* Dashboard Header */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
             padding-bottom: 20px;
+            border-bottom: 1px solid var(--glass);
             margin-bottom: 30px;
         }
 
-        h1 { color: var(--gold); margin: 0; letter-spacing: 2px; }
+        h1 { color: var(--gold); letter-spacing: 2px; margin: 0; font-size: 1.8rem; }
+        .live-indicator { color: #4caf50; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
 
-        /* Stats Bar */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        /* Stats Section */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px; 
         }
 
-        .stat-card {
-            background: var(--glass);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+        .stat-card { 
+            background: var(--glass); 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 1px solid var(--border); 
             text-align: center;
+            transition: transform 0.3s;
         }
 
-        .stat-card h3 { margin: 0; font-size: 0.8rem; color: var(--accent); text-transform: uppercase; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.8rem; font-weight: bold; color: var(--gold); }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card span { display: block; font-size: 0.75rem; color: var(--rose); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card b { font-size: 2rem; color: var(--gold); display: block; margin-top: 5px; }
 
-        /* Table Design */
-        .table-container {
-            background: var(--glass);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+        /* Orders Table */
+        .table-wrap { 
+            background: var(--glass); 
+            border-radius: 20px; 
+            overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th { 
-            background: rgba(255,255,255,0.05); 
-            color: var(--gold); 
-            padding: 15px; 
-            text-align: left; 
-            font-size: 0.9rem;
-        }
-        td { 
-            padding: 15px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-            font-size: 0.85rem;
-        }
+        th { background: rgba(255,255,255,0.08); color: var(--gold); padding: 18px 15px; text-align: left; font-size: 0.9rem; }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; font-size: 0.85rem; }
         
+        tr:last-child td { border-bottom: none; }
         tr:hover { background: rgba(255,255,255,0.02); }
 
-        /* Status Badges */
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .status-placed { background: #ffd70033; color: #ffd700; }
-        .status-paid { background: #2e7d3233; color: #4caf50; }
-
-        /* Chat Action Button */
-        .action-btn {
-            background: var(--gold);
-            color: black;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.75rem;
+        /* Action Buttons */
+        .btn-group { display: flex; gap: 8px; }
+        .btn { 
+            background: var(--gold); 
+            color: #000; 
+            border: none; 
+            padding: 8px 14px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.75rem; 
+            transition: 0.2s;
         }
 
-        .gift-btn {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            margin-left: 5px;
-        }
+        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+        .btn-gift { background: transparent; border: 1px solid var(--rose); color: var(--rose); }
+        .btn-gift:hover { background: var(--rose); color: white; }
+
+        .item-text { max-width: 300px; color: #bbb; font-style: italic; }
     </style>
 </head>
 <body>
 
+    <audio id="order-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
     <div class="header">
         <div>
             <h1>MOONLIGHT VAULT 🌙</h1>
-            <p style="font-size: 0.8rem; color: gray;">Live Order Tracking & Customer Management</p>
+            <div class="live-indicator">● LIVE CONNECTION ACTIVE</div>
         </div>
-        <div style="text-align: right;">
-            <div id="connection-status" style="color: #4caf50; font-size: 0.8rem;">● Live Connection Active</div>
+        <div style="text-align: right">
+            <small style="color: var(--rose)">Authorized Personnel Only</small>
         </div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <h3>Today's Orders</h3>
-            <p id="stat-count">0</p>
+            <span>Today's Volume</span>
+            <b id="stat-count">0</b>
         </div>
         <div class="stat-card">
-            <h3>Est. Revenue</h3>
-            <p id="stat-revenue">₹0</p>
+            <span>Live Revenue</span>
+            <b id="stat-rev">₹0</b>
+        </div>
+        <div class="stat-card">
+            <span>Active Customers</span>
+            <b id="stat-cust">0</b>
         </div>
     </div>
 
-    <div class="table-container">
-        <table id="orderTable">
+    <div class="table-wrap">
+        <table>
             <thead>
                 <tr>
-                    <th>Customer</th>
+                    <th>Customer Info</th>
                     <th>Order Details</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>Total</th>
+                    <th>Management</th>
                 </tr>
             </thead>
-            <tbody id="admin-orders-body">
-                </tbody>
+            <tbody id="order-rows">
+                <tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--rose);">Synchronizing with Moonlight Servers...</td></tr>
+            </tbody>
         </table>
     </div>
 
-    <script>
-        // Initialize Firebase (Using your existing config)
-        const firebaseConfig = { 
-            apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", 
-            authDomain: "moonlight-cravings.firebaseapp.com", 
-            projectId: "moonlight-cravings", 
-            storageBucket: "moonlight-cravings.firebasestorage.app", 
-            messagingSenderId: "222974574228", 
-            appId: "1:222974574228:web:47bed645deedf5788bbe81" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+<script>
+    // Configuration
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", 
+        authDomain: "moonlight-cravings.firebaseapp.com", 
+        projectId: "moonlight-cravings", 
+        storageBucket: "moonlight-cravings.firebasestorage.app", 
+        messagingSenderId: "222974574228", 
+        appId: "1:222974574228:web:47bed645deedf5788bbe81" 
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    let initialLoad = true;
 
-        // Listen for Orders
-        db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
-            const tbody = document.getElementById('admin-orders-body');
-            let totalRev = 0;
-            tbody.innerHTML = "";
-            
-            document.getElementById('stat-count').innerText = snap.size;
+    // Live Stream Listener
+    db.collection("orders").orderBy("timestamp", "desc").limit(50).onSnapshot(snap => {
+        const tbody = document.getElementById('order-rows');
+        let totalRev = 0;
+        let uniqueIPs = new Set();
+        
+        tbody.innerHTML = "";
 
-            snap.docs.forEach(doc => {
-                const data = doc.data();
-                totalRev += parseInt(data.price || 0);
+        // Play sound if a new order arrives after the page is already open
+        if (!initialLoad && snap.docChanges().some(change => change.type === "added")) {
+            document.getElementById('order-sound').play().catch(e => console.log("Sound blocked by browser"));
+        }
+        initialLoad = false;
 
-                const row = `
-                    <tr>
-                        <td>
-                            <b>${data.name}</b><br>
-                            <small style="color:gray">${data.phone}</small>
-                        </td>
-                        <td>${data.item}</td>
-                        <td style="color: var(--gold); font-weight: bold;">₹${data.price}</td>
-                        <td><span class="badge status-${data.status}">${data.status}</span></td>
-                        <td>
-                            <button class="action-btn" onclick="sendAdminMsg('${doc.id}')">REPLY</button>
-                            <button class="action-btn gift-btn" onclick="giftPoints('${data.customerIP}')">🎁 GIFT PTS</button>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-            document.getElementById('stat-revenue').innerText = "₹" + totalRev;
+        snap.docs.forEach(doc => {
+            const data = doc.data();
+            totalRev += parseInt(data.price || 0);
+            if(data.customerIP) uniqueIPs.add(data.customerIP);
+
+            const row = `
+                <tr>
+                    <td>
+                        <div style="font-weight:bold; color:var(--gold)">${data.name}</div>
+                        <div style="font-size:0.75rem; color:gray">ID: ${doc.id.substring(0,6)}...</div>
+                        <div style="font-size:0.75rem">${data.phone}</div>
+                    </td>
+                    <td><div class="item-text">${data.item}</div></td>
+                    <td><b style="color:var(--gold)">₹${data.price}</b></td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn" onclick="openChat('${doc.id}')">REPLY</button>
+                            <button class="btn btn-gift" onclick="giftPoints('${data.customerIP}')">GIFT PTS</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
         });
 
-        async function sendAdminMsg(orderId) {
-            const msg = prompt("Enter message to customer:");
-            if(!msg) return;
-            await db.collection("orders").doc(orderId).collection("chats").add({
-                text: msg,
-                sender: "Admin",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("Message Sent!");
-        }
+        // Update Stats
+        document.getElementById('stat-count').innerText = snap.size;
+        document.getElementById('stat-rev').innerText = "₹" + totalRev;
+        document.getElementById('stat-cust').innerText = uniqueIPs.size;
 
-        async function giftPoints(ip) {
-            const amt = prompt("How many points to gift?");
-            if(!amt) return;
-            await db.collection("points_pending").doc(ip).set({
-                amount: parseInt(amt)
-            });
-            alert("Points sent! User will see a popup.");
+        if(snap.size === 0) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:40px;'>No orders found in the database.</td></tr>";
         }
-    </script>
+    });
+
+    async function openChat(orderId) {
+        const msg = prompt("Send message to Customer's Chat Window:");
+        if(!msg) return;
+        
+        await db.collection("orders").doc(orderId).collection("chats").add({
+            text: msg,
+            sender: "Admin",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Message delivered.");
+    }
+
+    async function giftPoints(ip) {
+        if(!ip || ip === "undefined") return alert("Cannot identify customer IP.");
+        const amount = prompt("Enter amount of Moonlight Points to gift:");
+        if(!amount || isNaN(amount)) return;
+
+        await db.collection("points_pending").doc(ip).set({
+            amount: parseInt(amount),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Reward sent! Customer will see the gift popup.");
+    }
+</script>
 </body>
 </html>
