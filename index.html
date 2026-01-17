@@ -5,37 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moonlight Cravings | Premium Bakery</title>
 
-    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f319.png">
-    <link rel="shortcut icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f319.png">
+    <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
+    <link rel="shortcut icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
     <meta property="og:title" content="Moonlight Cravings 🌙">
-    <meta property="og:description" content="Premium Bakery - Baking Dreams Into Reality">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1535141192574-5d4897c82536?w=200">
+    <meta property="og:description" content="Freshly baked dreams. Order Cakes, Cupcakes, and more!">
+    <meta property="og:image" content="https://i.postimg.cc/vxYDnR6G/icon.png">
     <meta property="og:type" content="website">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
     <style>
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --soft-pink: #fff1f5; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); overflow-x: hidden; }
 
+        /* Background Animation */
         .bg-cakes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .floating-cake { position: absolute; font-size: 2rem; opacity: 0.15; animation: float 15s linear infinite; }
         @keyframes float { 0% { transform: translateY(110vh); } 100% { transform: translateY(-10vh); } }
 
-        nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
+        nav { background: var(--white); padding: 15px 40px; display: flex; justify-content: center; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(183,110,121,0.1); }
         .logo { font-size: 1.8rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 2px; }
-        .hero { height: 35vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .brand-desc { background: white; padding: 20px; text-align: center; margin: 20px auto; max-width: 800px; border-radius: 20px; font-style: italic; color: var(--rose-gold); }
+        
+        .hero { height: 30vh; background: linear-gradient(rgba(252,228,236,0.6), rgba(252,228,236,0.6)), url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1200'); background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; transition: 0.3s; }
-        .card:hover { transform: translateY(-10px); }
-        .card img { width: 100%; height: 250px; object-fit: cover; }
-        .card-body { padding: 20px; }
+        /* Category Buttons */
+        .category-nav { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 20px; position: sticky; top: 70px; background: var(--pink); z-index: 90; }
+        .cat-btn { background: white; border: 2px solid var(--rose-gold); color: var(--rose-gold); padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .cat-btn.active, .cat-btn:hover { background: var(--rose-gold); color: white; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 15px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .custom-box { grid-column: 1 / -1; background: white; padding: 40px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; }
+        .card { background: var(--white); border-radius: 25px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; transition: 0.3s; display: block; }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 15px; }
         
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 12px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .custom-box { grid-column: 1 / -1; background: white; padding: 30px; border-radius: 30px; border: 3px dashed var(--rose-gold); text-align: center; margin-top: 20px; }
+        
+        /* Modals & Chat (Same as before) */
         #modal { display: none; position: fixed; inset: 0; background: rgba(74, 20, 140, 0.8); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 30px; }
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; }
@@ -55,25 +63,61 @@
 
 <div class="hero"><h1>Baking Dreams Into Reality</h1></div>
 
-<div class="brand-desc">Freshly baked with love, no added preservatives. <br> Custom made creations available!</div>
+<div class="category-nav">
+    <button class="cat-btn active" onclick="filterItems('all')">All</button>
+    <button class="cat-btn" onclick="filterItems('cake')">Cakes</button>
+    <button class="cat-btn" onclick="filterItems('cupcake')">Cupcakes</button>
+    <button class="cat-btn" onclick="filterItems('cookie')">Cookies</button>
+    <button class="cat-btn" onclick="filterItems('other')">Other Delights</button>
+</div>
 
-<div class="container">
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1535141192574-5d4897c82536?w=500">
-        <div class="card-body"><h3>Classic Vanilla</h3><p>₹800</p><button class="btn" onclick="openOrder('Classic Vanilla', 800)">Buy Now</button></div>
+<div class="container" id="product-grid">
+    <div class="card" data-cat="cake">
+        <img src="https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=400">
+        <div class="card-body"><h3>Vanilla / Chocolate / Forest / Funfetti</h3><p>0.5kg: ₹500 | 1kg: ₹1000</p>
+        <button class="btn" onclick="openOrder('Standard Cake (specify flavor in chat)', 500)">Order Half Kg</button>
+        <button class="btn" onclick="openOrder('Standard Cake (specify flavor in chat)', 1000)">Order 1 Kg</button></div>
     </div>
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=500">
-        <div class="card-body"><h3>fun fetti</h3><p>₹900</p><button class="btn" onclick="openOrder('fun fetti', 900)">Buy Now</button></div>
+    <div class="card" data-cat="cake">
+        <img src="https://images.unsplash.com/photo-1567171466295-4afa5814522d?w=400">
+        <div class="card-body"><h3>Dark Chocolate & Orange</h3><p>1kg: ₹1200</p><button class="btn" onclick="openOrder('Dark Choco Orange Cake', 1200)">Buy Now</button></div>
     </div>
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1606313564059-39598042912c?w=500">
-        <div class="card-body"><h3>Black Forest Cake</h3><p>₹950</p><button class="btn" onclick="openOrder('Black Forest Cake', 950)">Buy Now</button></div>
+    <div class="card" data-cat="cake">
+        <img src="https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=400">
+        <div class="card-body"><h3>Banana Cake</h3><p>0.5kg: ₹350</p><button class="btn" onclick="openOrder('Banana Cake', 350)">Buy Now</button></div>
     </div>
+    <div class="card" data-cat="cake">
+        <img src="https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400">
+        <div class="card-body"><h3>Almond Dacquoise (6pcs)</h3><p>₹200</p><button class="btn" onclick="openOrder('Almond Dacquoise', 200)">Buy Now</button></div>
+    </div>
+    <div class="card" data-cat="cake">
+        <img src="https://images.unsplash.com/photo-1551806235-6629bc2445c2?w=400">
+        <div class="card-body"><h3>Pistachio Dacquoise (6pcs)</h3><p>₹250</p><button class="btn" onclick="openOrder('Pistachio Dacquoise', 250)">Buy Now</button></div>
+    </div>
+
+    <div class="card" data-cat="cupcake">
+        <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
+        <div class="card-body"><h3>Standard Cupcakes (Box of 5)</h3><p>Vanilla/Choco/Lemon: ₹200</p><button class="btn" onclick="openOrder('Cupcake Box (specify flavor)', 200)">Buy Now</button></div>
+    </div>
+    <div class="card" data-cat="cupcake">
+        <img src="https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=400">
+        <div class="card-body"><h3>Blueberry Cupcakes (Box of 5)</h3><p>₹275</p><button class="btn" onclick="openOrder('Blueberry Cupcakes', 275)">Buy Now</button></div>
+    </div>
+
+    <div class="card" data-cat="cookie">
+        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
+        <div class="card-body"><h3>Butter / Sugar Cookies (Box of 8)</h3><p>₹200</p><button class="btn" onclick="openOrder('Butter/Sugar Cookies', 200)">Buy Now</button></div>
+    </div>
+    <div class="card" data-cat="cookie">
+        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
+        <div class="card-body"><h3>Choco Chip Cookies (Box of 8)</h3><p>₹240</p><button class="btn" onclick="openOrder('Choco Chip Cookies', 240)">Buy Now</button></div>
+    </div>
+
     <div class="custom-box">
-        <h3>✨ Custom Cake Request</h3>
-        <textarea id="custom-text" style="width:100%; height:80px; margin:10px 0; border-radius:10px; padding:10px;" placeholder="Describe your dream cake..."></textarea>
-        <button class="btn" onclick="startCustom()">Submit Request</button>
+        <h3>✨ Special Request (Macarons, Churros, Donuts, Brownies)</h3>
+        <p>Describe what you need below and we will quote the price on WhatsApp!</p>
+        <textarea id="custom-text" style="width:100%; height:80px; margin:10px 0; border-radius:10px; padding:10px; border:1px solid #ddd;" placeholder="I want brownies and 2 donuts..."></textarea>
+        <button class="btn" onclick="startCustom()">Submit Custom Request</button>
     </div>
 </div>
 
@@ -91,13 +135,10 @@
 
 <div id="chat-window">
     <div id="chat-header"><span id="chat-title">My Orders 🌙</span><span onclick="closeChatWindow()" style="cursor:pointer">×</span></div>
-    
     <div id="order-list-view" style="height: 300px; overflow-y: auto; padding: 10px; background: #fff1f5;">
-        <p style="font-size: 0.8rem; text-align: center; color: var(--rose-gold);">Select an order to chat with the baker</p>
         <div id="my-orders-container"></div>
-        <button onclick="logoutCustomer()" id="logout-btn" style="display:none; width:100%; margin-top:10px; font-size:0.7rem; color:red; background:none; border:none; cursor:pointer;">Not you? Clear history</button>
+        <button onclick="logoutCustomer()" id="logout-btn" style="display:none; width:100%; margin-top:10px; font-size:0.7rem; color:red; background:none; border:none; cursor:pointer;">Clear history</button>
     </div>
-
     <div id="active-chat-view" style="display:none;">
         <div id="chat-messages"></div>
         <div style="padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee;">
@@ -111,6 +152,7 @@
 <button id="reopen-chat-btn" onclick="toggleChatWindow()" style="position:fixed; bottom:20px; right:20px; background:var(--plum); color:white; border:none; width:60px; height:60px; border-radius:50%; font-size:25px; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:2999;">💬</button>
 
 <script>
+    // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84",
         authDomain: "moonlight-cravings.firebaseapp.com",
@@ -122,9 +164,25 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let selItem = ""; let selPrice = 0; let activeOrderId = ""; 
-    let userIP = ""; 
+    let selItem = ""; let selPrice = 0; let activeOrderId = ""; let userIP = ""; 
 
+    // FILTER FUNCTION
+    function filterItems(cat) {
+        const cards = document.querySelectorAll('.card');
+        const btns = document.querySelectorAll('.cat-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+
+        cards.forEach(card => {
+            if(cat === 'all' || card.getAttribute('data-cat') === cat) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    // ON LOAD
     window.onload = async function() {
         try {
             const response = await fetch('https://api.ipify.org?format=json');
@@ -136,15 +194,14 @@
             localStorage.setItem('moonlight_fallback', userIP);
             loadOrderHistory(userIP);
         }
-
+        
+        // Recover Chat if exists
         const savedChatId = localStorage.getItem('active_chat_id');
-        const savedChatName = localStorage.getItem('active_chat_name');
-        if(savedChatId && savedChatName) {
-            openChat(savedChatId, savedChatName);
-        }
+        if(savedChatId) openChat(savedChatId, localStorage.getItem('active_chat_name'));
 
+        // BG Animation
         const bg = document.getElementById('cake-bg');
-        const icons = ['🍰', '🎂', '✨', '🧁'];
+        const icons = ['🍰', '🎂', '✨', '🧁', '🍪'];
         for(let i=0; i<15; i++) {
             let div = document.createElement('div');
             div.className = 'floating-cake'; div.innerText = icons[Math.floor(Math.random()*icons.length)];
@@ -154,74 +211,39 @@
     };
 
     function openOrder(item, price) { selItem = item; selPrice = price; document.getElementById('summary').innerText = `${item} - ₹${price}`; document.getElementById('modal').style.display = 'flex'; }
-    function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; selPrice = "Pending"; document.getElementById('modal').style.display = 'flex'; }
+    function startCustom() { const t = document.getElementById('custom-text').value; if(!t) return alert("Describe your cake!"); selItem = "CUSTOM: " + t; selPrice = "To be quoted"; document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeChatWindow() { document.getElementById('chat-window').style.display = 'none'; }
-    
-    function backToOrders() { 
-        localStorage.removeItem('active_chat_id'); 
-        localStorage.removeItem('active_chat_name');
-        document.getElementById('order-list-view').style.display = 'block'; 
-        document.getElementById('active-chat-view').style.display = 'none'; 
-        document.getElementById('chat-title').innerText = "My Orders 🌙"; 
-    }
-    
-    function toggleChatWindow() { 
-        const win = document.getElementById('chat-window'); 
-        win.style.display = win.style.display === 'none' ? 'flex' : 'none'; 
-        if(userIP) loadOrderHistory(userIP); 
-    }
+    function backToOrders() { document.getElementById('order-list-view').style.display = 'block'; document.getElementById('active-chat-view').style.display = 'none'; }
+    function toggleChatWindow() { const win = document.getElementById('chat-window'); win.style.display = win.style.display === 'none' ? 'flex' : 'none'; }
 
     async function submitOrder() {
-        const n = document.getElementById('name').value; 
-        const ph = document.getElementById('phone').value; 
-        const ad = document.getElementById('address').value;
+        const n = document.getElementById('name').value; const ph = document.getElementById('phone').value; const ad = document.getElementById('address').value;
         if(!n || !ph || !ad) return alert("All fields required!");
-        
         try {
-            const docRef = await db.collection("orders").add({ 
-                name: n, phone: ph, address: ad, item: selItem, price: selPrice, 
-                customerIP: userIP,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-            });
-
+            const docRef = await db.collection("orders").add({ name: n, phone: ph, address: ad, item: selItem, price: selPrice, customerIP: userIP, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
             await db.collection("orders").doc(docRef.id).collection("chats").add({ 
-                text: `Baker: Received order for ${selItem}! 🌙 \n\nPlease read this then you can close: Your number is shown in our order list, so we will directly message you on WhatsApp within 2 to 3 hours. \n\nYou won't have payment options here; we will send you our UPI QR Code via WhatsApp to confirm your order.`, 
-                sender: "Admin", 
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+                text: `Baker: Received order for ${selItem}! 🌙 \n\nPlease read this then you can close: Your number is in our list, we will message you on WhatsApp within 2-3 hours. \n\nWe will send the UPI QR Code via WhatsApp for payment.`, 
+                sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             });
-
-            closeModal(); 
-            openChat(docRef.id, selItem);
-        } catch(e) { alert("Error saving order!"); }
+            closeModal(); openChat(docRef.id, selItem);
+        } catch(e) { alert("Error!"); }
     }
 
     function loadOrderHistory(ip) {
         db.collection("orders").where("customerIP", "==", ip).orderBy("timestamp", "desc").onSnapshot(snap => {
             const container = document.getElementById('my-orders-container');
-            if (snap.empty) {
-                container.innerHTML = "<p style='text-align:center; font-size:0.8rem;'>No orders yet.</p>";
-                return;
-            }
-            container.innerHTML = snap.docs.map(doc => `
-                <div onclick="openChat('${doc.id}', '${doc.data().item}')" style="background:white; padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; border:1px solid #f8bbd0;">
-                    <div style="font-weight:bold; color:var(--plum);">${doc.data().item}</div>
-                    <div style="font-size:0.7rem; color:gray;">Click to chat with baker</div>
-                </div>`).join('');
-            document.getElementById('logout-btn').style.display = 'block';
+            container.innerHTML = snap.docs.map(doc => `<div onclick="openChat('${doc.id}', '${doc.data().item}')" style="background:white; padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; border:1px solid #f8bbd0;"><b>${doc.data().item}</b><br><small>Click to chat</small></div>`).join('');
+            if(!snap.empty) document.getElementById('logout-btn').style.display = 'block';
         });
     }
 
     function openChat(id, itemName) {
-        activeOrderId = id; 
-        localStorage.setItem('active_chat_id', id);
-        localStorage.setItem('active_chat_name', itemName);
-
+        activeOrderId = id; localStorage.setItem('active_chat_id', id); localStorage.setItem('active_chat_name', itemName);
         document.getElementById('chat-title').innerText = itemName;
         document.getElementById('order-list-view').style.display = 'none';
         document.getElementById('active-chat-view').style.display = 'block';
         document.getElementById('chat-window').style.display = 'flex';
-        
         db.collection("orders").doc(id).collection("chats").orderBy("timestamp").onSnapshot(snap => {
             const box = document.getElementById('chat-messages');
             box.innerHTML = snap.docs.map(d => `<div class="msg ${d.data().sender === 'Admin' ? 'admin' : 'user'}">${d.data().text}</div>`).join('');
@@ -230,21 +252,12 @@
     }
 
     async function sendMsg() {
-        const inp = document.getElementById('chat-input'); if(!inp.value || !activeOrderId) return;
-        const msgText = inp.value;
-        inp.value = ""; 
-        await db.collection("orders").doc(activeOrderId).collection("chats").add({ 
-            text: msgText, sender: "User", timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-        });
+        const inp = document.getElementById('chat-input'); if(!inp.value) return;
+        await db.collection("orders").doc(activeOrderId).collection("chats").add({ text: inp.value, sender: "User", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        inp.value = "";
     }
 
-    function logoutCustomer() {
-        if(confirm("This will clear your view. Orders are safe in our vault!")) {
-            localStorage.removeItem('active_chat_id');
-            localStorage.removeItem('active_chat_name');
-            document.getElementById('chat-window').style.display = 'none';
-        }
-    }
+    function logoutCustomer() { if(confirm("Clear local history?")) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
 </html>
