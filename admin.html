@@ -15,6 +15,7 @@
             --white: #ffffff; 
             --gold: #ffd700; 
             --green: #27ae60;
+            --red: #e74c3c;
         }
 
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); padding: 20px; }
@@ -42,12 +43,13 @@
         .btn:hover { background: var(--plum); }
         .btn-wa { background: #25d366; }
         .btn-confirm { background: var(--green); }
+        .btn-delete { background: white; color: var(--red); border: 1px solid var(--red); padding: 6px 10px; }
+        .btn-delete:hover { background: var(--red); color: white; }
 
         .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; font-weight: bold; display: inline-block; margin-top: 5px; }
         .status-placed { background: #fff3e0; color: #e67e22; border: 1px solid #e67e22; }
         .status-confirmed { background: #e8f5e9; color: var(--green); border: 1px solid var(--green); }
 
-        /* Chat Overlay Styles */
         #chat-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
@@ -158,7 +160,7 @@
                             ${!isConfirmed ? `<button class="btn btn-confirm" onclick="confirmOrder('${doc.id}')">CONFIRM</button>` : ''}
                             <button class="btn btn-wa" onclick="contactWhatsApp('${data.phone}', '${data.name}', '${data.item}')">WA</button>
                             <button class="btn" onclick="openChat('${doc.id}', '${data.name}')">CHAT</button>
-                            <button class="btn" style="background:var(--plum)" onclick="giftPoints('${data.customerIP}')">GIFT</button>
+                            <button class="btn btn-delete" onclick="deleteOrder('${doc.id}')">✕</button>
                         </div>
                     </td>
                 </tr>
@@ -171,13 +173,22 @@
         document.getElementById('stat-cust').innerText = uniqueIPs.size;
     });
 
+    // --- DELETE LOGIC ---
+    async function deleteOrder(orderId) {
+        if(confirm("Permanently delete this order from the vault?")) {
+            try {
+                await db.collection("orders").doc(orderId).delete();
+            } catch (error) {
+                alert("Error deleting: " + error.message);
+            }
+        }
+    }
+
     function contactWhatsApp(phone, name, items) {
         const cleanPhone = phone.replace(/\D/g, '');
         const message = `Hi ${name}! This is Moonlight Cravings. We received your order for: ${items}. Shall we proceed?`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
     }
-
-    // --- NEW CHAT SYSTEM LOGIC ---
 
     function openChat(orderId, customerName) {
         activeOrderId = orderId;
@@ -185,7 +196,6 @@
         document.getElementById('chat-overlay').style.display = 'flex';
         document.getElementById('chat-msgs').innerHTML = "Loading...";
 
-        // Real-time listener for this specific order's chat
         if(chatUnsubscribe) chatUnsubscribe();
         chatUnsubscribe = db.collection("orders").doc(orderId).collection("chats")
             .orderBy("timestamp", "asc")
@@ -211,9 +221,7 @@
         if(!text || !activeOrderId) return;
 
         await db.collection("orders").doc(activeOrderId).collection("chats").add({
-            text: text,
-            sender: "Admin",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            text: text, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         input.value = "";
     }
@@ -227,16 +235,6 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
-    }
-
-    async function giftPoints(ip) {
-        if(!ip || ip === "undefined") return alert("No Customer IP found");
-        const amount = prompt("How many points to gift?");
-        if(!amount || isNaN(amount)) return;
-        await db.collection("points_pending").doc(ip).set({
-            amount: parseInt(amount), timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Points Sent!");
     }
 </script>
 </body>
