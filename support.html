@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonlight Emergency Support 🆘</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #fff1f5; padding: 20px; }
+        .support-card { background: white; max-width: 600px; margin: auto; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .big-inbox { height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px; border-radius: 10px; max-width: 80%; }
+        .msg.user { background: #eee; align-self: flex-start; }
+        .msg.admin { background: #4a148c; color: white; align-self: flex-end; }
+        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
+        input[type="text"] { width: 70%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
+        .btn { padding: 10px 20px; border-radius: 10px; border: none; background: #b76e79; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="support-card">
+        <h2>Emergency Customer Service 🆘</h2>
+        <p>Send GPay screenshots or report issues here. Staff will reply live.</p>
+        
+        <div class="big-inbox" id="support-inbox"></div>
+        
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="support-msg" placeholder="Type message or paste image link...">
+            <button class="btn" onclick="sendSupport()">Send</button>
+        </div>
+        <p style="font-size: 0.7rem; color: gray; margin-top: 10px;">Tip: To send an image, upload to PostImages and paste the Direct Link here.</p>
+    </div>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Unique support ID per user IP
+        let userIP = "";
+        fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
+            userIP = d.ip;
+            loadSupport();
+        });
+
+        function loadSupport() {
+            db.collection("support").doc(userIP).collection("messages").orderBy("timestamp").onSnapshot(snap => {
+                const box = document.getElementById('support-inbox');
+                box.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    const isImg = data.text.includes('http') && (data.text.includes('.png') || data.text.includes('.jpg'));
+                    return `<div class="msg ${data.sender.toLowerCase()}">
+                        ${isImg ? `<img src="${data.text}">` : data.text}
+                    </div>`;
+                }).join('');
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        async function sendSupport() {
+            const txt = document.getElementById('support-msg').value;
+            if(!txt) return;
+            await db.collection("support").doc(userIP).collection("messages").add({
+                text: txt, sender: "User", timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('support-msg').value = "";
+        }
+    </script>
+</body>
+</html>
