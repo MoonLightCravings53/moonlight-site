@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Restored Original Theme Colors */
         :root { 
             --pink: #fce4ec; 
             --rose-gold: #b76e79; 
@@ -18,87 +17,52 @@
             --green: #27ae60;
         }
 
-        body { 
-            margin: 0; 
-            font-family: 'Georgia', serif; 
-            background: var(--pink); 
-            color: var(--plum); 
-            padding: 20px;
-        }
+        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); padding: 20px; }
 
         .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px;
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 20px; background: var(--white); border-radius: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
         }
 
         h1 { color: var(--rose-gold); margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
 
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 25px; 
-        }
-
-        .stat-card { 
-            background: var(--white); 
-            padding: 15px; 
-            border-radius: 15px; 
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
         .stat-card span { display: block; font-size: 0.7rem; color: var(--rose-gold); font-weight: bold; text-transform: uppercase; }
         .stat-card b { font-size: 1.5rem; color: var(--plum); }
 
-        .table-wrap { 
-            background: var(--white); 
-            border-radius: 20px; 
-            overflow-x: auto; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-
+        .table-wrap { background: var(--white); border-radius: 20px; overflow-x: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { background: #fdf2f5; color: var(--plum); padding: 15px; text-align: left; font-size: 0.9rem; border-bottom: 2px solid var(--pink); }
         td { padding: 15px; border-bottom: 1px solid var(--pink); font-size: 0.85rem; vertical-align: top; }
 
         .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn { 
-            background: var(--rose-gold); 
-            color: white; 
-            border: none; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 0.65rem; 
-            transition: 0.3s;
-        }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.65rem; transition: 0.3s; }
         .btn:hover { background: var(--plum); }
-
-        .btn-wa { background: #25d366; } /* WhatsApp Green */
-        .btn-wa:hover { background: #128c7e; }
-        
+        .btn-wa { background: #25d366; }
         .btn-confirm { background: var(--green); }
 
-        .status-badge { 
-            font-size: 0.6rem; 
-            padding: 3px 8px; 
-            border-radius: 10px; 
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 5px;
-        }
+        .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; font-weight: bold; display: inline-block; margin-top: 5px; }
         .status-placed { background: #fff3e0; color: #e67e22; border: 1px solid #e67e22; }
         .status-confirmed { background: #e8f5e9; color: var(--green); border: 1px solid var(--green); }
 
-        .item-text { color: #555; font-style: italic; line-height: 1.4; }
+        /* Chat Overlay Styles */
+        #chat-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .chat-modal {
+            background: white; width: 90%; max-width: 400px; height: 80vh; 
+            border-radius: 20px; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .chat-header { background: var(--plum); color: white; padding: 15px; display: flex; justify-content: space-between; }
+        #chat-msgs { flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; }
+        .msg { padding: 8px 12px; margin: 5px 0; border-radius: 10px; font-size: 0.8rem; max-width: 80%; }
+        .msg.Admin { background: var(--pink); align-self: flex-end; color: var(--plum); }
+        .msg.Customer { background: #eee; align-self: flex-start; }
+        .chat-input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee; }
+        .chat-input-area input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
     </style>
 </head>
 <body>
@@ -130,6 +94,20 @@
         </table>
     </div>
 
+    <div id="chat-overlay">
+        <div class="chat-modal">
+            <div class="chat-header">
+                <span id="chat-title">Chat</span>
+                <button onclick="closeChat()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
+            </div>
+            <div id="chat-msgs"></div>
+            <div class="chat-input-area">
+                <input type="text" id="admin-reply" placeholder="Type a message...">
+                <button class="btn" onclick="sendReply()">Send</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     const firebaseConfig = { 
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", 
@@ -143,6 +121,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     let initialLoad = true;
+    let activeOrderId = null;
+    let chatUnsubscribe = null;
 
     db.collection("orders").orderBy("timestamp", "desc").limit(50).onSnapshot(snap => {
         const tbody = document.getElementById('order-rows');
@@ -171,13 +151,13 @@
                         <div style="font-size:0.75rem; color:var(--rose-gold)">${data.phone}</div>
                         <span class="status-badge ${statusClass}">${statusLabel}</span>
                     </td>
-                    <td><div class="item-text">${data.item}</div></td>
+                    <td><div style="color: #555; font-style: italic; line-height: 1.4;">${data.item}</div></td>
                     <td><b style="color:var(--plum)">₹${data.price}</b></td>
                     <td>
                         <div class="btn-group">
                             ${!isConfirmed ? `<button class="btn btn-confirm" onclick="confirmOrder('${doc.id}')">CONFIRM</button>` : ''}
-                            <button class="btn btn-wa" onclick="contactWhatsApp('${data.phone}', '${data.name}', '${data.item}')">WHATSAPP</button>
-                            <button class="btn" onclick="openChat('${doc.id}')">CHAT</button>
+                            <button class="btn btn-wa" onclick="contactWhatsApp('${data.phone}', '${data.name}', '${data.item}')">WA</button>
+                            <button class="btn" onclick="openChat('${doc.id}', '${data.name}')">CHAT</button>
                             <button class="btn" style="background:var(--plum)" onclick="giftPoints('${data.customerIP}')">GIFT</button>
                         </div>
                     </td>
@@ -191,12 +171,51 @@
         document.getElementById('stat-cust').innerText = uniqueIPs.size;
     });
 
-    // New WhatsApp Logic
     function contactWhatsApp(phone, name, items) {
-        // Clean phone number (remove spaces/dashes)
         const cleanPhone = phone.replace(/\D/g, '');
         const message = `Hi ${name}! This is Moonlight Cravings. We received your order for: ${items}. Shall we proceed?`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
+    // --- NEW CHAT SYSTEM LOGIC ---
+
+    function openChat(orderId, customerName) {
+        activeOrderId = orderId;
+        document.getElementById('chat-title').innerText = "Chat with " + customerName;
+        document.getElementById('chat-overlay').style.display = 'flex';
+        document.getElementById('chat-msgs').innerHTML = "Loading...";
+
+        // Real-time listener for this specific order's chat
+        if(chatUnsubscribe) chatUnsubscribe();
+        chatUnsubscribe = db.collection("orders").doc(orderId).collection("chats")
+            .orderBy("timestamp", "asc")
+            .onSnapshot(s => {
+                const box = document.getElementById('chat-msgs');
+                box.innerHTML = s.docs.map(d => {
+                    const m = d.data();
+                    return `<div class="msg ${m.sender}">${m.text}</div>`;
+                }).join('');
+                box.scrollTop = box.scrollHeight;
+            });
+    }
+
+    function closeChat() {
+        document.getElementById('chat-overlay').style.display = 'none';
+        if(chatUnsubscribe) chatUnsubscribe();
+        activeOrderId = null;
+    }
+
+    async function sendReply() {
+        const input = document.getElementById('admin-reply');
+        const text = input.value.trim();
+        if(!text || !activeOrderId) return;
+
+        await db.collection("orders").doc(activeOrderId).collection("chats").add({
+            text: text,
+            sender: "Admin",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        input.value = "";
     }
 
     async function confirmOrder(orderId) {
@@ -208,14 +227,6 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
-    }
-
-    async function openChat(orderId) {
-        const msg = prompt("Send a message to the customer's portal:");
-        if(!msg) return;
-        await db.collection("orders").doc(orderId).collection("chats").add({
-            text: msg, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
     }
 
     async function giftPoints(ip) {
@@ -230,4 +241,3 @@
 </script>
 </body>
 </html>
-
