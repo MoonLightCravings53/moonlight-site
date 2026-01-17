@@ -14,30 +14,41 @@
         .logo { font-size: 1.4rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 1px; }
         .wallet-pill { background: linear-gradient(135deg, var(--plum), #6a1b9a); color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         
-        #claim-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 300px; border-radius: 20px; z-index: 5000; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); padding: 20px; border: 2px solid var(--gold); }
-        
+        /* Popups & Modals */
+        #claim-popup, #order-success-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 320px; border-radius: 25px; z-index: 5000; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); padding: 25px; border: 2px solid var(--gold); }
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4999; backdrop-filter: blur(3px); }
+
         .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
         .card { background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
         .card:hover { transform: translateY(-5px); }
         .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body h3 { margin: 15px 0 5px; font-size: 1.2rem; }
         
         select, textarea, input[type="text"] { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia'; }
         .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn:hover { background: var(--plum); }
+        .btn:hover:not(:disabled) { background: var(--plum); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
         .emergency-btn { display: block; background: #e74c3c; color: white; text-align: center; padding: 12px; text-decoration: none; font-weight: bold; border-radius: 0 0 15px 15px; }
 
         #chat-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; height: 500px; background: white; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 3000; flex-direction: column; overflow: hidden; }
         .chat-header { background: #fdf2f5; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .chat-header h4 { margin: 0; color: var(--rose-gold); }
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+<div class="overlay" id="modal-overlay"></div>
 
 <div id="claim-popup">
     <h3 style="margin:0">✨ Reward Unlocked!</h3>
     <p>You received <span id="pending-pts" style="font-weight:bold; color:var(--plum);">0</span> MoonLight Points!</p>
     <button class="btn" onclick="claimPoints()">ADD TO WALLET</button>
+</div>
+
+<div id="order-success-modal">
+    <h2 style="color:var(--rose-gold); margin-top:0;">Order Placed! 🌙</h2>
+    <p style="line-height:1.6;">Your treats are being prepared. We will contact you on WhatsApp shortly for confirmation.</p>
+    <p style="font-size:0.9rem; color:#888;">Button unlocks in: <span id="timer-sec" style="font-weight:bold; color:var(--plum);">10</span>s</p>
+    <button id="success-close-btn" class="btn" disabled onclick="closeSuccessModal()">I UNDERSTAND</button>
 </div>
 
 <nav>
@@ -56,19 +67,13 @@
         <div class="card-body">
             <h3>Premium Cakes</h3>
             <select id="cake-select">
-                <optgroup label="Standard (Vanilla/Choco/Forest/Funfetti/Lemon)">
+                <optgroup label="Standard">
                     <option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option>
                     <option value="999" data-label="1kg Standard Cake">1kg - ₹999</option>
                 </optgroup>
-                <optgroup label="Plum Cake">
-                    <option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option>
-                </optgroup>
-                <optgroup label="Special (Dark Choco / Orange)">
+                <optgroup label="Special">
                     <option value="600" data-label="0.5kg Special Cake">0.5kg - ₹600</option>
                     <option value="1199" data-label="1kg Special Cake">1kg - ₹1199</option>
-                </optgroup>
-                <optgroup label="Banana Cake">
-                    <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
                 </optgroup>
             </select>
             <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
@@ -82,49 +87,8 @@
             <select id="cupcake-select">
                 <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
                 <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
-                <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
-                <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
             </select>
             <button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
-        <div class="card-body">
-            <h3>Dacquoise & Macarons</h3>
-            <select id="treat-select">
-                <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
-                <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
-                <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
-        <div class="card-body">
-            <h3>Cookie Boxes (8 pcs)</h3>
-            <select id="cookie-select">
-                <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
-                <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
-                <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
-        <div class="card-body">
-            <h3>Bakery Snacks</h3>
-            <select id="snack-select">
-                <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
-                <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
-                <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
-            </select>
-            <button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button>
         </div>
     </div>
 
@@ -140,7 +104,6 @@
         <h4>🛒 Your Cart</h4>
         <button onclick="toggleChatWindow()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✕</button>
     </div>
-    
     <div style="padding:20px; flex:1; overflow-y:auto;">
         <div id="cart-items"></div>
         <hr>
@@ -179,6 +142,7 @@
             if(doc.exists && doc.data().amount > 0) {
                 document.getElementById('pending-pts').innerText = doc.data().amount;
                 document.getElementById('claim-popup').style.display = 'block';
+                document.getElementById('modal-overlay').style.display = 'block';
             }
         });
     };
@@ -204,10 +168,7 @@
         let total = 0;
         document.getElementById('cart-items').innerHTML = myCart.map((item, i) => {
             total += item.price;
-            return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;">
-                <span>${item.name}</span>
-                <span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span>
-            </div>`;
+            return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;"><span>${item.name}</span><span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span></div>`;
         }).join('');
         document.getElementById('cart-total-val').innerText = total;
     }
@@ -218,7 +179,7 @@
         const a = document.getElementById('c-addr').value;
         if(!n || !p || !a || myCart.length === 0) return alert("Fill all details!");
 
-        const orderRef = await db.collection("orders").add({
+        await db.collection("orders").add({
             name: n, phone: p, address: a,
             item: myCart.map(i => i.name).join(", "),
             price: document.getElementById('cart-total-val').innerText,
@@ -226,18 +187,39 @@
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Instant Automated Notification sent to Firebase for Admin
-        await orderRef.collection("chats").add({
-            text: "🌙 Order received in the bakery! We've started prepping your treats. Check your WhatsApp for a confirmation message shortly!",
-            sender: "Admin",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("Order Received! 🌙\nYour treats are being prepared. We will contact you on WhatsApp shortly!");
-        
+        // Trigger Success Modal with Countdown
         myCart = []; 
         renderCart();
         toggleChatWindow();
+        startSuccessCountdown();
+    }
+
+    function startSuccessCountdown() {
+        const modal = document.getElementById('order-success-modal');
+        const overlay = document.getElementById('modal-overlay');
+        const btn = document.getElementById('success-close-btn');
+        const timerDisplay = document.getElementById('timer-sec');
+        
+        let timeLeft = 10;
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+        btn.disabled = true;
+        timerDisplay.innerText = timeLeft;
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                timerDisplay.parentElement.innerText = "Order confirmed! 🌙";
+            }
+        }, 1000);
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('order-success-modal').style.display = 'none';
+        document.getElementById('modal-overlay').style.display = 'none';
     }
 
     async function claimPoints() {
@@ -245,6 +227,7 @@
         await db.collection("users").doc(userIP).set({ points: _SECURE_POINTS + amt }, { merge: true });
         await db.collection("points_pending").doc(userIP).delete();
         document.getElementById('claim-popup').style.display = 'none';
+        document.getElementById('modal-overlay').style.display = 'none';
     }
 
     function toggleChatWindow() {
