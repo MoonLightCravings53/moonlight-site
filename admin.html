@@ -14,6 +14,7 @@
             --rose: #b76e79; 
             --glass: rgba(255, 255, 255, 0.05); 
             --border: rgba(212, 175, 55, 0.2);
+            --green: #27ae60;
         }
 
         body { 
@@ -25,7 +26,6 @@
             line-height: 1.5;
         }
 
-        /* Dashboard Header */
         .header { 
             display: flex; 
             justify-content: space-between; 
@@ -38,7 +38,6 @@
         h1 { color: var(--gold); letter-spacing: 2px; margin: 0; font-size: 1.8rem; }
         .live-indicator { color: #4caf50; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
 
-        /* Stats Section */
         .stats-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
@@ -52,48 +51,48 @@
             border-radius: 15px; 
             border: 1px solid var(--border); 
             text-align: center;
-            transition: transform 0.3s;
         }
 
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-card span { display: block; font-size: 0.75rem; color: var(--rose); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card span { display: block; font-size: 0.75rem; color: var(--rose); text-transform: uppercase; }
         .stat-card b { font-size: 2rem; color: var(--gold); display: block; margin-top: 5px; }
 
-        /* Orders Table */
         .table-wrap { 
             background: var(--glass); 
             border-radius: 20px; 
             overflow: hidden; 
             border: 1px solid rgba(255,255,255,0.1); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th { background: rgba(255,255,255,0.08); color: var(--gold); padding: 18px 15px; text-align: left; font-size: 0.9rem; }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; font-size: 0.85rem; }
-        
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background: rgba(255,255,255,0.02); }
+        th { background: rgba(255,255,255,0.08); color: var(--gold); padding: 18px 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* Action Buttons */
-        .btn-group { display: flex; gap: 8px; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn { 
             background: var(--gold); 
             color: #000; 
             border: none; 
-            padding: 8px 14px; 
+            padding: 8px 12px; 
             border-radius: 6px; 
             cursor: pointer; 
             font-weight: bold; 
-            font-size: 0.75rem; 
-            transition: 0.2s;
+            font-size: 0.7rem; 
         }
 
-        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+        .btn-confirm { background: var(--green); color: white; }
         .btn-gift { background: transparent; border: 1px solid var(--rose); color: var(--rose); }
-        .btn-gift:hover { background: var(--rose); color: white; }
+        
+        .status-badge { 
+            font-size: 0.65rem; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            text-transform: uppercase; 
+            font-weight: bold;
+        }
+        .status-placed { background: #e67e22; color: #fff; }
+        .status-confirmed { background: var(--green); color: #fff; }
 
-        .item-text { max-width: 300px; color: #bbb; font-style: italic; }
+        .item-text { max-width: 250px; color: #bbb; font-style: italic; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -105,44 +104,29 @@
             <h1>MOONLIGHT VAULT 🌙</h1>
             <div class="live-indicator">● LIVE CONNECTION ACTIVE</div>
         </div>
-        <div style="text-align: right">
-            <small style="color: var(--rose)">Authorized Personnel Only</small>
-        </div>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card">
-            <span>Today's Volume</span>
-            <b id="stat-count">0</b>
-        </div>
-        <div class="stat-card">
-            <span>Live Revenue</span>
-            <b id="stat-rev">₹0</b>
-        </div>
-        <div class="stat-card">
-            <span>Active Customers</span>
-            <b id="stat-cust">0</b>
-        </div>
+        <div class="stat-card"><span>Orders</span><b id="stat-count">0</b></div>
+        <div class="stat-card"><span>Revenue</span><b id="stat-rev">₹0</b></div>
+        <div class="stat-card"><span>Users</span><b id="stat-cust">0</b></div>
     </div>
 
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>Customer Info</th>
+                    <th>Customer</th>
                     <th>Order Details</th>
                     <th>Total</th>
-                    <th>Management</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="order-rows">
-                <tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--rose);">Synchronizing with Moonlight Servers...</td></tr>
-            </tbody>
+            <tbody id="order-rows"></tbody>
         </table>
     </div>
 
 <script>
-    // Configuration
     const firebaseConfig = { 
         apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", 
         authDomain: "moonlight-cravings.firebaseapp.com", 
@@ -156,17 +140,14 @@
     const db = firebase.firestore();
     let initialLoad = true;
 
-    // Live Stream Listener
     db.collection("orders").orderBy("timestamp", "desc").limit(50).onSnapshot(snap => {
         const tbody = document.getElementById('order-rows');
         let totalRev = 0;
         let uniqueIPs = new Set();
-        
         tbody.innerHTML = "";
 
-        // Play sound if a new order arrives after the page is already open
         if (!initialLoad && snap.docChanges().some(change => change.type === "added")) {
-            document.getElementById('order-sound').play().catch(e => console.log("Sound blocked by browser"));
+            document.getElementById('order-sound').play().catch(e => {});
         }
         initialLoad = false;
 
@@ -175,19 +156,24 @@
             totalRev += parseInt(data.price || 0);
             if(data.customerIP) uniqueIPs.add(data.customerIP);
 
+            const isConfirmed = data.status === 'confirmed';
+            const statusClass = isConfirmed ? 'status-confirmed' : 'status-placed';
+            const statusLabel = isConfirmed ? 'Confirmed' : 'Pending';
+
             const row = `
                 <tr>
                     <td>
                         <div style="font-weight:bold; color:var(--gold)">${data.name}</div>
-                        <div style="font-size:0.75rem; color:gray">ID: ${doc.id.substring(0,6)}...</div>
-                        <div style="font-size:0.75rem">${data.phone}</div>
+                        <div style="font-size:0.7rem">${data.phone}</div>
+                        <span class="status-badge ${statusClass}">${statusLabel}</span>
                     </td>
                     <td><div class="item-text">${data.item}</div></td>
                     <td><b style="color:var(--gold)">₹${data.price}</b></td>
                     <td>
                         <div class="btn-group">
+                            ${!isConfirmed ? `<button class="btn btn-confirm" onclick="confirmOrder('${doc.id}')">CONFIRM</button>` : ''}
                             <button class="btn" onclick="openChat('${doc.id}')">REPLY</button>
-                            <button class="btn btn-gift" onclick="giftPoints('${data.customerIP}')">GIFT PTS</button>
+                            <button class="btn btn-gift" onclick="giftPoints('${data.customerIP}')">GIFT</button>
                         </div>
                     </td>
                 </tr>
@@ -195,38 +181,39 @@
             tbody.innerHTML += row;
         });
 
-        // Update Stats
         document.getElementById('stat-count').innerText = snap.size;
         document.getElementById('stat-rev').innerText = "₹" + totalRev;
         document.getElementById('stat-cust').innerText = uniqueIPs.size;
-
-        if(snap.size === 0) {
-            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:40px;'>No orders found in the database.</td></tr>";
-        }
     });
 
+    async function confirmOrder(orderId) {
+        if(confirm("Confirm this order? This will update the customer's status live.")) {
+            await db.collection("orders").doc(orderId).update({ status: 'confirmed' });
+            
+            await db.collection("orders").doc(orderId).collection("chats").add({
+                text: "Your order has been confirmed! We've started preparing your treats!",
+                sender: "Admin",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+    }
+
     async function openChat(orderId) {
-        const msg = prompt("Send message to Customer's Chat Window:");
+        const msg = prompt("Message to Customer:");
         if(!msg) return;
-        
         await db.collection("orders").doc(orderId).collection("chats").add({
-            text: msg,
-            sender: "Admin",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            text: msg, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Message delivered.");
     }
 
     async function giftPoints(ip) {
-        if(!ip || ip === "undefined") return alert("Cannot identify customer IP.");
-        const amount = prompt("Enter amount of Moonlight Points to gift:");
+        if(!ip || ip === "undefined") return alert("No IP found");
+        const amount = prompt("Moonlight Points to gift:");
         if(!amount || isNaN(amount)) return;
-
         await db.collection("points_pending").doc(ip).set({
-            amount: parseInt(amount),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            amount: parseInt(amount), timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Reward sent! Customer will see the gift popup.");
+        alert("Points sent!");
     }
 </script>
 </body>
