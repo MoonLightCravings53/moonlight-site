@@ -44,17 +44,20 @@
         .btn:hover { background: var(--plum); }
         .btn-wa { background: #25d366; }
         .btn-confirm { background: var(--green); }
+        .btn-cancel { background: #ff9800; color: white; } /* Orange for cancel */
         .btn-delete { background: white; color: var(--red); border: 1px solid var(--red); padding: 6px 10px; }
         .btn-delete:hover { background: var(--red); color: white; }
 
         .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; font-weight: bold; display: inline-block; margin-top: 5px; }
         .status-placed { background: #fff3e0; color: #e67e22; border: 1px solid #e67e22; }
         .status-confirmed { background: #e8f5e9; color: var(--green); border: 1px solid var(--green); }
+        .status-cancelled { background: #ffebee; color: var(--red); border: 1px solid var(--red); }
         
-        /* New Style for Fulfillment */
         .method-tag { font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
         .method-delivery { color: var(--blue); }
         .method-pickup { color: #e67e22; }
+
+        .otp-box { font-family: monospace; background: #eee; padding: 2px 5px; border-radius: 4px; color: #333; font-weight: bold; }
 
         #chat-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -92,7 +95,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Customer</th>
+                    <th>Order Info</th>
                     <th>Fulfillment</th>
                     <th>Order Items</th>
                     <th>Price</th>
@@ -133,7 +136,7 @@
     let activeOrderId = null;
     let chatUnsubscribe = null;
 
-    db.collection("orders").orderBy("timestamp", "desc").limit(50).onSnapshot(snap => {
+    db.collection("orders").orderBy("timestamp", "asc").onSnapshot(snap => {
         const tbody = document.getElementById('order-rows');
         let totalRev = 0;
         let uniqueIPs = new Set();
@@ -144,24 +147,32 @@
         }
         initialLoad = false;
 
-        snap.docs.forEach(doc => {
+        // Using snap size and index for sequential order numbering (Order #1, #2...)
+        snap.docs.forEach((doc, index) => {
             const data = doc.data();
+            const orderNumber = index + 1;
             totalRev += parseInt(data.price || 0);
             if(data.customerIP) uniqueIPs.add(data.customerIP);
 
             const isConfirmed = data.status === 'confirmed';
-            const statusClass = isConfirmed ? 'status-confirmed' : 'status-placed';
-            const statusLabel = isConfirmed ? 'CONFIRMED' : 'WAITING';
+            const isCancelled = data.status === 'cancelled';
             
-            // Logic for showing Delivery/Pickup
+            let statusClass = 'status-placed';
+            let statusLabel = 'WAITING';
+            if(isConfirmed) { statusClass = 'status-confirmed'; statusLabel = 'CONFIRMED'; }
+            if(isCancelled) { statusClass = 'status-cancelled'; statusLabel = 'CANCELLED'; }
+
             const method = data.method || "Delivery"; 
             const methodClass = method === "Delivery" ? "method-delivery" : "method-pickup";
             const methodIcon = method === "Delivery" ? "🚀" : "🏪";
+            
+            const otpDisplay = data.otp ? `<span class="otp-box">OTP: ${data.otp}</span>` : '';
 
             const row = `
                 <tr>
                     <td>
-                        <div style="font-weight:bold; color:var(--plum)">${data.name}</div>
+                        <div style="font-weight:bold; color:var(--plum)">Order #${orderNumber}</div>
+                        <div style="font-size:0.9rem; margin-top:4px;">${data.name}</div>
                         <div style="font-size:0.75rem; color:var(--rose-gold)">${data.phone}</div>
                         <span class="status-badge ${statusClass}">${statusLabel}</span>
                     </td>
@@ -172,12 +183,14 @@
                         <div style="font-size:0.7rem; color:#888; margin-top:4px; max-width:150px;">
                             ${data.address}
                         </div>
+                        ${isConfirmed ? `<div style="margin-top:5px;">${otpDisplay}</div>` : ''}
                     </td>
                     <td><div style="color: #555; font-style: italic; line-height: 1.4;">${data.item}</div></td>
                     <td><b style="color:var(--plum)">₹${data.price}</b></td>
                     <td>
                         <div class="btn-group">
-                            ${!isConfirmed ? `<button class="btn btn-confirm" onclick="confirmOrder('${doc.id}')">CONFIRM</button>` : ''}
+                            ${(!isConfirmed && !isCancelled) ? `<button class="btn btn-confirm" onclick="confirmOrder('${doc.id}', ${orderNumber}, '${data.phone}', '${data.name}', '${data.method}', '${data.customerIP}')">CONFIRM</button>` : ''}
+                            ${(!isConfirmed && !isCancelled) ? `<button class="btn btn-cancel" onclick="cancelOrder('${doc.id}', '${data.phone}', '${data.name}')">CANCEL</button>` : ''}
                             <button class="btn btn-wa" onclick="contactWhatsApp('${data.phone}', '${data.name}', '${data.item}')">WA</button>
                             <button class="btn" onclick="openChat('${doc.id}', '${data.name}')">CHAT</button>
                             <button class="btn btn-delete" onclick="deleteOrder('${doc.id}')">✕</button>
@@ -193,13 +206,57 @@
         document.getElementById('stat-cust').innerText = uniqueIPs.size;
     });
 
+    async function confirmOrder(docId, orderNum, phone, name, method, customerIP) {
+        if(confirm(`Confirm Order #${orderNum}?`)) {
+            // 1. Generate a 4-digit OTP
+            const generatedOTP = Math.floor(1000 + Math.random() * 9000);
+            
+            // 2. Gift Points (1 point for every 10 Rupees spent)
+            const orderDoc = await db.collection("orders").doc(docId).get();
+            const price = parseInt(orderDoc.data().price || 0);
+            const pointsToGift = Math.floor(price / 10);
+
+            // Update order status and OTP in Firebase
+            await db.collection("orders").doc(docId).update({ 
+                status: 'confirmed',
+                otp: generatedOTP
+            });
+
+            // Add point to pending for customer
+            await db.collection("points_pending").doc(customerIP).set({
+                amount: pointsToGift
+            });
+
+            // Log chat message
+            await db.collection("orders").doc(docId).collection("chats").add({
+                text: `Order confirmed! Order #${orderNum}. Your OTP is ${generatedOTP}.`,
+                sender: "Admin",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 3. Automate WhatsApp Redirect
+            const cleanPhone = phone.replace(/\D/g, '');
+            const waMsg = `✅ *ORDER CONFIRMED - MOONLIGHT CRAVINGS*\n\nOrder No: *#${orderNum}*\nName: ${name}\nFulfillment: ${method}\n\n🔐 *YOUR OTP: ${generatedOTP}*\n\n${method === 'Delivery' ? 'Please share this OTP with the driver upon arrival.' : 'Show this OTP at the counter for pickup.'}\n\nEnjoy your treats! 🌙`;
+            
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+        }
+    }
+
+    async function cancelOrder(docId, phone, name) {
+        if(confirm(`Are you sure you want to CANCEL ${name}'s order?`)) {
+            await db.collection("orders").doc(docId).update({ status: 'cancelled' });
+            
+            const cleanPhone = phone.replace(/\D/g, '');
+            const waMsg = `❌ *ORDER CANCELLED*\n\nHi ${name}, your order with Moonlight Cravings has been cancelled. If this was a mistake, please contact us immediately.`;
+            
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+        }
+    }
+
+    // [Rest of existing functions kept as is]
     async function deleteOrder(orderId) {
         if(confirm("Permanently delete this order from the vault?")) {
-            try {
-                await db.collection("orders").doc(orderId).delete();
-            } catch (error) {
-                alert("Error deleting: " + error.message);
-            }
+            try { await db.collection("orders").doc(orderId).delete(); } catch (e) { alert(e.message); }
         }
     }
 
@@ -214,7 +271,6 @@
         document.getElementById('chat-title').innerText = "Chat with " + customerName;
         document.getElementById('chat-overlay').style.display = 'flex';
         document.getElementById('chat-msgs').innerHTML = "Loading...";
-
         if(chatUnsubscribe) chatUnsubscribe();
         chatUnsubscribe = db.collection("orders").doc(orderId).collection("chats")
             .orderBy("timestamp", "asc")
@@ -238,22 +294,10 @@
         const input = document.getElementById('admin-reply');
         const text = input.value.trim();
         if(!text || !activeOrderId) return;
-
         await db.collection("orders").doc(activeOrderId).collection("chats").add({
             text: text, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         input.value = "";
-    }
-
-    async function confirmOrder(orderId) {
-        if(confirm("Mark this order as Confirmed?")) {
-            await db.collection("orders").doc(orderId).update({ status: 'confirmed' });
-            await db.collection("orders").doc(orderId).collection("chats").add({
-                text: "Your order has been confirmed! We've started preparing your treats.",
-                sender: "Admin",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }
     }
 </script>
 </body>
