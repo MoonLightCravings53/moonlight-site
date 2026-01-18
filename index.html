@@ -157,8 +157,6 @@
                     <option value="1199" data-label="1kg Dark Chocolate Cake">Dark Chocolate: 1kg - ₹1199</option>
                     <option value="600" data-label="0.5kg Orange Cake">Orange: 0.5kg - ₹600</option>
                     <option value="1199" data-label="1kg Orange Cake">Orange: 1kg - ₹1199</option>
-                    <option value="600" data-label="0.5kg Special Cake">Special: 0.5kg - ₹600</option>
-                    <option value="1199" data-label="1kg Special Cake">Special: 1kg - ₹1199</option>
                 </optgroup>
                 <optgroup label="Banana">
                     <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
@@ -169,10 +167,10 @@
     </div>
 
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
+        <img id="cupcake-img" src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
         <div class="card-body">
             <h3>Cupcakes (Box of 5)</h3>
-            <select id="cupcake-select">
+            <select id="cupcake-select" onchange="updateImage(this, 'cupcake-img')">
                 <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
                 <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
                 <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
@@ -196,10 +194,10 @@
     </div>
 
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
+        <img id="cookie-img" src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
         <div class="card-body">
             <h3>Cookie Boxes (8 pcs)</h3>
-            <select id="cookie-select">
+            <select id="cookie-select" onchange="updateImage(this, 'cookie-img')">
                 <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
                 <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
                 <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
@@ -209,10 +207,10 @@
     </div>
 
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
+        <img id="snack-img" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
         <div class="card-body">
             <h3>Bakery Snacks</h3>
-            <select id="snack-select">
+            <select id="snack-select" onchange="updateImage(this, 'snack-img')">
                 <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
                 <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
                 <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
@@ -325,10 +323,49 @@
     function openVal() { document.getElementById('valentine-overlay').style.display = 'flex'; }
     function closeVal() { document.getElementById('valentine-overlay').style.display = 'none'; }
 
+    // Helper Function for Image Swapping
+    function updateImage(selectElement, imgId) {
+        const label = selectElement.options[selectElement.selectedIndex].getAttribute('data-label');
+        const imgEl = document.getElementById(imgId);
+        
+        const imageMap = {
+            "Donut Holes": "https://i.postimg.cc/pXjYMKVW/Donut-holes.jpg",
+            "Brownies": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg",
+            "Churros": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg",
+            "Butter Cookies": "https://i.postimg.cc/k4Fd84Ky/butter-cookies.jpg",
+            "Black Forest": "https://i.postimg.cc/W3PvhrFk/Black-forest.png",
+            "Orange Cake": "https://i.postimg.cc/L6gN0W0F/Orange-cake.jpg",
+            "Choco Chip": "https://i.postimg.cc/NFHCTC3y/Chocolate-chip-cookies.jpg",
+            "Sugar Cookies": "https://i.postimg.cc/J4jdzg3p/Sugar-cookies.jpg",
+            "Vanilla Cupcakes": "https://i.postimg.cc/mrkwC69n/Vanilla-cupcake.jpg",
+            "Chocolate Cupcakes": "https://i.postimg.cc/nhcYfw30/Chocolate-cupcake.jpg",
+            "Lemon Cupcakes": "https://i.postimg.cc/VL4ngWz8/Lemon-cupcake.jpg"
+        };
+
+        for (let key in imageMap) {
+            if (label.includes(key)) {
+                imgEl.src = imageMap[key];
+                return;
+            }
+        }
+        
+        // Reset to defaults if no match
+        if (imgId === 'cake-img') imgEl.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400";
+        if (imgId === 'cupcake-img') imgEl.src = "https://images.unsplash.com/photo-1519869325930-281384150729?w=400";
+        if (imgId === 'cookie-img') imgEl.src = "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400";
+        if (imgId === 'snack-img') imgEl.src = "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400";
+    }
+
     function checkFunfetti(el) {
         const label = el.options[el.selectedIndex].getAttribute('data-label');
         const imgEl = document.getElementById('cake-img');
-        if(label.includes("Funfetti")) {
+        
+        // First check your specific new cake requests
+        if(label.includes("Black Forest")) {
+            imgEl.src = "https://i.postimg.cc/W3PvhrFk/Black-forest.png";
+        } else if(label.includes("Orange Cake")) {
+            imgEl.src = "https://i.postimg.cc/L6gN0W0F/Orange-cake.jpg";
+        } else if(label.includes("Funfetti")) {
             imgEl.src = "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg";
         } else {
             imgEl.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400";
