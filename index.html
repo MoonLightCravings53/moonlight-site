@@ -91,7 +91,6 @@
         #order-success-modal, #claim-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 320px; border-radius: 25px; z-index: 5000; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); padding: 25px; border: 2px solid var(--gold); }
         .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4999; backdrop-filter: blur(3px); }
 
-        /* Valentine Overlay */
         #valentine-overlay {
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
             background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
@@ -103,7 +102,6 @@
 <body oncontextmenu="return false;">
 
 <div class="bg-animation" id="bg-elements"></div>
-
 <div class="overlay" id="modal-overlay"></div>
 
 <div id="valentine-overlay">
@@ -115,7 +113,7 @@
 
 <nav>
     <div class="logo-container">
-        <div class="logo">MOONLIGHT 🌙</div>
+        <div class="logo">MOONLIGHTCRAVINGS 🌙</div>
         <button class="val-btn" onclick="openVal()">Valentines???</button>
     </div>
     <div style="display:flex; gap:10px;">
@@ -124,7 +122,7 @@
     </div>
 </nav>
 
-<a href="support.html" class="emergency-btn">🆘 EMERGENCY HOTLINE & PAYMENT HELP</a>
+<a href="support.html" class="emergency-btn">IF</a>
 
 <div class="hero-desc">
     <h2>✨ Freshly baked with love, <br> no added preservatives. ✨</h2>
@@ -181,10 +179,10 @@
     </div>
 
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
+        <img id="treat-img" src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
         <div class="card-body">
             <h3>Dacquoise & Macarons</h3>
-            <select id="treat-select">
+            <select id="treat-select" onchange="updateImage(this, 'treat-img')">
                 <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
                 <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
                 <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
@@ -323,23 +321,23 @@
     function openVal() { document.getElementById('valentine-overlay').style.display = 'flex'; }
     function closeVal() { document.getElementById('valentine-overlay').style.display = 'none'; }
 
-    // Helper Function for Image Swapping
     function updateImage(selectElement, imgId) {
         const label = selectElement.options[selectElement.selectedIndex].getAttribute('data-label');
         const imgEl = document.getElementById(imgId);
         
         const imageMap = {
             "Donut Holes": "https://i.postimg.cc/pXjYMKVW/Donut-holes.jpg",
-            "Brownies": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg",
+            "Brownies": "https://i.postimg.cc/jqmQ1Mb8/brownies.jpg",
             "Churros": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg",
             "Butter Cookies": "https://i.postimg.cc/k4Fd84Ky/butter-cookies.jpg",
-            "Black Forest": "https://i.postimg.cc/W3PvhrFk/Black-forest.png",
-            "Orange Cake": "https://i.postimg.cc/L6gN0W0F/Orange-cake.jpg",
             "Choco Chip": "https://i.postimg.cc/NFHCTC3y/Chocolate-chip-cookies.jpg",
             "Sugar Cookies": "https://i.postimg.cc/J4jdzg3p/Sugar-cookies.jpg",
             "Vanilla Cupcakes": "https://i.postimg.cc/mrkwC69n/Vanilla-cupcake.jpg",
             "Chocolate Cupcakes": "https://i.postimg.cc/nhcYfw30/Chocolate-cupcake.jpg",
-            "Lemon Cupcakes": "https://i.postimg.cc/VL4ngWz8/Lemon-cupcake.jpg"
+            "Lemon Cupcakes": "https://i.postimg.cc/VL4ngWz8/Lemon-cupcake.jpg",
+            "Macarons": "https://i.postimg.cc/yY7rWjfx/Macarons.jpg",
+            "Almond Dacquoise": "https://i.postimg.cc/XYRfB7Vg/Almon-Daquoise.jpg",
+            "Pistachio Dacquoise": "https://i.postimg.cc/MpC7fKWn/Pistachio-Daquoise.jpg"
         };
 
         for (let key in imageMap) {
@@ -349,24 +347,31 @@
             }
         }
         
-        // Reset to defaults if no match
         if (imgId === 'cake-img') imgEl.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400";
         if (imgId === 'cupcake-img') imgEl.src = "https://images.unsplash.com/photo-1519869325930-281384150729?w=400";
         if (imgId === 'cookie-img') imgEl.src = "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400";
         if (imgId === 'snack-img') imgEl.src = "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400";
+        if (imgId === 'treat-img') imgEl.src = "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400";
     }
 
     function checkFunfetti(el) {
         const label = el.options[el.selectedIndex].getAttribute('data-label');
         const imgEl = document.getElementById('cake-img');
         
-        // First check your specific new cake requests
         if(label.includes("Black Forest")) {
             imgEl.src = "https://i.postimg.cc/W3PvhrFk/Black-forest.png";
         } else if(label.includes("Orange Cake")) {
             imgEl.src = "https://i.postimg.cc/L6gN0W0F/Orange-cake.jpg";
         } else if(label.includes("Funfetti")) {
             imgEl.src = "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg";
+        } else if(label.includes("Plum Cake")) {
+            imgEl.src = "https://i.postimg.cc/Z5xbpwmw/Plum-cake.png";
+        } else if(label.includes("Banana Cake")) {
+            imgEl.src = "https://i.postimg.cc/xdj0RLTT/Bannana-Cake.png";
+        } else if(label.includes("Vanilla Cake")) {
+            imgEl.src = "https://i.postimg.cc/mDJBBq3g/Vanilla-Cake.png";
+        } else if(label.includes("Lemon Cake")) {
+            imgEl.src = "https://i.postimg.cc/hvmgjrMs/Lemon-cake.png";
         } else {
             imgEl.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400";
         }
