@@ -11,7 +11,6 @@
         :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --gold: #ffd700; }
         body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); -webkit-user-select: none; user-select: none; overflow-x: hidden; }
         
-        /* Background Animations */
         @keyframes float {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-15px) rotate(1deg); }
@@ -26,18 +25,16 @@
 
         .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px; }
         
-        /* Floating Cards */
         .card { 
             background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; 
             animation: float 6s ease-in-out infinite;
         }
-        /* Offset animation timing for a "random" feel */
         .card:nth-child(2n) { animation-delay: 1s; animation-duration: 7s; }
         .card:nth-child(3n) { animation-delay: 2s; animation-duration: 5s; }
         
         .card:hover { transform: scale(1.03); animation-play-state: paused; z-index: 10; }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card img { width: 100%; height: 200px; object-fit: cover; transition: 0.5s; }
         
         select, textarea, input[type="text"], .cart-select { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia'; }
         .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
@@ -73,20 +70,32 @@
 
 <div class="container">
     <div class="card">
-        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
+        <img id="cake-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
         <div class="card-body">
             <h3>Premium Cakes</h3>
-            <select id="cake-select">
+            <select id="cake-select" onchange="checkFunfetti(this)">
                 <optgroup label="Standard">
-                    <option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option>
-                    <option value="999" data-label="1kg Standard Cake">1kg - ₹999</option>
+                    <option value="500" data-label="0.5kg Lemon Cake">Lemon: 0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Lemon Cake">Lemon: 1kg - ₹999</option>
+                    <option value="500" data-label="0.5kg Chocolate Cake">Chocolate: 0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Chocolate Cake">Chocolate: 1kg - ₹999</option>
+                    <option value="500" data-label="0.5kg Vanilla Cake">Vanilla: 0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Vanilla Cake">Vanilla: 1kg - ₹999</option>
+                    <option value="500" data-label="0.5kg Black Forest Cake">Black Forest: 0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Black Forest Cake">Black Forest: 1kg - ₹999</option>
+                    <option value="500" data-label="0.5kg Funfetti Cake">Funfetti: 0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Funfetti Cake">Funfetti: 1kg - ₹999</option>
                 </optgroup>
                 <optgroup label="Plum">
                     <option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option>
                 </optgroup>
                 <optgroup label="Special">
-                    <option value="600" data-label="0.5kg Special Cake">0.5kg - ₹600</option>
-                    <option value="1199" data-label="1kg Special Cake">1kg - ₹1199</option>
+                    <option value="600" data-label="0.5kg Dark Chocolate Cake">Dark Chocolate: 0.5kg - ₹600</option>
+                    <option value="1199" data-label="1kg Dark Chocolate Cake">Dark Chocolate: 1kg - ₹1199</option>
+                    <option value="600" data-label="0.5kg Orange Cake">Orange: 0.5kg - ₹600</option>
+                    <option value="1199" data-label="1kg Orange Cake">Orange: 1kg - ₹1199</option>
+                    <option value="600" data-label="0.5kg Special Cake">Special: 0.5kg - ₹600</option>
+                    <option value="1199" data-label="1kg Special Cake">Special: 1kg - ₹1199</option>
                 </optgroup>
                 <optgroup label="Banana">
                     <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
@@ -182,7 +191,7 @@
 
 <div id="order-success-modal">
     <h2 style="color:var(--rose-gold); margin-top:0;">Order Placed! 🌙</h2>
-    <p style="line-height:1.6;">Your treats are being prepared. We will contact you on WhatsApp shortly for confirmation.</p>
+    <p style="line-height:1.6;">Your treats are being prepared. You will mostly get messaged from <b>+91 8870459614</b> or <b>+91 9442010001</b> on WhatsApp shortly for confirmation.</p>
     <p style="font-size:0.9rem; color:#888;">Button unlocks in: <span id="timer-sec" style="font-weight:bold; color:var(--plum);">10</span>s</p>
     <button id="success-close-btn" class="btn" disabled onclick="closeSuccessAndRefresh()">I UNDERSTAND</button>
 </div>
@@ -224,6 +233,16 @@
             }
         });
     };
+
+    function checkFunfetti(el) {
+        const label = el.options[el.selectedIndex].getAttribute('data-label');
+        const imgEl = document.getElementById('cake-img');
+        if(label.includes("Funfetti")) {
+            imgEl.src = "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg";
+        } else {
+            imgEl.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400";
+        }
+    }
 
     function addToCartBySelect(id) {
         const el = document.getElementById(id);
@@ -290,7 +309,7 @@
             if (timeLeft <= 0) {
                 clearInterval(timer);
                 btn.disabled = false;
-                timerDisplay.parentElement.innerText = "Order confirmed! 🌙";
+                timerDisplay.parentElement.innerHTML = "Order confirmed! 🌙 <br> (Expect a message from <b>+91 8870459614</b> or <b>+91 9442010001</b>)";
             }
         }, 1000);
     }
