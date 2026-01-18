@@ -3,258 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Vault | Moonlight Cravings</title>
+    <title>Moonlight Cravings | Premium Bakery</title>
+    <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
     <style>
-        :root { 
-            --pink: #fce4ec; 
-            --rose-gold: #b76e79; 
-            --plum: #4a148c; 
-            --white: #ffffff; 
-            --gold: #ffd700; 
-            --green: #27ae60;
-            --red: #e74c3c;
-            --blue: #3498db;
-        }
-
-        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); padding: 20px; }
-
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 20px; background: var(--white); border-radius: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-        }
-
-        h1 { color: var(--rose-gold); margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .stat-card span { display: block; font-size: 0.7rem; color: var(--rose-gold); font-weight: bold; text-transform: uppercase; }
-        .stat-card b { font-size: 1.5rem; color: var(--plum); }
-
-        .table-wrap { background: var(--white); border-radius: 20px; overflow-x: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th { background: #fdf2f5; color: var(--plum); padding: 15px; text-align: left; font-size: 0.9rem; border-bottom: 2px solid var(--pink); }
-        td { padding: 15px; border-bottom: 1px solid var(--pink); font-size: 0.85rem; vertical-align: top; }
-
-        .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn { background: var(--rose-gold); color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.65rem; transition: 0.3s; }
-        .btn:hover { background: var(--plum); }
-        .btn-wa { background: #25d366; }
-        .btn-confirm { background: var(--green); }
-        .btn-delete { background: white; color: var(--red); border: 1px solid var(--red); padding: 6px 10px; }
-        .btn-delete:hover { background: var(--red); color: white; }
-
-        .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; font-weight: bold; display: inline-block; margin-top: 5px; }
-        .status-placed { background: #fff3e0; color: #e67e22; border: 1px solid #e67e22; }
-        .status-confirmed { background: #e8f5e9; color: var(--green); border: 1px solid var(--green); }
+        :root { --pink: #fce4ec; --rose-gold: #b76e79; --plum: #4a148c; --white: #ffffff; --gold: #ffd700; }
+        body { margin: 0; font-family: 'Georgia', serif; background: var(--pink); color: var(--plum); -webkit-user-select: none; user-select: none; overflow-x: hidden; }
         
-        /* New Style for Fulfillment */
-        .method-tag { font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
-        .method-delivery { color: var(--blue); }
-        .method-pickup { color: #e67e22; }
+        /* Background Animations */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
 
-        #chat-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        nav { background: var(--white); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .logo { font-size: 1.4rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 1px; }
+        .wallet-pill { background: linear-gradient(135deg, var(--plum), #6a1b9a); color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        
+        .hero-desc { text-align: center; padding: 20px; font-style: italic; color: var(--rose-gold); line-height: 1.6; }
+
+        .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px; }
+        
+        /* Floating Cards */
+        .card { 
+            background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; 
+            animation: float 6s ease-in-out infinite;
         }
-        .chat-modal {
-            background: white; width: 90%; max-width: 400px; height: 80vh; 
-            border-radius: 20px; display: flex; flex-direction: column; overflow: hidden;
-        }
-        .chat-header { background: var(--plum); color: white; padding: 15px; display: flex; justify-content: space-between; }
-        #chat-msgs { flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; }
-        .msg { padding: 8px 12px; margin: 5px 0; border-radius: 10px; font-size: 0.8rem; max-width: 80%; }
-        .msg.Admin { background: var(--pink); align-self: flex-end; color: var(--plum); }
-        .msg.Customer { background: #eee; align-self: flex-start; }
-        .chat-input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #eee; }
-        .chat-input-area input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
+        /* Offset animation timing for a "random" feel */
+        .card:nth-child(2n) { animation-delay: 1s; animation-duration: 7s; }
+        .card:nth-child(3n) { animation-delay: 2s; animation-duration: 5s; }
+        
+        .card:hover { transform: scale(1.03); animation-play-state: paused; z-index: 10; }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        
+        select, textarea, input[type="text"], .cart-select { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia'; }
+        .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn:hover:not(:disabled) { background: var(--plum); }
+        
+        .emergency-btn { display: block; background: #e74c3c; color: white; text-align: center; padding: 12px; text-decoration: none; font-weight: bold; }
+
+        #chat-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; height: 550px; background: white; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 3000; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #fdf2f5; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
+        #order-success-modal, #claim-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 320px; border-radius: 25px; z-index: 5000; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); padding: 25px; border: 2px solid var(--gold); }
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4999; backdrop-filter: blur(3px); }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-    <audio id="order-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+<div class="overlay" id="modal-overlay"></div>
 
-    <div class="header">
-        <h1>MOONLIGHT VAULT 🌙</h1>
-        <div style="font-size: 0.7rem; color: var(--green); font-weight: bold;">● LIVE SYSTEM</div>
+<nav>
+    <div class="logo">MOONLIGHT 🌙</div>
+    <div style="display:flex; gap:10px;">
+        <div class="wallet-pill">✨ <span id="user-points">0</span></div>
+        <div onclick="openCart()" style="cursor:pointer; font-size:1.5rem">🛒<span id="cart-count" style="font-size:0.8rem; background:red; color:white; padding:2px 6px; border-radius:50%">0</span></div>
     </div>
+</nav>
 
-    <div class="stats-grid">
-        <div class="stat-card"><span>Total Orders</span><b id="stat-count">0</b></div>
-        <div class="stat-card"><span>Revenue</span><b id="stat-rev">₹0</b></div>
-        <div class="stat-card"><span>Unique Users</span><b id="stat-cust">0</b></div>
-    </div>
+<a href="support.html" class="emergency-btn">🆘 EMERGENCY HOTLINE & PAYMENT HELP</a>
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Customer</th>
-                    <th>Fulfillment</th>
-                    <th>Order Items</th>
-                    <th>Price</th>
-                    <th>Management</th>
-                </tr>
-            </thead>
-            <tbody id="order-rows"></tbody>
-        </table>
-    </div>
+<div class="hero-desc">
+    <h2>✨ Freshly baked with love, <br> no added preservatives. ✨</h2>
+    <p>Custom made treats are available for every occasion.</p>
+</div>
 
-    <div id="chat-overlay">
-        <div class="chat-modal">
-            <div class="chat-header">
-                <span id="chat-title">Chat</span>
-                <button onclick="closeChat()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
-            </div>
-            <div id="chat-msgs"></div>
-            <div class="chat-input-area">
-                <input type="text" id="admin-reply" placeholder="Type a message...">
-                <button class="btn" onclick="sendReply()">Send</button>
-            </div>
+<div class="container">
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
+        <div class="card-body">
+            <h3>Premium Cakes</h3>
+            <select id="cake-select">
+                <optgroup label="Standard">
+                    <option value="500" data-label="0.5kg Standard Cake">0.5kg - ₹500</option>
+                    <option value="999" data-label="1kg Standard Cake">1kg - ₹999</option>
+                </optgroup>
+                <optgroup label="Plum">
+                    <option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option>
+                </optgroup>
+                <optgroup label="Special">
+                    <option value="600" data-label="0.5kg Special Cake">0.5kg - ₹600</option>
+                    <option value="1199" data-label="1kg Special Cake">1kg - ₹1199</option>
+                </optgroup>
+                <optgroup label="Banana">
+                    <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
+                </optgroup>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
         </div>
     </div>
 
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
+        <div class="card-body">
+            <h3>Cupcakes (Box of 5)</h3>
+            <select id="cupcake-select">
+                <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
+                <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
+                <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
+                <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
+        <div class="card-body">
+            <h3>Dacquoise & Macarons</h3>
+            <select id="treat-select">
+                <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
+                <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
+                <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
+        <div class="card-body">
+            <h3>Cookie Boxes (8 pcs)</h3>
+            <select id="cookie-select">
+                <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
+                <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
+                <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
+        <div class="card-body">
+            <h3>Bakery Snacks</h3>
+            <select id="snack-select">
+                <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
+                <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
+                <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
+            </select>
+            <button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="card" style="display:flex; flex-direction:column; justify-content:center; padding: 20px;">
+        <h3>✨ Custom Requests</h3>
+        <textarea id="custom-req" placeholder="Specific flavors or large orders..."></textarea>
+        <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
+    </div>
+</div>
+
+<div id="chat-window">
+    <div class="chat-header">
+        <h4>🛒 Your Cart</h4>
+        <button onclick="toggleChatWindow()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px; flex:1; overflow-y:auto;">
+        <div id="cart-items"></div>
+        <hr>
+        <div style="font-weight:bold; margin:10px 0;">Total: ₹<span id="cart-total-val">0</span></div>
+        
+        <input type="text" id="c-name" placeholder="Full Name">
+        <input type="text" id="c-phone" placeholder="WhatsApp Number">
+        <input type="text" id="c-addr" placeholder="Delivery Address">
+        
+        <label style="font-size: 0.8rem; color: var(--rose-gold); display: block; margin-top: 10px;">Fulfillment Type:</label>
+        <select id="c-method" class="cart-select" style="width: 100%;">
+            <option value="Delivery">🚀 Doorstep Delivery</option>
+            <option value="Pickup">🏪 Store Pickup</option>
+        </select>
+
+        <button class="btn" style="width:100%; margin-top:15px;" onclick="submitOrder()">Place Order</button>
+    </div>
+</div>
+
+<div id="order-success-modal">
+    <h2 style="color:var(--rose-gold); margin-top:0;">Order Placed! 🌙</h2>
+    <p style="line-height:1.6;">Your treats are being prepared. We will contact you on WhatsApp shortly for confirmation.</p>
+    <p style="font-size:0.9rem; color:#888;">Button unlocks in: <span id="timer-sec" style="font-weight:bold; color:var(--plum);">10</span>s</p>
+    <button id="success-close-btn" class="btn" disabled onclick="closeSuccessAndRefresh()">I UNDERSTAND</button>
+</div>
+
+<div id="claim-popup">
+    <h3 style="margin:0">✨ Reward Unlocked!</h3>
+    <p>You received <span id="pending-pts" style="font-weight:bold; color:var(--plum);">0</span> MoonLight Points!</p>
+    <button class="btn" onclick="claimPoints()">ADD TO WALLET</button>
+</div>
+
+<button onclick="toggleChatWindow()" style="position:fixed; bottom:20px; right:20px; background:var(--plum); color:white; border:none; width:60px; height:60px; border-radius:50%; font-size:25px; cursor:pointer; box-shadow:0 10px 30px rgba(74,20,140,0.3)">💬</button>
+
 <script>
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", 
-        authDomain: "moonlight-cravings.firebaseapp.com", 
-        projectId: "moonlight-cravings", 
-        storageBucket: "moonlight-cravings.firebasestorage.app", 
-        messagingSenderId: "222974574228", 
-        appId: "1:222974574228:web:47bed645deedf5788bbe81" 
-    };
-    
+    const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    let initialLoad = true;
-    let activeOrderId = null;
-    let chatUnsubscribe = null;
 
-    db.collection("orders").orderBy("timestamp", "desc").limit(50).onSnapshot(snap => {
-        const tbody = document.getElementById('order-rows');
-        let totalRev = 0;
-        let uniqueIPs = new Set();
-        tbody.innerHTML = "";
+    let userIP = "";
+    let myCart = [];
+    let _SECURE_POINTS = 0;
 
-        if (!initialLoad && snap.docChanges().some(change => change.type === "added")) {
-            document.getElementById('order-sound').play().catch(e => {});
-        }
-        initialLoad = false;
+    window.onload = async function() {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const d = await r.json();
+        userIP = d.ip;
 
-        snap.docs.forEach(doc => {
-            const data = doc.data();
-            totalRev += parseInt(data.price || 0);
-            if(data.customerIP) uniqueIPs.add(data.customerIP);
-
-            const isConfirmed = data.status === 'confirmed';
-            const statusClass = isConfirmed ? 'status-confirmed' : 'status-placed';
-            const statusLabel = isConfirmed ? 'CONFIRMED' : 'WAITING';
-            
-            // Logic for showing Delivery/Pickup
-            const method = data.method || "Delivery"; 
-            const methodClass = method === "Delivery" ? "method-delivery" : "method-pickup";
-            const methodIcon = method === "Delivery" ? "🚀" : "🏪";
-
-            const row = `
-                <tr>
-                    <td>
-                        <div style="font-weight:bold; color:var(--plum)">${data.name}</div>
-                        <div style="font-size:0.75rem; color:var(--rose-gold)">${data.phone}</div>
-                        <span class="status-badge ${statusClass}">${statusLabel}</span>
-                    </td>
-                    <td>
-                        <div class="method-tag ${methodClass}">
-                            ${methodIcon} ${method.toUpperCase()}
-                        </div>
-                        <div style="font-size:0.7rem; color:#888; margin-top:4px; max-width:150px;">
-                            ${data.address}
-                        </div>
-                    </td>
-                    <td><div style="color: #555; font-style: italic; line-height: 1.4;">${data.item}</div></td>
-                    <td><b style="color:var(--plum)">₹${data.price}</b></td>
-                    <td>
-                        <div class="btn-group">
-                            ${!isConfirmed ? `<button class="btn btn-confirm" onclick="confirmOrder('${doc.id}')">CONFIRM</button>` : ''}
-                            <button class="btn btn-wa" onclick="contactWhatsApp('${data.phone}', '${data.name}', '${data.item}')">WA</button>
-                            <button class="btn" onclick="openChat('${doc.id}', '${data.name}')">CHAT</button>
-                            <button class="btn btn-delete" onclick="deleteOrder('${doc.id}')">✕</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
-
-        document.getElementById('stat-count').innerText = snap.size;
-        document.getElementById('stat-rev').innerText = "₹" + totalRev;
-        document.getElementById('stat-cust').innerText = uniqueIPs.size;
-    });
-
-    async function deleteOrder(orderId) {
-        if(confirm("Permanently delete this order from the vault?")) {
-            try {
-                await db.collection("orders").doc(orderId).delete();
-            } catch (error) {
-                alert("Error deleting: " + error.message);
+        db.collection("users").doc(userIP).onSnapshot(doc => {
+            if(doc.exists) {
+                _SECURE_POINTS = doc.data().points || 0;
+                document.getElementById('user-points').innerText = _SECURE_POINTS;
             }
-        }
-    }
-
-    function contactWhatsApp(phone, name, items) {
-        const cleanPhone = phone.replace(/\D/g, '');
-        const message = `Hi ${name}! This is Moonlight Cravings. We received your order for: ${items}. Shall we proceed?`;
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
-    }
-
-    function openChat(orderId, customerName) {
-        activeOrderId = orderId;
-        document.getElementById('chat-title').innerText = "Chat with " + customerName;
-        document.getElementById('chat-overlay').style.display = 'flex';
-        document.getElementById('chat-msgs').innerHTML = "Loading...";
-
-        if(chatUnsubscribe) chatUnsubscribe();
-        chatUnsubscribe = db.collection("orders").doc(orderId).collection("chats")
-            .orderBy("timestamp", "asc")
-            .onSnapshot(s => {
-                const box = document.getElementById('chat-msgs');
-                box.innerHTML = s.docs.map(d => {
-                    const m = d.data();
-                    return `<div class="msg ${m.sender}">${m.text}</div>`;
-                }).join('');
-                box.scrollTop = box.scrollHeight;
-            });
-    }
-
-    function closeChat() {
-        document.getElementById('chat-overlay').style.display = 'none';
-        if(chatUnsubscribe) chatUnsubscribe();
-        activeOrderId = null;
-    }
-
-    async function sendReply() {
-        const input = document.getElementById('admin-reply');
-        const text = input.value.trim();
-        if(!text || !activeOrderId) return;
-
-        await db.collection("orders").doc(activeOrderId).collection("chats").add({
-            text: text, sender: "Admin", timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        input.value = "";
+
+        db.collection("points_pending").doc(userIP).onSnapshot(doc => {
+            if(doc.exists && doc.data().amount > 0) {
+                document.getElementById('pending-pts').innerText = doc.data().amount;
+                document.getElementById('claim-popup').style.display = 'block';
+                document.getElementById('modal-overlay').style.display = 'block';
+            }
+        });
+    };
+
+    function addToCartBySelect(id) {
+        const el = document.getElementById(id);
+        const price = parseInt(el.value);
+        const label = el.options[el.selectedIndex].getAttribute('data-label');
+        myCart.push({ name: label, price: price });
+        renderCart();
     }
 
-    async function confirmOrder(orderId) {
-        if(confirm("Mark this order as Confirmed?")) {
-            await db.collection("orders").doc(orderId).update({ status: 'confirmed' });
-            await db.collection("orders").doc(orderId).collection("chats").add({
-                text: "Your order has been confirmed! We've started preparing your treats.",
-                sender: "Admin",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }
+    function addCustomToCart() {
+        const req = document.getElementById('custom-req').value;
+        if(!req) return alert("Please enter details");
+        myCart.push({ name: "CUSTOM: " + req, price: 0 });
+        renderCart();
+        document.getElementById('custom-req').value = "";
     }
+
+    function renderCart() {
+        document.getElementById('cart-count').innerText = myCart.length;
+        let total = 0;
+        document.getElementById('cart-items').innerHTML = myCart.map((item, i) => {
+            total += item.price;
+            return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;"><span>${item.name}</span><span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span></div>`;
+        }).join('');
+        document.getElementById('cart-total-val').innerText = total;
+    }
+
+    async function submitOrder() {
+        const n = document.getElementById('c-name').value;
+        const p = document.getElementById('c-phone').value;
+        const a = document.getElementById('c-addr').value;
+        const m = document.getElementById('c-method').value;
+        if(!n || !p || !a || myCart.length === 0) return alert("Fill all details!");
+
+        await db.collection("orders").add({
+            name: n, phone: p, address: a, method: m,
+            item: myCart.map(i => i.name).join(", "),
+            price: document.getElementById('cart-total-val').innerText,
+            customerIP: userIP, status: 'placed',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        myCart = []; 
+        renderCart();
+        toggleChatWindow();
+        startSuccessCountdown();
+    }
+
+    function startSuccessCountdown() {
+        const modal = document.getElementById('order-success-modal');
+        const overlay = document.getElementById('modal-overlay');
+        const btn = document.getElementById('success-close-btn');
+        const timerDisplay = document.getElementById('timer-sec');
+        
+        let timeLeft = 10;
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+        btn.disabled = true;
+        timerDisplay.innerText = timeLeft;
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                timerDisplay.parentElement.innerText = "Order confirmed! 🌙";
+            }
+        }, 1000);
+    }
+
+    function closeSuccessAndRefresh() {
+        location.reload();
+    }
+
+    async function claimPoints() {
+        const amt = parseInt(document.getElementById('pending-pts').innerText);
+        await db.collection("users").doc(userIP).set({ points: _SECURE_POINTS + amt }, { merge: true });
+        await db.collection("points_pending").doc(userIP).delete();
+        document.getElementById('claim-popup').style.display = 'none';
+        document.getElementById('modal-overlay').style.display = 'none';
+    }
+
+    function toggleChatWindow() {
+        const w = document.getElementById('chat-window');
+        w.style.display = w.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function openCart() { toggleChatWindow(); }
 </script>
 </body>
 </html>
