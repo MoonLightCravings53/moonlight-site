@@ -1,564 +1,1125 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Moonlight Cravings | Premium Bakery</title>
+
     <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
     <style>
+
         :root { 
+
             --pink: #fce4ec; 
+
             --rose-gold: #b76e79; 
+
             --plum: #4a148c; 
+
             --white: #ffffff; 
+
             --gold: #ffd700; 
+
             --valentine: #ff4d6d;
+
             --neon-pink: #ff0055;
+
             --black-pink: #1a0a0f;
+
         }
+
         
+
         body { 
+
             margin: 0; 
+
             font-family: 'Georgia', serif; 
+
             background: var(--pink); 
+
             color: var(--plum); 
+
             -webkit-user-select: none; 
+
             user-select: none; 
+
             overflow-x: hidden;
+
             position: relative;
+
         }
+
+
 
         /* Star Wars Style Floating Background */
+
         .bg-animation {
+
             position: fixed;
+
             top: 0; left: 0; width: 100%; height: 100%;
+
             z-index: -1;
+
             pointer-events: none;
+
             overflow: hidden;
+
         }
+
+
 
         .floating-item {
+
             position: absolute;
+
             font-size: 2rem;
+
             opacity: 0.3;
+
             animation: moveAcross 15s linear infinite;
+
         }
+
+
 
         @keyframes moveAcross {
+
             from { transform: translate(-100px, -100px) rotate(0deg); }
+
             to { transform: translate(110vw, 110vh) rotate(360deg); }
+
         }
+
+
 
         nav { background: var(--white); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
         .logo-container { display: flex; align-items: center; gap: 10px; }
+
         .logo { font-size: 1.2rem; font-weight: bold; color: var(--rose-gold); letter-spacing: 1px; }
+
         
+
         .val-btn {
+
             background: var(--valentine);
+
             color: white;
+
             border: none;
+
             padding: 8px 12px;
+
             border-radius: 15px;
+
             cursor: pointer;
+
             font-size: 0.7rem;
+
             font-weight: bold;
+
             transition: 0.3s;
+
             animation: pulse 2s infinite;
+
         }
+
+
 
         /* NEW NEON VOUCHER BUTTON */
+
         .voucher-btn-nav {
+
             background: #000;
+
             color: var(--neon-pink);
+
             border: 1px solid var(--neon-pink);
+
             padding: 8px 12px;
+
             border-radius: 15px;
+
             cursor: pointer;
+
             font-size: 0.7rem;
+
             font-weight: bold;
+
             text-transform: uppercase;
+
             box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+
             transition: 0.3s;
+
         }
+
         .voucher-btn-nav:hover {
+
             box-shadow: 0 0 20px var(--neon-pink);
+
             background: var(--neon-pink);
+
             color: white;
+
         }
+
+
 
         @keyframes pulse {
+
             0% { transform: scale(1); }
+
             50% { transform: scale(1.05); box-shadow: 0 0 10px var(--valentine); }
+
             100% { transform: scale(1); }
+
         }
+
+
 
         .wallet-pill { background: linear-gradient(135deg, var(--plum), #6a1b9a); color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+
         
+
         .hero-desc { text-align: center; padding: 20px; font-style: italic; color: var(--rose-gold); line-height: 1.6; }
 
+
+
         .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px; }
+
         
+
         .card { 
+
             background: white; border-radius: 20px; overflow: hidden; text-align: center; padding-bottom: 20px; 
+
             box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; 
+
         }
+
         
+
         .card:hover { transform: scale(1.03); z-index: 10; }
+
         .card img { width: 100%; height: 200px; object-fit: cover; transition: 0.5s; }
+
         
+
         select, textarea, input[type="text"], .cart-select { width: 85%; padding: 10px; border-radius: 12px; border: 1.5px solid #eee; margin: 8px 0; outline: none; font-family: 'Georgia'; }
+
         .btn { background: var(--rose-gold); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+
         .btn:hover:not(:disabled) { background: var(--plum); }
+
         
+
         .emergency-btn { display: block; background: #e74c3c; color: white; text-align: center; padding: 12px; text-decoration: none; font-weight: bold; }
 
+
+
         #chat-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; height: 550px; background: white; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 3000; flex-direction: column; overflow: hidden; }
+
         .chat-header { background: #fdf2f5; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); }
+
         
+
         #order-success-modal, #claim-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 320px; border-radius: 25px; z-index: 5000; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); padding: 25px; border: 2px solid var(--gold); }
+
         .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4999; backdrop-filter: blur(3px); }
 
+
+
         #valentine-overlay {
+
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+
             background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+
             z-index: 10000; flex-direction: column; justify-content: center; align-items: center;
+
             color: white; text-align: center;
+
         }
+
+
 
         /* VOUCHER PAGE STYLE */
+
         #voucher-overlay {
+
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+
             background: var(--black-pink);
+
             z-index: 11000; flex-direction: column; justify-content: center; align-items: center;
+
             color: #ff85a2; text-align: center; padding: 20px;
+
         }
+
         .voucher-card {
+
             background: rgba(255, 255, 255, 0.03);
+
             border: 1px solid rgba(255, 133, 162, 0.2);
+
             padding: 40px;
+
             border-radius: 30px;
+
             backdrop-filter: blur(10px);
+
             max-width: 400px;
+
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
+
         }
+
         .neon-text {
+
             color: #fff;
+
             text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+
             letter-spacing: 2px;
+
             margin-bottom: 10px;
+
         }
+
         .voucher-input {
+
             background: rgba(0,0,0,0.5);
+
             border: 1px solid var(--neon-pink) !important;
+
             color: #fff !important;
+
             text-align: center;
+
             font-size: 1.2rem;
+
             letter-spacing: 4px;
+
             margin: 20px 0;
+
         }
+
     </style>
+
 </head>
+
 <body oncontextmenu="return false;">
 
+
+
 <div class="bg-animation" id="bg-elements"></div>
+
 <div class="overlay" id="modal-overlay"></div>
 
+
+
 <div id="valentine-overlay">
+
     <div style="font-size: 5rem;">🌹</div>
+
     <h1 style="font-size: 3rem; margin: 10px 0;">COMING SOON!</h1>
+
     <p style="font-size: 1.2rem;">Our Valentine's Collection is being baked with extra love.</p>
+
     <button class="btn" onclick="closeVal()" style="background: white; color: var(--valentine); margin-top: 20px;">BACK TO SHOP</button>
+
 </div>
+
+
 
 <div id="voucher-overlay">
+
     <div class="voucher-card">
+
         <div style="font-size: 3rem; margin-bottom: 15px;">🎟️</div>
+
         <h1 class="neon-text">Vouchers</h1>
+
         <p style="font-size: 0.9rem; font-style: italic; opacity: 0.8; line-height: 1.5;">
+
             Moonlight Cravers(Best Solution) Vouchers will come out soon, once a while. So keep your eyes peeked!
+
         </p>
+
         
+
         <button class="btn" onclick="enableNotifications()" style="background: none; border: 1px solid var(--neon-pink); color: var(--neon-pink); margin: 20px 0; font-size: 0.8rem;">
+
             Enable Notifications
+
         </button>
 
+
+
         <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 20px;">
+
             <p style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">REDEEM 10-DIGIT CODE</p>
+
             <input type="text" id="v-code" class="voucher-input" placeholder="MCXXXXXXXXXXXX" maxlength="14">
+
             <button class="btn" onclick="redeemVoucher()" style="background: var(--neon-pink); width: 100%;">CLAIM REWARD</button>
+
         </div>
 
+
+
         <p onclick="closeVoucher()" style="margin-top: 25px; cursor: pointer; font-size: 0.8rem; text-decoration: underline;">Close Page</p>
+
     </div>
+
 </div>
 
+
+
 <nav>
+
     <div class="logo-container">
+
         <div class="logo">MOONLIGHTCRAVINGS 🌙</div>
+
         <button class="val-btn" onclick="openVal()">Valentines???</button>
+
         <button class="voucher-btn-nav" onclick="openVoucher()">Voucher????</button>
+
     </div>
+
     <div style="display:flex; gap:10px;">
+
         <div class="wallet-pill">✨ <span id="user-points">0</span></div>
+
         <div onclick="openCart()" style="cursor:pointer; font-size:1.5rem">🛒<span id="cart-count" style="font-size:0.8rem; background:red; color:white; padding:2px 6px; border-radius:50%">0</span></div>
+
     </div>
+
 </nav>
+
+
 
 <a href="support.html" class="emergency-btn">IF</a>
 
+
+
 <div class="hero-desc">
+
     <h2>✨ Freshly baked with love, <br> no added preservatives. ✨</h2>
+
     <p>Custom made treats are available for every occasion.</p>
+
 </div>
+
+
 
 <div class="container">
+
     <div class="card">
+
         <img id="cake-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
+
         <div class="card-body">
+
             <h3>Premium Cakes</h3>
+
             <select id="cake-select" onchange="checkFunfetti(this)">
+
                 <optgroup label="Standard">
+
                     <option value="500" data-label="0.5kg Lemon Cake">Lemon: 0.5kg - ₹500</option>
+
                     <option value="999" data-label="1kg Lemon Cake">Lemon: 1kg - ₹999</option>
+
                     <option value="500" data-label="0.5kg Chocolate Cake">Chocolate: 0.5kg - ₹500</option>
+
                     <option value="999" data-label="1kg Chocolate Cake">Chocolate: 1kg - ₹999</option>
+
                     <option value="500" data-label="0.5kg Vanilla Cake">Vanilla: 0.5kg - ₹500</option>
+
                     <option value="999" data-label="1kg Vanilla Cake">Vanilla: 1kg - ₹999</option>
+
                     <option value="500" data-label="0.5kg Black Forest Cake">Black Forest: 0.5kg - ₹500</option>
+
                     <option value="999" data-label="1kg Black Forest Cake">Black Forest: 1kg - ₹999</option>
+
                     <option value="500" data-label="0.5kg Funfetti Cake">Funfetti: 0.5kg - ₹500</option>
+
                     <option value="999" data-label="1kg Funfetti Cake">Funfetti: 1kg - ₹999</option>
+
                 </optgroup>
+
                 <optgroup label="Plum">
+
                     <option value="500" data-label="0.5kg Plum Cake">0.5kg - ₹500</option>
+
                 </optgroup>
+
                 <optgroup label="Special">
+
                     <option value="600" data-label="0.5kg Dark Chocolate Cake">Dark Chocolate: 0.5kg - ₹600</option>
+
                     <option value="1199" data-label="1kg Dark Chocolate Cake">Dark Chocolate: 1kg - ₹1199</option>
+
                     <option value="600" data-label="0.5kg Orange Cake">Orange: 0.5kg - ₹600</option>
+
                     <option value="1199" data-label="1kg Orange Cake">Orange: 1kg - ₹1199</option>
+
                 </optgroup>
+
                 <optgroup label="Banana">
+
                     <option value="350" data-label="0.5kg Banana Cake">0.5kg - ₹350</option>
+
                 </optgroup>
+
             </select>
+
             <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
+
         </div>
+
     </div>
 
+
+
     <div class="card">
+
         <img id="cupcake-img" src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
+
         <div class="card-body">
+
             <h3>Cupcakes (Box of 5)</h3>
+
             <select id="cupcake-select" onchange="updateImage(this, 'cupcake-img')">
+
                 <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
+
                 <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
+
                 <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
+
                 <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
+
             </select>
+
             <button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button>
+
         </div>
+
     </div>
 
+
+
     <div class="card">
+
         <img id="treat-img" src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
+
         <div class="card-body">
+
             <h3>Dacquoise & Macarons</h3>
+
             <select id="treat-select" onchange="updateImage(this, 'treat-img')">
+
                 <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
+
                 <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
+
                 <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
+
             </select>
+
             <button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button>
+
         </div>
+
     </div>
 
+
+
     <div class="card">
+
         <img id="cookie-img" src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
+
         <div class="card-body">
+
             <h3>Cookie Boxes (8 pcs)</h3>
+
             <select id="cookie-select" onchange="updateImage(this, 'cookie-img')">
+
                 <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
+
                 <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
+
                 <option value="240" data-label="8x Choco Chip Cookies">Choco Chip - ₹240</option>
+
             </select>
+
             <button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button>
+
         </div>
+
     </div>
 
+
+
     <div class="card">
+
         <img id="snack-img" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
+
         <div class="card-body">
+
             <h3>Bakery Snacks</h3>
+
             <select id="snack-select" onchange="updateImage(this, 'snack-img')">
+
                 <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
+
                 <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
+
                 <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
+
             </select>
+
             <button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button>
+
         </div>
+
     </div>
+
+
 
     <div class="card" style="display:flex; flex-direction:column; justify-content:center; padding: 20px;">
+
         <h3>✨ Custom Requests</h3>
+
         <textarea id="custom-req" placeholder="Specific flavors or large orders..."></textarea>
+
         <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
+
     </div>
+
 </div>
+
+
 
 <div id="chat-window">
+
     <div class="chat-header">
+
         <h4>🛒 Your Cart</h4>
+
         <button onclick="toggleChatWindow()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✕</button>
+
     </div>
+
     <div style="padding:20px; flex:1; overflow-y:auto;">
+
         <div id="cart-items"></div>
+
         <hr>
+
         <div style="font-weight:bold; margin:10px 0;">Total: ₹<span id="cart-total-val">0</span></div>
+
         
+
         <input type="text" id="c-name" placeholder="Full Name">
+
         <input type="text" id="c-phone" placeholder="WhatsApp Number">
+
         
+
         <label style="font-size: 0.8rem; color: var(--rose-gold); display: block; margin-top: 10px;">Fulfillment Type:</label>
+
         <select id="c-method" class="cart-select" style="width: 100%;" onchange="toggleAddressField()">
+
             <option value="Delivery">🚀 Doorstep Delivery</option>
+
             <option value="Pickup">🏪 Store Pickup</option>
+
         </select>
 
+
+
         <div id="address-container">
+
             <input type="text" id="c-addr" placeholder="Delivery Address">
+
         </div>
 
+
+
         <button class="btn" style="width:100%; margin-top:15px;" onclick="submitOrder()">Place Order</button>
+
     </div>
+
 </div>
+
+
 
 <div id="order-success-modal">
+
     <h2 style="color:var(--rose-gold); margin-top:0;">Order Placed! 🌙</h2>
+
     <p style="line-height:1.6;">Your treats are being prepared. You will mostly get messaged from <b>+91 8870459614</b> or <b>+91 9442010001</b> on WhatsApp shortly for confirmation.</p>
+
     <p style="font-size:0.9rem; color:#888;">Button unlocks in: <span id="timer-sec" style="font-weight:bold; color:var(--plum);">10</span>s</p>
+
     <button id="success-close-btn" class="btn" disabled onclick="closeSuccessAndRefresh()">I UNDERSTAND</button>
+
 </div>
 
+
+
 <div id="claim-popup">
+
     <h3 style="margin:0">✨ Reward Unlocked!</h3>
+
     <p>You received <span id="pending-pts" style="font-weight:bold; color:var(--plum);">0</span> MoonLight Points!</p>
+
     <button class="btn" onclick="claimPoints()">ADD TO WALLET</button>
+
 </div>
+
+
 
 <button onclick="toggleChatWindow()" style="position:fixed; bottom:20px; right:20px; background:var(--plum); color:white; border:none; width:60px; height:60px; border-radius:50%; font-size:25px; cursor:pointer; box-shadow:0 10px 30px rgba(74,20,140,0.3); z-index:2000;">💬</button>
 
+
+
 <script>
+
     const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
+
     firebase.initializeApp(firebaseConfig);
+
     const db = firebase.firestore();
 
+
+
     let userIP = "";
+
     let myCart = [];
+
     let _SECURE_POINTS = 0;
 
+
+
     window.onload = async function() {
+
         createFloatingBackground();
+
         const r = await fetch('https://api.ipify.org?format=json');
+
         const d = await r.json();
+
         userIP = d.ip;
 
+
+
         db.collection("users").doc(userIP).onSnapshot(doc => {
+
             if(doc.exists) {
+
                 _SECURE_POINTS = doc.data().points || 0;
+
                 document.getElementById('user-points').innerText = _SECURE_POINTS;
+
             }
+
         });
+
+
 
         db.collection("points_pending").doc(userIP).onSnapshot(doc => {
+
             if(doc.exists && doc.data().amount > 0) {
+
                 document.getElementById('pending-pts').innerText = doc.data().amount;
+
                 document.getElementById('claim-popup').style.display = 'block';
+
                 document.getElementById('modal-overlay').style.display = 'block';
+
             }
+
         });
+
     };
 
+
+
     /* NEW VOUCHER FUNCTIONS */
+
     function openVoucher() { document.getElementById('voucher-overlay').style.display = 'flex'; }
+
     function closeVoucher() { document.getElementById('voucher-overlay').style.display = 'none'; }
 
+
+
     function enableNotifications() {
+
         if (!("Notification" in window)) {
+
             alert("This browser does not support notifications.");
+
         } else if (Notification.permission === "granted") {
+
             alert("Notifications already enabled! We'll ping you when vouchers drop.");
+
         } else {
+
             Notification.requestPermission().then(permission => {
+
                 if (permission === "granted") {
+
                     new Notification("Moonlight Cravings", { body: "You will now receive voucher updates!" });
+
                 }
+
             });
+
         }
+
     }
+
+
 
     async function redeemVoucher() {
+
         const code = document.getElementById('v-code').value.toUpperCase();
+
         if(!code.startsWith("MC") || code.length < 10) {
+
             return alert("Invalid Code Format! Use MCXXXXXXXXXX");
+
         }
+
+
 
         const vRef = db.collection("vouchers").doc(code);
+
         const doc = await vRef.get();
 
+
+
         if(!doc.exists) {
+
             alert("This code doesn't exist yet! Wait until Feb 13-14! 🌙");
+
         } else if (doc.data().status === "claimed") {
+
             alert("This voucher has already been used!");
+
         } else {
+
             const reward = doc.data().points || 100;
+
             await db.collection("users").doc(userIP).set({ points: _SECURE_POINTS + reward }, { merge: true });
+
             await vRef.update({ status: "claimed", claimedBy: userIP });
+
             alert(`SUCCESS! ✨ You received ${reward} points!`);
+
             closeVoucher();
+
         }
+
     }
+
+
 
     /* EXISTING FUNCTIONS */
+
     function createFloatingBackground() {
+
         const bg = document.getElementById('bg-elements');
+
         const items = ['🍰', '🧁', '🎂', '🧁', '🍰'];
+
         for(let i=0; i<15; i++) {
+
             const span = document.createElement('span');
+
             span.className = 'floating-item';
+
             span.innerText = items[Math.floor(Math.random() * items.length)];
+
             span.style.left = Math.random() * 100 + 'vw';
+
             span.style.top = Math.random() * 100 + 'vh';
+
             span.style.animationDelay = (Math.random() * 15) + 's';
+
             span.style.fontSize = (Math.random() * 20 + 20) + 'px';
+
             bg.appendChild(span);
+
         }
+
     }
+
+
 
     function toggleAddressField() {
+
         const method = document.getElementById('c-method').value;
+
         const addrContainer = document.getElementById('address-container');
+
         addrContainer.style.display = (method === 'Pickup') ? 'none' : 'block';
+
     }
+
+
 
     function openVal() { document.getElementById('valentine-overlay').style.display = 'flex'; }
+
     function closeVal() { document.getElementById('valentine-overlay').style.display = 'none'; }
 
+
+
     function updateImage(selectElement, imgId) {
+
         const label = selectElement.options[selectElement.selectedIndex].getAttribute('data-label');
+
         const imgEl = document.getElementById(imgId);
+
         const imageMap = {
+
             "Donut Holes": "https://i.postimg.cc/pXjYMKVW/Donut-holes.jpg",
+
             "Brownies": "https://i.postimg.cc/jqmQ1Mb8/brownies.jpg",
+
             "Churros": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg",
+
             "Butter Cookies": "https://i.postimg.cc/k4Fd84Ky/butter-cookies.jpg",
+
             "Choco Chip": "https://i.postimg.cc/NFHCTC3y/Chocolate-chip-cookies.jpg",
+
             "Sugar Cookies": "https://i.postimg.cc/J4jdzg3p/Sugar-cookies.jpg",
+
             "Vanilla Cupcakes": "https://i.postimg.cc/mrkwC69n/Vanilla-cupcake.jpg",
+
             "Chocolate Cupcakes": "https://i.postimg.cc/nhcYfw30/Chocolate-cupcake.jpg",
+
             "Lemon Cupcakes": "https://i.postimg.cc/VL4ngWz8/Lemon-cupcake.jpg",
+
             "Blueberry Cupcakes": "https://i.postimg.cc/rygRH2Dn/Blueberry-Cupcake.jpg",
+
             "Macarons": "https://i.postimg.cc/yY7rWjfx/Macarons.jpg",
+
             "Almond Dacquoise": "https://i.postimg.cc/XYRfB7Vg/Almon-Daquoise.jpg",
+
             "Pistachio Dacquoise": "https://i.postimg.cc/MpC7fKWn/Pistachio-Daquoise.jpg"
+
         };
+
         for (let key in imageMap) {
+
             if (label.includes(key)) { imgEl.src = imageMap[key]; return; }
+
         }
+
     }
+
+
 
     function checkFunfetti(el) {
+
         const label = el.options[el.selectedIndex].getAttribute('data-label');
+
         const imgEl = document.getElementById('cake-img');
+
         if(label.includes("Black Forest")) imgEl.src = "https://i.postimg.cc/W3PvhrFk/Black-forest.png";
+
         else if(label.includes("Dark Chocolate")) imgEl.src = "https://i.postimg.cc/hvCJQTkL/Dark-Chocolate-Cake.png";
+
         else if(label.includes("Orange Cake")) imgEl.src = "https://i.postimg.cc/L6gN0F0F/Orange-cake.jpg";
+
         else if(label.includes("Funfetti")) imgEl.src = "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg";
+
         else if(label.includes("Plum Cake")) imgEl.src = "https://i.postimg.cc/Z5xbpwmw/Plum-cake.png";
+
         else if(label.includes("Banana Cake")) imgEl.src = "https://i.postimg.cc/xdj0RLTT/Bannana-Cake.png";
+
         else if(label.includes("Vanilla Cake")) imgEl.src = "https://i.postimg.cc/mDJBBq3g/Vanilla-Cake.png";
+
         else if(label.includes("Lemon Cake")) imgEl.src = "https://i.postimg.cc/hvmgjrMs/Lemon-cake.png";
+
     }
+
+
 
     function addToCartBySelect(id) {
+
         const el = document.getElementById(id);
+
         const price = parseInt(el.value);
+
         const label = el.options[el.selectedIndex].getAttribute('data-label');
+
         myCart.push({ name: label, price: price });
+
         renderCart();
+
     }
+
+
 
     function addCustomToCart() {
+
         const req = document.getElementById('custom-req').value;
+
         if(!req) return alert("Please enter details");
+
         myCart.push({ name: "CUSTOM: " + req, price: 0 });
+
         renderCart();
+
         document.getElementById('custom-req').value = "";
+
     }
+
+
 
     function renderCart() {
+
         document.getElementById('cart-count').innerText = myCart.length;
+
         let total = 0;
+
         document.getElementById('cart-items').innerHTML = myCart.map((item, i) => {
+
             total += item.price;
+
             return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin:8px 0;"><span>${item.name}</span><span>₹${item.price} <button onclick="myCart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer;">✕</button></span></div>`;
+
         }).join('');
+
         document.getElementById('cart-total-val').innerText = total;
+
     }
+
+
 
     async function submitOrder() {
+
         const n = document.getElementById('c-name').value;
+
         const p = document.getElementById('c-phone').value;
+
         const m = document.getElementById('c-method').value;
+
         let a = document.getElementById('c-addr').value;
+
         if(m === "Pickup") a = "STORE PICKUP";
+
         if(!n || !p || (m === "Delivery" && !a) || myCart.length === 0) return alert("Fill all details!");
+
         await db.collection("orders").add({
+
             name: n, phone: p, address: a, method: m,
+
             item: myCart.map(i => i.name).join(", "),
+
             price: document.getElementById('cart-total-val').innerText,
+
             customerIP: userIP, status: 'placed',
+
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
+
         });
+
         myCart = []; renderCart(); toggleChatWindow(); startSuccessCountdown();
+
     }
 
+
+
     function startSuccessCountdown() {
+
         const modal = document.getElementById('order-success-modal');
+
         const overlay = document.getElementById('modal-overlay');
+
         const btn = document.getElementById('success-close-btn');
+
         const timerDisplay = document.getElementById('timer-sec');
+
         let timeLeft = 10;
+
         modal.style.display = 'block'; overlay.style.display = 'block';
+
         btn.disabled = true; timerDisplay.innerText = timeLeft;
+
         const timer = setInterval(() => {
+
             timeLeft--; timerDisplay.innerText = timeLeft;
+
             if (timeLeft <= 0) {
+
                 clearInterval(timer); btn.disabled = false;
+
                 timerDisplay.parentElement.innerHTML = "Order confirmed! 🌙 <br> (Expect a message from <b>+91 8870459614</b> or <b>+91 9442010001</b>)";
+
             }
+
         }, 1000);
+
     }
+
+
 
     function closeSuccessAndRefresh() { location.reload(); }
 
+
+
     async function claimPoints() {
+
         const amt = parseInt(document.getElementById('pending-pts').innerText);
+
         await db.collection("users").doc(userIP).set({ points: _SECURE_POINTS + amt }, { merge: true });
+
         await db.collection("points_pending").doc(userIP).delete();
+
         document.getElementById('claim-popup').style.display = 'none';
+
         document.getElementById('modal-overlay').style.display = 'none';
+
     }
+
+
 
     function toggleChatWindow() {
+
         const w = document.getElementById('chat-window');
+
         w.style.display = w.style.display === 'flex' ? 'none' : 'flex';
+
     }
 
-    function openCart() { toggleChatWindow(); }
-</script>
-</body>
-</html>
 
+
+    function openCart() { toggleChatWindow(); }
+
+</script>
+
+</body>
+
+</html>
