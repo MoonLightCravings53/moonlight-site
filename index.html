@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="title" content="Moonlight Cravings | Premium Bakery">
-<meta name="description" content="Custom made treats for every occasion. Moonlight x VB Collaboration.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonlight Cravings | Premium Bakery</title>
 
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://moonlightcravings53.github.io/moonlight-site/">
-<meta property="og:title" content="Moonlight Cravings | Premium Bakery">
-<meta property="og:description" content="Custom made treats for every occasion. Moonlight x VB Collaboration.">
-<meta property="og:image" content="https://i.postimg.cc/1X6FLsmV/614595661_1819368908769275_8442615453582945422_n.png">
+    <meta property="og:title" content="Moonlight Cravings | Premium Bakery">
+    <meta property="og:description" content="🏐 Spike your cravings! Custom made treats for every occasion. 🌙">
+    <meta property="og:image" content="https://i.postimg.cc/1X6FLsmV/614595661_1819368908769275_8442615453582945422_n.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://i.postimg.cc/1X6FLsmV/614595661_1819368908769275_8442615453582945422_n.png">
 
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://moonlightcravings53.github.io/moonlight-site/">
-<meta property="twitter:title" content="Moonlight Cravings | Premium Bakery">
-<meta property="twitter:description" content="Custom made treats for every occasion. Moonlight x VB Collaboration.">
-<meta property="twitter:image" content="https://i.postimg.cc/1X6FLsmV/614595661_1819368908769275_8442615453582945422_n.png">
+    <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         :root { 
             --pink: #fce4ec; 
@@ -25,7 +25,6 @@
             --valentine: #ff4d6d; 
             --neon-pink: #ff0055; 
             --black-pink: #1a0a0f;
-            /* New Volleyball Theme Colors */
             --vb-orange: #ff8c00;
             --vb-blue: #1e3a8a;
         }
@@ -159,7 +158,7 @@
 
 <nav>
     <div class="logo-container">
-        <div class="logo">🏐 MOONLIGHT x VB 🌙</div>
+        <div class="logo">🏐 MOONLIGHTCRAVINGS x VolleyBall 🌙</div>
         <button class="val-btn" onclick="openVal()">Valentines???</button>
         <button class="voucher-btn-nav" onclick="openVoucher()">Voucher????</button>
     </div>
@@ -295,8 +294,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     let userIP = ""; let myCart = []; let _SECURE_POINTS = 0; let myVouchers = []; let activeVoucherId = null; let pendingVoucherToUse = null;
-
-    // Added 10 Random LahanaIzTrsh Voucher Codes
     const GLOBAL_CODES = {
         "MCLaHaNaIzTrShZ!9k@2m#7v": { type: "discount", value: 30, desc: "30% OFF - Volleyball Special!" },
         "MCLaHaNaIzTrShZ$1a%5p^8q": { type: "item", value: "Free Box of Churros", desc: "Get Free Churros with your order!" },
@@ -320,7 +317,7 @@
 
     function createFloatingBackground() { 
         const bg = document.getElementById('bg-elements'); 
-        const items = ['🏐', '🏐', '🏐']; // Volleyballs only
+        const items = ['🏐', '🏐', '🏐'];
         for(let i=0; i<15; i++) { 
             const span = document.createElement('span'); 
             span.className = 'floating-item'; 
@@ -331,8 +328,6 @@
             span.style.fontSize = (Math.random() * 20 + 25) + 'px'; 
             bg.appendChild(span); 
         } 
-        
-        // Add flying "LahanaIzTrsh" words
         for(let i=0; i<6; i++) {
             const word = document.createElement('div');
             word.className = 'flying-word';
@@ -343,8 +338,6 @@
             bg.appendChild(word);
         }
     }
-
-    // --- REMAINDER OF YOUR ORIGINAL JAVASCRIPT LOGIC UNCHANGED ---
     function openVoucher() { document.getElementById('voucher-overlay').style.display = 'flex'; }
     function closeVoucher() { document.getElementById('voucher-overlay').style.display = 'none'; }
     function openActiveVouchers() { renderActiveVouchers(); document.getElementById('active-vouchers-overlay').style.display = 'flex'; }
