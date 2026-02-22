@@ -34,11 +34,20 @@
             min-height: 100vh;
         }
 
+        /* Initial Device Detector */
         #device-detector {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 30000;
+            background: black; z-index: 40000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; border: 5px solid white;
+        }
+
+        /* Rotation Prompt - Only shows when mobile is selected and phone is vertical */
+        #rotate-prompt {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 50000;
+            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            color: white; padding: 20px;
         }
 
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
@@ -107,6 +116,13 @@
     </div>
 </div>
 
+<div id="rotate-prompt">
+    <h1 style="font-size: 3rem;">🔄</h1>
+    <h2>PLEASE ROTATE HORIZONTAL</h2>
+    <p>Turn your phone sideways to see every button and get the full experience.</p>
+    <button class="btn" style="margin-top: 20px;" onclick="closeRotatePrompt()">I'M READY</button>
+</div>
+
 <div class="bg-animation" id="bg-elements"></div>
 <div class="overlay" id="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:4999;"></div>
 
@@ -156,57 +172,7 @@
         <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
     </div>
 
-    <div class="card">
-        <img id="cupcake-img" src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
-        <h3>Cupcakes (Box of 5)</h3>
-        <select id="cupcake-select" onchange="updateImage(this, 'cupcake-img')">
-            <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
-            <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
-            <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
-            <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
-        </select>
-        <button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button>
     </div>
-
-    <div class="card">
-        <img id="treat-img" src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
-        <h3>Dacquoise & Macarons</h3>
-        <select id="treat-select" onchange="updateImage(this, 'treat-img')">
-            <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
-            <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
-            <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
-        </select>
-        <button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button>
-    </div>
-
-    <div class="card">
-        <img id="cookie-img" src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
-        <h3>Cookie Boxes (8 pcs)</h3>
-        <select id="cookie-select" onchange="updateImage(this, 'cookie-img')">
-            <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
-            <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
-            <option value="240" data-label="8x Choco chip Cookies">Choco chip - ₹240</option>
-        </select>
-        <button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button>
-    </div>
-
-    <div class="card">
-        <img id="snack-img" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
-        <h3>Bakery Snacks</h3>
-        <select id="snack-select" onchange="updateImage(this, 'snack-img')">
-            <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
-            <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
-            <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
-        </select>
-        <button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button>
-    </div>
-
-    <div class="card" style="display:flex; flex-direction:column; justify-content:center; padding: 20px;">
-        <h3>✨ Custom Requests</h3>
-        <textarea id="custom-req" placeholder="Specific flavors or large orders..."></textarea>
-        <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
-    </div>
-</div>
 
 <div id="chat-window">
     <div style="background:#eee; padding:15px; display:flex; justify-content:space-between;"><h4>🛒 Your Cart</h4><button onclick="toggleChatWindow()">✕</button></div>
@@ -242,9 +208,18 @@
 
     function setResolution(type) {
         document.getElementById('device-detector').style.display = 'none';
-        if(type === 'mobile') { document.querySelector("meta[name=viewport]").setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'); }
+        if(type === 'mobile') { 
+            document.querySelector("meta[name=viewport]").setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+            // Show the rotation prompt
+            document.getElementById('rotate-prompt').style.display = 'flex';
+        }
     }
 
+    function closeRotatePrompt() {
+        document.getElementById('rotate-prompt').style.display = 'none';
+    }
+
+    // Floating animation and shop functions
     function createFloatingBackground() { 
         const bg = document.getElementById('bg-elements');
         for(let i=0; i<15; i++) { 
@@ -256,11 +231,6 @@
     function addToCartBySelect(id) { 
         const el = document.getElementById(id); const label = el.options[el.selectedIndex].getAttribute('data-label');
         myCart.push({ name: label, price: parseInt(el.value) }); renderCart();
-    }
-
-    function addCustomToCart() { 
-        const req = document.getElementById('custom-req').value; if(!req) return alert("Details?");
-        myCart.push({ name: "CUSTOM: " + req, price: 0 }); renderCart(); document.getElementById('custom-req').value = "";
     }
 
     function renderCart() {
@@ -286,12 +256,6 @@
         const imgEl = document.getElementById('cake-img');
         const map = { "Black Forest": "https://i.postimg.cc/W3PvhrFk/Black-forest.png", "Dark Chocolate": "https://i.postimg.cc/hvCJQTkL/Dark-Chocolate-Cake.png", "Orange": "https://i.postimg.cc/L6gN0F0F/Orange-cake.jpg", "Funfetti": "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg", "Vanilla": "https://i.postimg.cc/mDJBBq3g/Vanilla-Cake.png", "Lemon": "https://i.postimg.cc/hvmgjrMs/Lemon-cake.png", "Banana": "https://i.postimg.cc/xdj0RLTT/Bannana-Cake.png" };
         for (let k in map) { if(label.includes(k)) { imgEl.src = map[k]; return; } }
-    }
-
-    function updateImage(sel, id) {
-        const label = sel.options[sel.selectedIndex].getAttribute('data-label');
-        const map = { "Donut": "https://i.postimg.cc/pXjYMKVW/Donut-holes.jpg", "Brownies": "https://i.postimg.cc/jqmQ1Mb8/brownies.jpg", "Churros": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg", "Butter": "https://i.postimg.cc/k4Fd84Ky/butter-cookies.jpg", "Choco chip": "https://i.postimg.cc/NFHCTC3y/Chocolate-chip-cookies.jpg", "Sugar": "https://i.postimg.cc/J4jdzg3p/Sugar-cookies.jpg", "Macarons": "https://i.postimg.cc/yY7rWjfx/Macarons.jpg" };
-        for (let k in map) { if(label.includes(k)) { document.getElementById(id).src = map[k]; return; } }
     }
 
     function toggleChatWindow() { const w = document.getElementById('chat-window'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; }
