@@ -13,6 +13,7 @@
     <meta property="og:type" content="website">
 
     <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -31,7 +32,7 @@
             overflow-x: hidden; position: relative; min-height: 100vh;
         }
 
-        /* --- UPDATED AUTH MODAL STYLES --- */
+        /* --- AUTH MODAL STYLES --- */
         #auth-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: black; z-index: 60000;
@@ -42,24 +43,26 @@
             width: 320px; text-align: center;
         }
 
-        /* Existing Styles Preserved */
         #device-detector { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 40000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 5px solid white; }
         #rotate-prompt { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 50000; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 20px; }
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
         .floating-item { position: absolute; font-size: 2rem; opacity: 0.1; animation: moveAcross 15s linear infinite; color: white; }
         @keyframes moveAcross { from { transform: translate(-100px, -100px) rotate(0deg); } to { transform: translate(110vw, 110vh) rotate(360deg); } }
+        
         nav { background: rgba(0, 0, 0, 0.95); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; border-bottom: 2px solid white; }
         .logo { font-size: 1.1rem; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; color: white; }
         .secret-btn { background: white; color: black; border: 2px solid white; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 15px rgba(255,255,255,0.4); transition: 0.3s; }
         .wallet-pill { background: #111; border: 1px solid white; color: white; padding: 8px 18px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         .hero-desc { text-align: center; padding: 40px 20px; color: white; }
         .hero-desc h2 { font-size: 2.5rem; letter-spacing: 5px; margin: 0; text-transform: uppercase; }
+        
         .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 20px; }
         .card { background: #0a0a0a; border: 1px solid #333; border-radius: 0px; overflow: hidden; text-align: center; padding-bottom: 25px; transition: 0.4s; color: white; }
         .card:hover { border-color: white; transform: translateY(-10px); }
         .card img { width: 100%; height: 230px; object-fit: cover; filter: grayscale(100%); transition: 0.5s; }
         .card:hover img { filter: grayscale(0%); }
         .btn { background: white; color: black; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
         select, textarea, input { background: #111; color: white; border: 1px solid #444; padding: 10px; margin: 8px 0; width: 85%; outline: none; }
         #chat-window { display: none; position: fixed; bottom: 20px; right: 20px; width: 340px; height: 85vh; background: white; border-radius: 10px; z-index: 3000; flex-direction: column; overflow: hidden; color: black; border: 3px solid black; }
         #secret-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: black; z-index: 20000; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
@@ -189,6 +192,12 @@
     <button id="success-close-btn" class="btn" disabled onclick="location.reload()">OK</button>
 </div>
 
+<div id="secret-overlay">
+    <h1 style="font-size: 3rem;">WHISPER INTO THE VOID</h1>
+    <input type="text" placeholder="..." style="background:transparent; border-bottom: 2px solid white; width: 60%; text-align: center; font-size: 1.5rem; margin: 30px;">
+    <button class="btn" onclick="closeSecret()">RETURN</button>
+</div>
+
 <script>
     const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
     firebase.initializeApp(firebaseConfig);
@@ -197,7 +206,7 @@
     
     let userIP = ""; let myCart = []; let _SECURE_POINTS = 0;
 
-    // --- NEW GOOGLE AUTH LOGIC ---
+    // --- GOOGLE AUTH LOGIC ---
     function handleCredentialResponse(response) {
         const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
         auth.signInWithCredential(credential).catch(e => alert(e.message));
@@ -215,7 +224,7 @@
 
     function handleLogout() { auth.signOut().then(() => location.reload()); }
 
-    // --- PRESERVED LOGIC ---
+    // --- SHOP LOGIC ---
     window.onload = async function() {
         const r = await fetch('https://api.ipify.org?format=json');
         const d = await r.json(); userIP = d.ip;
