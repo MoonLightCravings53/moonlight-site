@@ -8,305 +8,253 @@
     <meta property="og:title" content="MoonlightCravings | Premium Bakery">
     <meta property="og:description" content="🌙 Premium treats for every occasion. 🌙">
     <meta property="og:image" content="https://i.postimg.cc/1X6FLsmV/614595661_1819368908769275_8442615453582945422_n.png">
-    <meta property="og:type" content="website">
-
+    
     <link rel="icon" href="https://i.postimg.cc/vxYDnR6G/icon.png">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
     <style>
         :root { 
             --black: #050505;
-            --dark-grey: #121212;
-            --venom-white: #ffffff;
+            --white: #ffffff;
+            --grey: #1a1a1a;
         }
         
         body { 
             margin: 0; font-family: 'Georgia', serif; 
-            background: var(--black); color: var(--venom-white); 
+            background: var(--black); color: var(--white); 
             -webkit-user-select: none; user-select: none; 
-            overflow-x: hidden; position: relative; min-height: 100vh;
+            overflow-x: hidden; min-height: 100vh;
         }
 
-        /* Initial Device Detector */
-        #device-detector {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 40000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; border: 5px solid white;
-        }
-
-        /* Rotation Prompt */
-        #rotate-prompt {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98); z-index: 50000;
-            flex-direction: column; justify-content: center; align-items: center; text-align: center;
-            color: white; padding: 20px;
-        }
-
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
-        .floating-item { position: absolute; font-size: 2rem; opacity: 0.1; animation: moveAcross 15s linear infinite; color: white; }
-        
-        @keyframes moveAcross { 
-            from { transform: translate(-100px, -100px) rotate(0deg); } 
-            to { transform: translate(110vw, 110vh) rotate(360deg); } 
-        }
-
-        nav { 
-            background: rgba(0, 0, 0, 0.95);
-            padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; 
-            position: sticky; top:0; z-index:100; border-bottom: 2px solid white;
-        }
-        .logo { font-size: 1.1rem; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; color: white; }
-
-        .secret-btn {
-            background: white; color: black; border: 2px solid white;
-            padding: 8px 16px; border-radius: 4px; cursor: pointer;
-            font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(255,255,255,0.4); transition: 0.3s;
-        }
-        .secret-btn:hover { background: black; color: white; box-shadow: 0 0 25px white; }
-
-        .wallet-pill { 
-            background: #111; border: 1px solid white;
-            color: white; padding: 8px 18px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 8px;
-        }
-
-        .hero-desc { text-align: center; padding: 40px 20px; color: white; }
-        .hero-desc h2 { font-size: 2.5rem; letter-spacing: 5px; margin: 0; text-transform: uppercase; }
-
+        /* Responsive Grid: 1 column on mobile, 2 on tablets, 3+ on desktop */
         .container { 
             max-width: 1200px; margin: auto; display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; padding: 20px;
         }
-        
+
+        /* Device Detectors */
+        #device-detector, #rotate-prompt {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 50000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; border: 5px solid white; box-sizing: border-box;
+        }
+
+        #rotate-prompt { display: none; background: rgba(0,0,0,0.95); }
+
+        /* Navigation */
+        nav { 
+            background: rgba(0, 0, 0, 0.95); padding: 15px;
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top:0; z-index:100; border-bottom: 2px solid white;
+        }
+        .logo { font-size: 1rem; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* Product Cards */
         .card { 
-            background: #0a0a0a; border: 1px solid #333; border-radius: 0px; 
-            overflow: hidden; text-align: center; padding-bottom: 25px;
-            transition: 0.4s; color: white; 
+            background: #0a0a0a; border: 1px solid #333; 
+            text-align: center; padding-bottom: 20px; transition: 0.3s;
         }
-        .card:hover { border-color: white; transform: translateY(-10px); }
-        .card img { width: 100%; height: 230px; object-fit: cover; filter: grayscale(100%); transition: 0.5s; }
+        .card:hover { border-color: white; }
+        .card img { width: 100%; height: 200px; object-fit: cover; filter: grayscale(100%); transition: 0.5s; }
         .card:hover img { filter: grayscale(0%); }
-        
-        .btn { background: white; color: black; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn:hover { background: #888; }
 
-        select, textarea, input { background: #111; color: white; border: 1px solid #444; padding: 10px; margin: 8px 0; width: 85%; outline: none; }
+        /* Inputs & Buttons */
+        .btn { background: white; color: black; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn:hover { background: #bbb; }
+        select, textarea, input { background: #111; color: white; border: 1px solid #444; padding: 10px; margin: 5px 0; width: 90%; }
 
-        #chat-window { display: none; position: fixed; bottom: 20px; right: 20px; width: 340px; height: 85vh; background: white; border-radius: 10px; z-index: 3000; flex-direction: column; overflow: hidden; color: black; border: 3px solid black; }
-        #secret-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: black; z-index: 20000; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        #order-success-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 2px solid white; color: white; padding: 30px; z-index: 10000; width: 300px; text-align: center; }
+        /* Cart Window - Responsive Width */
+        #chat-window { 
+            display: none; position: fixed; bottom: 20px; right: 20px; 
+            width: 350px; max-width: 90vw; height: 80vh; 
+            background: white; color: black; z-index: 4000;
+            flex-direction: column; border: 3px solid black; border-radius: 10px;
+        }
+
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .floating-item { position: absolute; font-size: 1.5rem; opacity: 0.1; animation: move 20s linear infinite; }
+        @keyframes move { from { transform: translate(-10vw, -10vh); } to { transform: translate(110vw, 110vh); } }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
 <div id="device-detector">
-    <h1 style="letter-spacing: 10px;">SYSTEM START</h1>
-    <p>PICK YOUR INTERFACE</p>
-    <div style="display: flex; gap: 20px; margin-top: 20px;">
-        <button class="btn" onclick="setResolution('mobile')">MOBILE</button>
-        <button class="btn" onclick="setResolution('pc')">COMPUTER</button>
-    </div>
+    <h1>SYSTEM START</h1>
+    <p>SELECT YOUR DEVICE</p>
+    <button class="btn" onclick="handleDevice('mobile')">MOBILE</button>
+    <button class="btn" onclick="handleDevice('pc')">COMPUTER</button>
 </div>
 
 <div id="rotate-prompt">
-    <h1 style="font-size: 3.5rem;">🔄</h1>
+    <h1>🔄</h1>
     <h2>PLEASE ROTATE HORIZONTAL</h2>
-    <p>Turn your phone sideways to view the full bakery menu and order buttons.</p>
-    <button class="btn" style="margin-top: 20px;" onclick="closeRotatePrompt()">I AM ROTATED</button>
+    <p>We recommend landscape mode for the best ordering experience.</p>
+    <button class="btn" onclick="closeRotate()">I'M READY</button>
 </div>
 
 <div class="bg-animation" id="bg-elements"></div>
 
 <nav>
-    <div style="display:flex; align-items:center; gap:15px;">
-        <div class="logo">MOONLIGHTCRAVINGS</div>
-        <button class="secret-btn" onclick="openSecret()">SECRET?</button>
-    </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-        <div class="wallet-pill">MP <span id="user-points">0</span></div>
-        <div onclick="openCart()" style="cursor:pointer; font-size:1.5rem">🛒<span id="cart-count" style="background:white; color:black; padding:2px 6px; border-radius:50%; font-size:0.8rem">0</span></div>
+    <div class="logo">MOONLIGHTCRAVINGS</div>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <div style="border:1px solid white; padding:5px 10px;">MP: <span id="user-points">0</span></div>
+        <div onclick="toggleCart()" style="cursor:pointer; font-size:1.2rem;">🛒 <span id="cart-count">0</span></div>
     </div>
 </nav>
-
-<div class="hero-desc">
-    <h2>PREMIUM CRAVINGS.</h2>
-    <p>NO PRESERVATIVES. DARK ELEGANCE.</p>
-</div>
 
 <div class="container">
     <div class="card">
         <img id="cake-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
         <h3>Premium Cakes</h3>
-        <select id="cake-select" onchange="checkFunfetti(this)">
-            <optgroup label="Standard">
-                <option value="500" data-label="0.5kg Lemon Cake">Lemon: 0.5kg - ₹500</option>
-                <option value="999" data-label="1kg Lemon Cake">Lemon: 1kg - ₹999</option>
-                <option value="500" data-label="0.5kg Chocolate Cake">Chocolate: 0.5kg - ₹500</option>
-                <option value="500" data-label="0.5kg Vanilla Cake">Vanilla: 0.5kg - ₹500</option>
-                <option value="500" data-label="0.5kg Black Forest Cake">Black Forest: 0.5kg - ₹500</option>
-                <option value="500" data-label="0.5kg Funfetti Cake">Funfetti: 0.5kg - ₹500</option>
-            </optgroup>
-            <optgroup label="Special">
-                <option value="600" data-label="0.5kg Dark Chocolate Cake">Dark Chocolate: 0.5kg - ₹600</option>
-                <option value="600" data-label="0.5kg Orange Cake">Orange: 0.5kg - ₹600</option>
-                <option value="350" data-label="0.5kg Banana Cake">Banana Cake: 0.5kg - ₹350</option>
-            </optgroup>
+        <select id="cake-select" onchange="updateCakeImg(this)">
+            <option value="500" data-label="0.5kg Lemon Cake">Lemon (0.5kg) - ₹500</option>
+            <option value="999" data-label="1kg Lemon Cake">Lemon (1kg) - ₹999</option>
+            <option value="500" data-label="0.5kg Chocolate Cake">Chocolate (0.5kg) - ₹500</option>
+            <option value="500" data-label="0.5kg Black Forest">Black Forest - ₹500</option>
+            <option value="500" data-label="0.5kg Funfetti">Funfetti - ₹500</option>
         </select>
-        <button class="btn" onclick="addToCartBySelect('cake-select')">Add to Cart</button>
+        <button class="btn" onclick="addToCart('cake-select')">Add to Cart</button>
     </div>
 
     <div class="card">
-        <img id="cupcake-img" src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
+        <img src="https://images.unsplash.com/photo-1519869325930-281384150729?w=400">
         <h3>Cupcakes (Box of 5)</h3>
-        <select id="cupcake-select" onchange="updateImage(this, 'cupcake-img')">
+        <select id="cupcake-select">
             <option value="200" data-label="5x Vanilla Cupcakes">Vanilla - ₹200</option>
             <option value="200" data-label="5x Chocolate Cupcakes">Chocolate - ₹200</option>
-            <option value="200" data-label="5x Lemon Cupcakes">Lemon - ₹200</option>
             <option value="275" data-label="5x Blueberry Cupcakes">Blueberry - ₹275</option>
         </select>
-        <button class="btn" onclick="addToCartBySelect('cupcake-select')">Add to Cart</button>
+        <button class="btn" onclick="addToCart('cupcake-select')">Add to Cart</button>
     </div>
 
     <div class="card">
-        <img id="treat-img" src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400">
-        <h3>Dacquoise & Macarons</h3>
-        <select id="treat-select" onchange="updateImage(this, 'treat-img')">
-            <option value="200" data-label="6pc Almond Dacquoise">Almond Dacquoise (6pcs) - ₹200</option>
-            <option value="250" data-label="6pc Pistachio Dacquoise">Pistachio Dacquoise (6pcs) - ₹250</option>
-            <option value="200" data-label="10pc Macarons">Macarons (10pcs) - ₹200</option>
-        </select>
-        <button class="btn" onclick="addToCartBySelect('treat-select')">Add to Cart</button>
-    </div>
-
-    <div class="card">
-        <img id="cookie-img" src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
-        <h3>Cookie Boxes (8 pcs)</h3>
-        <select id="cookie-select" onchange="updateImage(this, 'cookie-img')">
+        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400">
+        <h3>Cookie Boxes</h3>
+        <select id="cookie-select">
             <option value="200" data-label="8x Butter Cookies">Butter Cookies - ₹200</option>
-            <option value="200" data-label="8x Sugar Cookies">Sugar Cookies - ₹200</option>
-            <option value="240" data-label="8x Choco chip Cookies">Choco chip - ₹240</option>
+            <option value="240" data-label="8x Choco-chip">Choco-chip - ₹240</option>
         </select>
-        <button class="btn" onclick="addToCartBySelect('cookie-select')">Add to Cart</button>
+        <button class="btn" onclick="addToCart('cookie-select')">Add to Cart</button>
     </div>
 
     <div class="card">
-        <img id="snack-img" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
+        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
         <h3>Bakery Snacks</h3>
-        <select id="snack-select" onchange="updateImage(this, 'snack-img')">
-            <option value="180" data-label="10pc Donut Holes">Donut Holes (10pcs) - ₹180</option>
-            <option value="150" data-label="6pc Churros">Churros (6pcs) - ₹150</option>
-            <option value="240" data-label="6pc Brownies">Brownies (6pcs) - ₹240</option>
+        <select id="snack-select">
+            <option value="180" data-label="10pc Donut Holes">Donut Holes - ₹180</option>
+            <option value="240" data-label="6pc Brownies">Brownies - ₹240</option>
         </select>
-        <button class="btn" onclick="addToCartBySelect('snack-select')">Add to Cart</button>
+        <button class="btn" onclick="addToCart('snack-select')">Add to Cart</button>
     </div>
 
-    <div class="card" style="display:flex; flex-direction:column; justify-content:center; padding: 20px;">
-        <h3>✨ Custom Requests</h3>
-        <textarea id="custom-req" placeholder="Describe your dream treat..."></textarea>
-        <button class="btn" onclick="addCustomToCart()">Add Custom Order</button>
+    <div class="card" style="padding: 20px;">
+        <h3>✨ Custom Orders</h3>
+        <textarea id="custom-req" placeholder="Describe your custom cake or bulk order details..."></textarea>
+        <button class="btn" onclick="addCustom()">Add Custom to Cart</button>
     </div>
 </div>
 
 <div id="chat-window">
-    <div style="background:#000; color:white; padding:15px; display:flex; justify-content:space-between;"><h4>🛒 YOUR CART</h4><button onclick="toggleChatWindow()" style="background:none; color:white; border:none; cursor:pointer;">✕</button></div>
-    <div style="padding:20px; overflow-y:auto; flex:1;">
-        <div id="cart-items"></div><hr>
-        <div style="font-weight:bold; margin:10px 0; font-size:1.2rem;">Total: ₹<span id="cart-total-val">0</span></div>
-        <input type="text" id="c-name" placeholder="Full Name">
+    <div style="background:black; color:white; padding:15px; display:flex; justify-content:space-between;">
+        <span>YOUR CART</span>
+        <button onclick="toggleCart()" style="color:white; background:none; border:none;">✕</button>
+    </div>
+    <div style="padding:15px; overflow-y:auto; flex:1;" id="cart-list"></div>
+    <div style="padding:15px; border-top:1px solid #ddd;">
+        <div style="font-weight:bold; margin-bottom:10px;">Total: ₹<span id="cart-total">0</span></div>
+        <input type="text" id="c-name" placeholder="Name">
         <input type="text" id="c-phone" placeholder="WhatsApp Number">
-        <select id="c-method" style="width:100%"><option value="Delivery">🚀 Delivery</option><option value="Pickup">🏪 Pickup</option></select>
-        <input type="text" id="c-addr" placeholder="Address">
-        <button class="btn" style="width:100%; margin-top:10px; background:black; color:white; border:2px solid black;" onclick="submitOrder()">Place Order</button>
+        <input type="text" id="c-addr" placeholder="Delivery Address">
+        <button class="btn" style="width:100%; background:black; color:white;" onclick="placeOrder()">Submit Order</button>
     </div>
 </div>
 
-<div id="order-success-modal">
-    <h2>ORDER PLACED</h2>
-    <p>Check WhatsApp for confirmation.</p>
-    <p style="font-size:0.8rem;">Processing in: <span id="timer-sec">10</span>s</p>
-    <button id="success-close-btn" class="btn" disabled onclick="location.reload()">OK</button>
-</div>
-
-<div id="secret-overlay">
-    <h1 style="font-size: 3rem;">WHISPER INTO THE VOID</h1>
-    <input type="text" placeholder="..." style="background:transparent; border-bottom: 2px solid white; width: 60%; text-align: center; font-size: 1.5rem; margin: 30px;">
-    <button class="btn" onclick="closeSecret()">RETURN</button>
-</div>
-
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", authDomain: "moonlight-cravings.firebaseapp.com", projectId: "moonlight-cravings", storageBucket: "moonlight-cravings.firebasestorage.app", messagingSenderId: "222974574228", appId: "1:222974574228:web:47bed645deedf5788bbe81" };
+    // Firebase Init
+    const firebaseConfig = { apiKey: "AIzaSyBLvz14iffabRCLRc3FuDvqhCvN5qs3a84", projectId: "moonlight-cravings" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    let userIP = ""; let myCart = []; let _SECURE_POINTS = 0;
 
-    window.onload = async function() {
-        const r = await fetch('https://api.ipify.org?format=json');
-        const d = await r.json(); userIP = d.ip;
-        db.collection("users").doc(userIP).onSnapshot(doc => { if(doc.exists) { _SECURE_POINTS = doc.data().points || 0; document.getElementById('user-points').innerText = _SECURE_POINTS; } });
-        createFloatingBackground();
-    };
+    let cart = [];
+    let userIP = "Guest";
 
-    function setResolution(type) {
+    function handleDevice(type) {
         document.getElementById('device-detector').style.display = 'none';
-        if(type === 'mobile') { 
-            document.getElementById('rotate-prompt').style.display = 'flex';
-        }
-    }
-    function closeRotatePrompt() { document.getElementById('rotate-prompt').style.display = 'none'; }
-
-    function createFloatingBackground() { 
-        const bg = document.getElementById('bg-elements');
-        for(let i=0; i<15; i++) { 
-            const span = document.createElement('span'); span.className = 'floating-item'; span.innerText = '⚫'; 
-            span.style.left = Math.random() * 100 + 'vw'; span.style.top = Math.random() * 100 + 'vh'; bg.appendChild(span);
-        } 
+        if(type === 'mobile') document.getElementById('rotate-prompt').style.display = 'flex';
     }
 
-    function addToCartBySelect(id) { 
-        const el = document.getElementById(id); const label = el.options[el.selectedIndex].getAttribute('data-label');
-        myCart.push({ name: label, price: parseInt(el.value) }); renderCart();
+    function closeRotate() { document.getElementById('rotate-prompt').style.display = 'none'; }
+
+    function addToCart(id) {
+        const el = document.getElementById(id);
+        const item = {
+            name: el.options[el.selectedIndex].getAttribute('data-label'),
+            price: parseInt(el.value)
+        };
+        cart.push(item);
+        updateCartUI();
     }
 
-    function addCustomToCart() { 
-        const req = document.getElementById('custom-req').value; if(!req) return alert("What are your requirements?");
-        myCart.push({ name: "CUSTOM: " + req, price: 0 }); renderCart(); document.getElementById('custom-req').value = "";
+    function addCustom() {
+        const val = document.getElementById('custom-req').value;
+        if(!val) return alert("Please enter details");
+        cart.push({ name: "CUSTOM: " + val, price: 0 });
+        document.getElementById('custom-req').value = "";
+        updateCartUI();
     }
 
-    function renderCart() {
-        document.getElementById('cart-count').innerText = myCart.length;
-        let t = 0; document.getElementById('cart-items').innerHTML = myCart.map((item, i) => { t += item.price; return `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${item.name}</span><span>₹${item.price}</span></div>`; }).join('');
-        document.getElementById('cart-total-val').innerText = t;
+    function updateCartUI() {
+        document.getElementById('cart-count').innerText = cart.length;
+        let total = 0;
+        const html = cart.map(item => {
+            total += item.price;
+            return `<div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:5px;">
+                        <span>${item.name}</span><span>₹${item.price}</span>
+                    </div>`;
+        }).join('');
+        document.getElementById('cart-list').innerHTML = html;
+        document.getElementById('cart-total').innerText = total;
     }
 
-    async function submitOrder() {
-        const n = document.getElementById('c-name').value; const p = document.getElementById('c-phone').value;
-        if(!n || !p || myCart.length === 0) return alert("Fill all details!");
-        await db.collection("orders").add({ name: n, phone: p, items: myCart.map(i => i.name).join(", "), price: document.getElementById('cart-total-val').innerText, customerIP: userIP, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-        startSuccessCountdown();
+    function toggleCart() {
+        const win = document.getElementById('chat-window');
+        win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
     }
 
-    function startSuccessCountdown() {
-        document.getElementById('order-success-modal').style.display = 'block';
-        let tl = 10; const itv = setInterval(() => { tl--; document.getElementById('timer-sec').innerText = tl; if(tl<=0){ clearInterval(itv); document.getElementById('success-close-btn').disabled = false; } }, 1000);
+    async function placeOrder() {
+        const name = document.getElementById('c-name').value;
+        const phone = document.getElementById('c-phone').value;
+        if(!name || !phone || cart.length === 0) return alert("Missing details or empty cart");
+
+        await db.collection("orders").add({
+            name, phone, 
+            items: cart.map(i => i.name).join(", "),
+            total: document.getElementById('cart-total').innerText,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        alert("Order Placed! Check WhatsApp for confirmation.");
+        location.reload();
     }
 
-    function checkFunfetti(el) {
+    function updateCakeImg(el) {
         const label = el.options[el.selectedIndex].getAttribute('data-label');
-        const map = { "Black Forest": "https://i.postimg.cc/W3PvhrFk/Black-forest.png", "Dark Chocolate": "https://i.postimg.cc/hvCJQTkL/Dark-Chocolate-Cake.png", "Orange": "https://i.postimg.cc/L6gN0F0F/Orange-cake.jpg", "Funfetti": "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg", "Vanilla": "https://i.postimg.cc/mDJBBq3g/Vanilla-Cake.png", "Lemon": "https://i.postimg.cc/hvmgjrMs/Lemon-cake.png", "Banana": "https://i.postimg.cc/xdj0RLTT/Bannana-Cake.png" };
-        for (let k in map) { if(label.includes(k)) { document.getElementById('cake-img').src = map[k]; return; } }
+        const img = document.getElementById('cake-img');
+        if(label.includes("Lemon")) img.src = "https://i.postimg.cc/hvmgjrMs/Lemon-cake.png";
+        if(label.includes("Black Forest")) img.src = "https://i.postimg.cc/W3PvhrFk/Black-forest.png";
+        if(label.includes("Funfetti")) img.src = "https://i.postimg.cc/R0GsjwSn/Fun-fetty.jpg";
     }
 
-    function updateImage(sel, id) {
-        const label = sel.options[sel.selectedIndex].getAttribute('data-label');
-        const map = { "Donut": "https://i.postimg.cc/pXjYMKVW/Donut-holes.jpg", "Brownies": "https://i.postimg.cc/jqmQ1Mb8/brownies.jpg", "Churros": "https://i.postimg.cc/Qx7kZc8R/Churros.jpg", "Butter": "https://i.postimg.cc/k4Fd84Ky/butter-cookies.jpg", "Choco chip": "https://i.postimg.cc/NFHCTC3y/Chocolate-chip-cookies.jpg", "Sugar": "https://i.postimg.cc/J4jdzg3p/Sugar-cookies.jpg", "Macarons": "https://i.postimg.cc/yY7rWjfx/Macarons.jpg" };
-        for (let k in map) { if(label.includes(k)) { document.getElementById(id).src = map[k]; return; } }
+    // BG Animation
+    const bg = document.getElementById('bg-elements');
+    for(let i=0; i<15; i++) {
+        const s = document.createElement('span'); s.className = 'floating-item'; s.innerText = '🌙';
+        s.style.left = Math.random() * 100 + 'vw'; s.style.top = Math.random() * 100 + 'vh';
+        bg.appendChild(s);
     }
-
-    function toggleChatWindow() { const w = document.getElementById('chat-window'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; }
-    function openCart() { toggleChatWindow(); }
-    function openSecret() { document.getElementById('secret-overlay').style.display = 'flex'; }
-    function closeSecret() { document.getElementById('secret-overlay').style.display = 'none'; }
 </script>
 </body>
 </html>
